@@ -42,6 +42,7 @@ class SuperAdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+
         return $panel->default()
                         ->id('admin')
                         ->colors([
@@ -71,6 +72,7 @@ class SuperAdminPanelProvider extends PanelProvider
                         ->plugins([
                             FilamentShieldPlugin::make(),
                             FilamentSocialitePlugin::make()
+
                             // (required) Add providers corresponding with providers in `config/services.php`.
                             ->setProviders([
                                 'google' => [
@@ -80,11 +82,11 @@ class SuperAdminPanelProvider extends PanelProvider
                                     // (optional) Button color override, default: 'gray'.
                                     'color' => 'primary',
                                     // (optional) Button style override, default: true (outlined).
-                                    'outlined' => false,
+                                    'outlined' => true,
                                 ],
                             ])
                             // (optional) Enable/disable registration of new (socialite-) users.
-                            ->setRegistrationEnabled(true)
+                            ->setRegistrationEnabled(false)
                             // (optional) Enable/disable registration of new (socialite-) users using a callback.
                             // In this example, a login flow can only continue if there exists a user (Authenticatable) already.
                             ->setRegistrationEnabled(fn(string $provider, SocialiteUserContract $oauthUser, ?Authenticatable $user) => (bool) $user)
@@ -101,9 +103,9 @@ class SuperAdminPanelProvider extends PanelProvider
                         ])
                         ->path('admin')
                         ->registration(Register::class)
-                        ->login()
+                        ->login(\App\Filament\Pages\Auth\Login::class)
                         ->emailVerification()
-                        ->profile()
+                        ->profile(EditProfile::class)
                         ->userMenuItems([
                             'profile' => MenuItem::make()->url(fn(): string => EditProfile::getUrl())
                         ])

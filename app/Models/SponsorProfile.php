@@ -25,5 +25,10 @@ class SponsorProfile extends Model implements HasMedia
     ];
 
     protected $guarded = [];
-    
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -20,6 +20,8 @@ use Filament\{
     Forms\Components\Textarea,
     Forms\Components\TextInput,
     Forms\Form,
+    Infolists\Components\Section,
+    Infolists\Components\TextEntry,
     Notifications\Notification,
     Resources\Resource,
     Tables,
@@ -145,7 +147,6 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                             if (!auth()->user()->can('update_publishing::schedule')) {
                                 return null;
                             }
-                           
                         })
                         ->filters([
                                 //
@@ -154,18 +155,26 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                             Tables\Actions\EditAction::make()
                             ->visible(auth()->user()->can('update_publishing::schedule')),
                             Tables\Actions\ViewAction::make()
+                            ->infolist([
+                                Section::make()
+                                ->columns(2)
+                                ->schema([
+                                    TextEntry::make('film_title'),
+                                    TextEntry::make('release_date'),
+                                    TextEntry::make('film_type.genre_name'),
+                                    TextEntry::make('sponsor.organization_name'),
+                                    TextEntry::make('creator.name'),
+                                    TextEntry::make('synopsis'),
+                                    
+                                    
+                                    
+                                ])
+                            ])
                             ->fillForm(function (PublishingSchedule $schedule) {
                                 $data = $schedule->toArray();
 
                                 return $data;
-                            })->form([
-                                TextInput::make('film_title')
-                                ->required()
-                                ->maxLength(255),
-                                DateTimePicker::make('release_date')
-                                ->label('Premier On'),
-                                Textarea::make('synopsis')->label('Synopsis')->columnSpanFull()->nullable()
-                            ]),
+                            }),
                             Tables\Actions\Action::make('upload_to_vimeo')
                             ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
                             ->requiresConfirmation(function (PublishingSchedule $schedule) {

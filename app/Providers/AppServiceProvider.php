@@ -25,13 +25,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-
-        FilamentSocialiteFacade::setCreateUserCallback(fn(string $provider, SocialiteUserContract $oauthUser, FilamentSocialite $socialite) => $socialite->getUserModelClass()::create([
-                    'name' => $oauthUser->getName(),
-                    'email' => $oauthUser->getEmail(),
-        ]));
-
-        FilamentSocialiteFacade::setUserResolver(fn(string $provider, SocialiteUserContract $oauthUser, FilamentSocialite $socialite) => dd([$socialite,$oauthUser]));
+        
     }
 }

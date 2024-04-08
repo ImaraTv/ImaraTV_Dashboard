@@ -35,4 +35,9 @@ class CreatorProfile extends Model implements HasMedia, FilamentUser
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location');
+    }
 }

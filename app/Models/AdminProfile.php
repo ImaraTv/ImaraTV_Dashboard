@@ -22,4 +22,9 @@ class AdminProfile extends Model implements HasMedia
     protected $table = 'admin_profiles';
 
     protected $guarded = [];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

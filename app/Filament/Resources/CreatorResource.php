@@ -15,10 +15,17 @@ use Filament\{
     Forms\Components\Textarea,
     Forms\Components\TextInput,
     Forms\Form,
+    Infolists\Components\Actions,
+    Infolists\Components\ImageEntry,
+    Infolists\Components\Section,
+    Infolists\Components\TextEntry,
     Resources\Resource,
+    Support\Enums\MaxWidth,
     Tables,
+    Tables\Actions\Action,
     Tables\Table
 };
+use Notification;
 use function auth;
 
 class CreatorResource extends Resource
@@ -35,7 +42,7 @@ class CreatorResource extends Resource
     {
         return $form->schema([
                     self::creatorForm()
-        ])->statePath('data');
+                ])->statePath('data');
     }
 
     public static function table(Table $table): Table
@@ -52,6 +59,27 @@ class CreatorResource extends Resource
                         ])
                         ->actions([
                             Tables\Actions\EditAction::make(),
+                            Tables\Actions\ViewAction::make('View Profile')
+                            ->infolist([
+                                Section::make()
+                                    
+                                ->schema([
+                                    ImageEntry::make('profile_picture')->columnSpan(2),
+                                    ImageEntry::make('profile_banner')->columnSpan(2),
+                                    TextEntry::make('name')->columnSpan(2),
+                                    TextEntry::make('email')->columnSpan(2),
+                                    TextEntry::make('mobile_phone')->columnSpan(2),
+                                    TextEntry::make('stage_name')->columnSpan(2),
+                                    TextEntry::make('description')->columnSpan(4),
+                                    TextEntry::make('skills_and_talents')->columnSpan(2),
+                                    TextEntry::make('identification_number')->columnSpan(2),
+                                    TextEntry::make('date_of_birth')->columnSpan(2),
+                                    TextEntry::make('payment_via')->columnSpan(2),
+                                    TextEntry::make('payment_account_number')->columnSpan(2),
+                                    TextEntry::make('kra_pin')->columnSpan(2),
+                                    TextEntry::make('location.location_name')->columnSpan(2)
+                                ])->columns(4)
+                            ])
                         ])
                         ->bulkActions([
                             Tables\Actions\BulkActionGroup::make([
