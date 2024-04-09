@@ -45,6 +45,7 @@ namespace :deploy do
 		execute :php, "artisan route:clear"
 		execute :php, "artisan view:clear"
 		execute :php, "artisan optimize:clear"
+		execute :chown, "-R www-data:www-data #{deploy_to}"
             end
         end
     end

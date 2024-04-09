@@ -74,15 +74,15 @@ class EditProfile extends Page implements HasForms
             ];
             if ($sponsor_form) {
                 $logo = collect($sponsor_form->getMedia('logo'))->last();
-                if($logo){
-                    $d['logo']=$logo->getUrl();
+                if ($logo) {
+                    $d['logo'] = $logo->getUrl();
                 }
-                $this->fdata = array_merge(collect($sponsor_form)->toArray(),$d);
+                $this->fdata = array_merge(collect($sponsor_form)->toArray(), $d);
             } else {
                 $this->fdata = (new SponsorProfile())->toArray();
             }
-            
-            
+
+
             $this->form->fill(
                     $this->fdata
             );
@@ -490,7 +490,7 @@ class EditProfile extends Page implements HasForms
                                     ->icon('heroicon-m-star')
                                     ->form(
                                             [
-                                                SpatieMediaLibraryFileUpload::make('profile_picture')
+                                                FileUpload::make('profile_picture')
                                                 ->image()
                                                 ->nullable()
                                                 ->name('profile_picture')
@@ -505,7 +505,11 @@ class EditProfile extends Page implements HasForms
                                                 ->columnSpan(2),
                                             ]
                                     )->action(function (array $data): void {
-                                        dd($data);
+                                        $this->saveAdminProfile($data);
+                                        Notification::make()
+                                        ->title('Profile updated!')
+                                        ->success()
+                                        ->send();
                                     })
                                     ->closeModalByClickingAway(false),
                                 ])
