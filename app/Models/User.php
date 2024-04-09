@@ -73,4 +73,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
     {
         return [];
     }
+
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            $model->assignRole('creator');
+        });
+    }
 }
