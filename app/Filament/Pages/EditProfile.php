@@ -34,7 +34,7 @@ use Filament\{
 use function __;
 use function auth;
 use function collect;
-use function ddd;
+use function storage_path;
 
 class EditProfile extends Page implements HasForms
 {
@@ -42,6 +42,10 @@ class EditProfile extends Page implements HasForms
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
+    protected static ?string $title = 'My Profile';
+
+    public static ?string $slug = 'my-profile';
 
     protected static string $view = 'filament.pages.edit-profile';
 
@@ -60,7 +64,7 @@ class EditProfile extends Page implements HasForms
 
     public static function getLabel(): string
     {
-        return __('filament-panels::pages/auth/edit-profile.label');
+        return 'My Profile';
     }
 
     public function mount(): void
@@ -88,7 +92,7 @@ class EditProfile extends Page implements HasForms
             );
         }
         if (auth()->user()->hasRole('creator')) {
-
+            self::$model = CreatorProfile::class;
             $creator_form = CreatorProfile::with(['user', 'location'])->where('user_id', auth()->id())->first();
             if ($creator_form) {
 
@@ -105,11 +109,7 @@ class EditProfile extends Page implements HasForms
                 if ($banner) {
                     $d['profile_banner'] = $banner->getUrl();
                 }
-                $v = collect($creator_form)->toArray();
-                $v['media'] = [
-                    'profile_picture' => '',
-                    'profile_banner' => ''
-                ];
+
                 $this->fdata = array_merge(collect($creator_form)->toArray(), $d);
             } else {
                 $this->fdata = (new CreatorProfile())->toArray();

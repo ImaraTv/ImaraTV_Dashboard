@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\{
     Filament\Resources\CreatorProposalResource\Pages,
+    Models\CreatorProfile,
     Models\CreatorProposal,
     Models\FilmGenre,
     Models\FilmTopic,
@@ -29,11 +30,16 @@ use Filament\{
     Tables\Table
 };
 use function auth;
+use function collect;
 
 class CreatorProposalResource extends Resource implements HasShieldPermissions
 {
 
     protected static ?string $model = CreatorProposal::class;
+
+    protected static ?string $modelLabel = 'Film Project';
+
+    public static ?string $slug = 'film-projects';
 
     protected static ?string $navigationIcon = 'heroicon-s-film';
 
@@ -56,13 +62,36 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return self::profileComplete();
+    }
+
+    public static function profileComplete()
+    {
+        if (auth()->user()->hasRole('creator')) {
+            $profile = CreatorProfile::where(['user_id' => auth()->id()])->first();
+            if ($profile) {
+                $nc = collect($profile)->except('deleted_at', 'created_at', 'updated_at')
+                        ->filter(fn($i) => is_null($i) || $i = "" || strlen($i) == 0)
+                        ->count();
+                if ($nc == 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
     public static function form(Form $form): Form
     {
 
         $can_change_status = auth()->user()->can('change_status_creator::proposal');
         $can_assign_sponsor = auth()->user()->can('assign_sponsor_creator::proposal');
-
+        $can_create_proposal = self::profileComplete();
         return $form
+                        ->disabled(!$can_create_proposal)
                         ->schema([
                             Card::make()->schema([
                                 TextInput::make('working_title')->label('Working Title')->columnSpan(4),

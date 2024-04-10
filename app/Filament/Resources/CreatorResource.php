@@ -4,28 +4,26 @@ namespace App\Filament\Resources;
 
 use App\{
     Filament\Resources\CreatorResource\Pages,
-    Models\CreatorProfile
+    Models\CreatorProfile,
+    Models\Location
 };
 use Filament\{
     Forms\Components\Card,
     Forms\Components\DatePicker,
+    Forms\Components\FileUpload,
     Forms\Components\Select,
     Forms\Components\SpatieMediaLibraryFileUpload,
     Forms\Components\TagsInput,
     Forms\Components\Textarea,
     Forms\Components\TextInput,
     Forms\Form,
-    Infolists\Components\Actions,
     Infolists\Components\ImageEntry,
     Infolists\Components\Section,
     Infolists\Components\TextEntry,
     Resources\Resource,
-    Support\Enums\MaxWidth,
     Tables,
-    Tables\Actions\Action,
     Tables\Table
 };
-use Notification;
 use function auth;
 
 class CreatorResource extends Resource
@@ -33,9 +31,9 @@ class CreatorResource extends Resource
 
     protected static ?string $model = CreatorProfile::class;
 
-    public static ?string $label = 'creatorProfile';
+    public static ?string $label = 'Creator Profile';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-m-user-group';
 
 
     public static function form(Form $form): Form
@@ -47,6 +45,7 @@ class CreatorResource extends Resource
 
     public static function table(Table $table): Table
     {
+        
         return $table
                         ->columns([
                             Tables\Columns\TextColumn::make('name'),
@@ -62,7 +61,6 @@ class CreatorResource extends Resource
                             Tables\Actions\ViewAction::make('View Profile')
                             ->infolist([
                                 Section::make()
-                                    
                                 ->schema([
                                     ImageEntry::make('profile_picture')->columnSpan(2),
                                     ImageEntry::make('profile_banner')->columnSpan(2),
@@ -116,14 +114,14 @@ class CreatorResource extends Resource
     {
         return Card::make()->schema(
                         [
-                                    SpatieMediaLibraryFileUpload::make('attachments')
+                                    SpatieMediaLibraryFileUpload::make('profile_picture')
                                     ->name('profile_picture')
-                                    ->label('Profile Picture')
-                                    ->collection('creator_profile')
-                                    ->columnSpan(2),
+                                    ->collection('profile_pictures')
+                                    ->columnSpan(3),
                                     SpatieMediaLibraryFileUpload::make('profile_banner')
-                                    ->collection('creator_profile')
-                                    ->columnSpan(4),
+                                    ->name('profile_banner')
+                                    ->collection('profile_banners')
+                                    ->columnSpan(3),
                                     TextInput::make('name')
                                     ->columnSpan(3),
                                     TextInput::make('stage_name')
@@ -134,6 +132,7 @@ class CreatorResource extends Resource
                                     TextInput::make('mobile_phone')
                                     ->columnSpan(3),
                                     Textarea::make('description')
+                                    ->rows(5)
                                     ->label('About Me')
                                     ->columnSpan(6),
                                     TagsInput::make('skills_and_talents')
@@ -162,11 +161,7 @@ class CreatorResource extends Resource
                                     ->columnSpan(3),
 //                                --
                             Select::make('location')
-                                    ->options([
-                                        'kajiado' => 'Kajiado',
-                                        'nairobi' => 'Nairobi',
-                                        'nakuru' => 'Nakuru',
-                                    ])->columnSpan(3)
+                                    ->options(Location::all()->pluck('location_name', 'id'))->columnSpan(3)
                                     ->label('Location'),
                         ]
                 )->columns(6);

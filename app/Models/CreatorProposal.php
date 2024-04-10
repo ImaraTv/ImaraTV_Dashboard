@@ -14,7 +14,7 @@ use Spatie\MediaLibrary\{
     InteractsWithMedia
 };
 
-class CreatorProposal extends Model implements HasMedia, FilamentUser
+class CreatorProposal extends Model implements HasMedia
 {
 
     use HasFactory,

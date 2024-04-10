@@ -2,12 +2,11 @@
 
 namespace App\Providers;
 
-use DutchCodingCompany\FilamentSocialite\{
-    Facades\FilamentSocialite as FilamentSocialiteFacade,
-    FilamentSocialite
+use Filament\Facades\Filament;
+use Illuminate\Support\{
+    Facades\Blade,
+    ServiceProvider
 };
-use Illuminate\Support\ServiceProvider;
-use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        
     }
 
     /**

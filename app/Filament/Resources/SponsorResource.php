@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\{
+    Filament\Resources\SponsorResource\Pages,
+    Models\FilmTopic,
+    Models\Location,
+    Models\SponsorProfile
+};
+use Filament\{
+    Forms\Components\Card,
+    Forms\Components\SpatieMediaLibraryFileUpload,
+    Forms\Components\TagsInput,
+    Forms\Components\Textarea,
+    Forms\Components\TextInput,
+    Forms\Form,
+    Resources\Resource,
+    Tables,
+    Tables\Table
+};
+use function auth;
+
+class SponsorResource extends Resource
+{
+
+    protected static ?string $model = SponsorProfile::class;
+
+    protected static ?string $navigationIcon = 'heroicon-m-building-office';
+
+
+    public static function sponsorForm()
+    {
+        return Card::make()->schema(
+                        [
+                                    SpatieMediaLibraryFileUpload::make('logo')
+                                    ->image()
+                                    ->name('Organization Logo')
+                                    ->collection('logo')
+                                    ->columnSpan(2)->nullable(),
+//                            --
+                            Textarea::make('about_us')
+                                    ->rows(5)
+                                    ->required()
+                                    ->columnSpan('4')
+                                    ->label('About Us')->nullable(),
+//                            --
+                            TextInput::make('organization_name')
+                                    ->columnSpan(3)
+                                    ->label('Organization Name')->nullable(),
+//                            --
+                            TextInput::make('organization_website')
+                                    ->url()
+                                    ->suffixIcon('heroicon-m-globe-alt')
+                                    ->columnSpan(3)
+                                    ->label('Organization Website')->nullable(),
+//                            --
+                            TagsInput::make('topics_of_interest')
+                                    ->placeholder('Topics of Interst')
+                                    ->suggestions(FilmTopic::all()->pluck('topic_name'))
+                                    ->columnSpanFull()
+                                    ->label('Topics of Interest')->nullable(),
+//                            --
+                            TagsInput::make('locations_of_interest')
+                                    ->suggestions(Location::all()->pluck('location_name'))
+                                    ->separator(',')
+                                    ->placeholder('locations of interest')
+                                    ->separator(',')
+                                    ->columnSpanFull()
+                                    ->label('Locations of Interest')->nullable(),
+//                            --
+                            TextInput::make('contact_person_name')
+                                    ->columnSpan(3)
+                                    ->label('Contact Person Name')->nullable(),
+//                            --
+                            TextInput::make('contact_person_email')
+                                    ->columnSpan(3)
+                                    ->label('Contact Person Email')->email()->nullable(),
+                                    TextInput::make('contact_person_phone')
+                                    ->columnSpan(3)
+                                    ->label('Contact Person Phone')->nullable(),
+//                            --
+                            TextInput::make('contact_person_alt_phone')
+                                    ->columnSpan(3)
+                                    ->label('Contact Person Alt Phone')->nullable(),
+                        ]
+                )->columns(6);
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form
+                        ->schema([
+                                self::sponsorForm()
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        $admins_only = auth()->user()->can('update');
+
+        $query = SponsorProfile::query()->with(['user'])
+                ->whereHas('user', function ($q) {
+            $q->role('sponsor');
+        });
+
+        return $table
+                        ->query($query)
+                        ->columns([
+                            Tables\Columns\TextColumn::make('organization_name'),
+                            Tables\Columns\TextColumn::make('user.name')->label('User Name'),
+                            Tables\Columns\TextColumn::make('user.email')->label('User Email'),
+                            Tables\Columns\TextColumn::make('contact_person_name'),
+                            Tables\Columns\TextColumn::make('contact_person_email'),
+                            Tables\Columns\TextColumn::make('contact_person_phone')
+                        ])
+                        ->filters([
+                                //
+                        ])
+                        ->actions([
+                            Tables\Actions\EditAction::make(),
+                        ])
+                        ->bulkActions([
+                            Tables\Actions\BulkActionGroup::make([
+                                Tables\Actions\DeleteBulkAction::make(),
+                            ]),
+        ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+                //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListSponsors::route('/'),
+            'create' => Pages\CreateSponsor::route('/create'),
+            'edit' => Pages\EditSponsor::route('/{record}/edit'),
+        ];
+    }
+}

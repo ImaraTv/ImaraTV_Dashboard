@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ankitpokhrel/tus-php": "^2.4",
         "bezhansalleh/filament-shield": "^3.2",
         "dutchcodingcompany/filament-socialite": "^1.4",
         "filament/filament": "^3.2",
@@ -18,7 +19,8 @@
         "livewire/livewire": "^3.4",
         "owenvoke/blade-fontawesome": "^2.6",
         "tymon/jwt-auth": "^2.1",
-        "vimeo/vimeo-api": "^2.0"
+        "vimeo/laravel": "^5.9",
+        "vimeo/vimeo-api": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.12",

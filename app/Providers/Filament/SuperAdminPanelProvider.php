@@ -3,12 +3,15 @@
 namespace App\Providers\Filament;
 
 use App\{
+    Filament\Pages\Auth\Login,
     Filament\Pages\Auth\Register,
     Filament\Pages\EditProfile,
+    Models\CreatorProfile,
     Models\SocialiteUser,
     Models\User
 };
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Blade;
 use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
 use Filament\{
     Enums\ThemeMode,
@@ -21,6 +24,7 @@ use Filament\{
     Panel,
     PanelProvider,
     Support\Colors\Color,
+    View\PanelsRenderHook,
     Widgets
 };
 use Illuminate\{
@@ -36,15 +40,40 @@ use Illuminate\{
 use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 use function app_path;
 use function asset;
+use function auth;
+use function collect;
 
 class SuperAdminPanelProvider extends PanelProvider
 {
+
+    public static function profileComplete()
+    {
+        if (auth()->user()->hasRole('creator')) {
+            $profile = CreatorProfile::where(['user_id' => auth()->id()])->first();
+            if ($profile) {
+                $nc = collect($profile)->except('deleted_at', 'created_at', 'updated_at')
+                        ->filter(fn($i) => is_null($i) || $i = "" || strlen($i) == 0)
+                        ->count();
+                if ($nc == 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
 
     public function panel(Panel $panel): Panel
     {
 
         return $panel->default()
                         ->id('admin')
+                        ->renderHook(PanelsRenderHook::TOPBAR_START, function () {
+                            if (!self::profileComplete()) {
+                                $mes = "Please complete your profile to add film projects";
+                                return Blade::render("<div class='bg-gray-400 p-2 rounded-lg text-center text-white w-full'>{$mes}</div>");
+                            }
+                        })
                         ->colors([
                             'danger' => Color::Rose,
                             'gray' => Color::Gray,
@@ -103,7 +132,7 @@ class SuperAdminPanelProvider extends PanelProvider
                         ])
                         ->path('admin')
                         ->registration(Register::class)
-                        ->login(\App\Filament\Pages\Auth\Login::class)
+                        ->login(Login::class)
                         ->emailVerification()
                         ->profile(EditProfile::class)
                         ->userMenuItems([

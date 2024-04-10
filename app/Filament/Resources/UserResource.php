@@ -16,7 +16,10 @@ use Filament\{
     Tables,
     Tables\Table
 };
-use Illuminate\Support\Facades\Hash;
+use Illuminate\{
+    Database\Eloquent\Model,
+    Support\Facades\Hash
+};
 use Spatie\Permission\Models\Role;
 use function auth;
 use function collect;
@@ -27,7 +30,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-m-user';
 
     public ?array $data = [];
 
@@ -96,11 +99,17 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function table(Table $table): Table
     {
+        $query = User::withoutRole(['super_admin']);
+        
         return $table
+                        ->query($query)
                         ->columns([
                             Tables\Columns\TextColumn::make('id')->sortable(),
                             Tables\Columns\TextColumn::make('name')->searchable(),
                             Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
+                            Tables\Columns\TextColumn::make('role')->getStateUsing(function(Model $record){
+                                return collect($record->roles)->filter(fn($i)=>$i->name!='panel_user')->first()?->name;
+                            }),
                             Tables\Columns\TextColumn::make('created_at')->dateTime()
                         ])
                         ->filters([

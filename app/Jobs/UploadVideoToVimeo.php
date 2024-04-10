@@ -10,7 +10,7 @@ use Illuminate\{
     Queue\InteractsWithQueue,
     Queue\SerializesModels
 };
-use Vimeo\Vimeo;
+use Vimeo\Laravel\Facades\Vimeo;
 use function env;
 
 class UploadVideoToVimeo implements ShouldQueue
@@ -49,17 +49,22 @@ class UploadVideoToVimeo implements ShouldQueue
 
     public function upload($file, $name = ""): string
     {
-        $client_id = env('VIMEO_CLIENT_ID');
-        $client_secret = env('VIMEO_CLIENT_SECRET');
-        $token = env('VIMEO_CLIENT_ACCESS');
-        $lib = new Vimeo(client_id: $client_id, client_secret: $client_secret, access_token: $token);
-        if ($this->proposal->vimeo_link != null) {
-            $response = $lib->replace($this->proposal->vimeo_link, $file);
-        } else {
-            $response = $lib->upload($file, ['name' => $name, 'privacy' => ['view' => 'anybody']]);
+
+
+        try {
+
+            if ($this->proposal->vimeo_link != null) {
+
+                $response = Vimeo::replace($this->proposal->vimeo_link, $file);
+            } else {
+                $response = Vimeo::upload($file);
+            }
+            
+            $this->proposal->vimeo_link = $response;
+            $this->proposal->save();
+            return $response;
+        } catch (Exception $exc) {
+            echo $exc->getTraceAsString();
         }
-        $this->proposal->vimeo_link = $response;
-        $this->proposal->save();
-        return $response;
     }
 }
