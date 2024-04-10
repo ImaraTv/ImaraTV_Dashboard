@@ -19,8 +19,8 @@ class CreatorProfile extends Model implements HasMedia
 
     use HasFactory,
         SoftDeletes,
-        InteractsWithMedia,
-        HasPanelShield;
+        InteractsWithMedia
+        ;
 
     protected $casts = [
         'skills_and_talents' => 'array',
