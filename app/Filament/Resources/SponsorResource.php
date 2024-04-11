@@ -91,7 +91,7 @@ class SponsorResource extends Resource
     {
         return $form
                         ->schema([
-                                self::sponsorForm()
+                            self::sponsorForm()
         ]);
     }
 
@@ -141,5 +141,13 @@ class SponsorResource extends Resource
             'create' => Pages\CreateSponsor::route('/create'),
             'edit' => Pages\EditSponsor::route('/{record}/edit'),
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (auth()->user()->hasRole('creator|sponsor')) {
+            return false;
+        }
+        return true;
     }
 }
