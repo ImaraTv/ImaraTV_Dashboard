@@ -12,7 +12,7 @@ return [
      * The maximum file size of an item in bytes.
      * Adding a larger file will result in an exception.
      */
-    'max_file_size' => 1048576, // 1GB
+    'max_file_size' => 1073741824, // 1GB
 
     /*
      * This queue connection will be used to generate derived and responsive images.
