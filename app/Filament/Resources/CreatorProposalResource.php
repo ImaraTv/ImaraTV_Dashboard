@@ -122,7 +122,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 SpatieMediaLibraryFileUpload::make('trailer_upload')
                                 ->collection('trailers')
                                 ->acceptedFileTypes(['video/*'])
-                                ->maxSize(30000)
+                                ->maxSize(config('media-library.max_file_size'))
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('poster_upload')
@@ -132,9 +132,10 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('hd_fil_upload')
+                                ->label('HD file upload')
                                 ->collection('videos')
-                                ->acceptedFileTypes(['video/*'])
-                                ->maxSize(30000)
+                                ->acceptedFileTypes(['video/mp4', 'video/ogg', 'video/webm', 'video/mkv', 'video/*'])
+                                ->maxSize(config('media-library.max_file_size'))
                                 ->columnSpan(8)->nullable(),
 //                                --
                                 Select::make('sponsored_by')
