@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\ProposalStatus as Status;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\{
+    Forms\Components\Checkbox,
     Forms\Components\TextInput,
     Pages\Actions\CreateAction,
     Pages\Page,
@@ -39,6 +40,9 @@ class ProposalStatus extends Page implements HasTable
                         ->name('status')
                         ->required()
                         ->maxLength(255),
+                        Checkbox::make('allow_to_publish')
+                        ->default(false)
+                        ->label('Allow to publish')
                     ])
                     ->using(function (array $data): Status {
                         return Status::create($data);
@@ -54,6 +58,7 @@ class ProposalStatus extends Page implements HasTable
                         ->columns([
                             TextColumn::make('status')
                             ->name('status'),
+                            \Filament\Tables\Columns\CheckboxColumn::make('allow_to_publish'),
                             TextColumn::make('created_at')
                             ->date()
                         ])
@@ -66,7 +71,10 @@ class ProposalStatus extends Page implements HasTable
                                 TextInput::make('status')
                                 ->label('Proposal Status')
                                 ->name('status')
-                                ->maxLength(255)
+                                ->maxLength(255),
+                                Checkbox::make('allow_to_publish')
+                                ->default(false)
+                                ->label('Allow to publish')
                             ])
                             ->using(function (Status $record, array $data): Status {
                                 $record->update($data);

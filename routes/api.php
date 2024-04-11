@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\API\{
     AuthController,
-    CreatorsController
+    CategoriesController,
+    CreatorsController,
+    VideosController
 };
 use Illuminate\Support\Facades\Route;
+use function Safe\date;
 
 /**
  * Description of api
@@ -23,4 +26,7 @@ Route::group([
         });
 Route::group([], function () {
     Route::get('/creators', [CreatorsController::class, 'creators']);
+    Route::get('/videos', [VideosController::class, 'videos']);
+    Route::get('/videos/{id}', [VideosController::class, 'video']);
+    Route::get('/categories', [CategoriesController::class, 'categories']);
 });
