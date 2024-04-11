@@ -134,7 +134,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 SpatieMediaLibraryFileUpload::make('hd_fil_upload')
                                 ->label('HD file upload')
                                 ->collection('videos')
-                                ->acceptedFileTypes(['video/mp4', 'video/ogg', 'video/webm', 'video/mkv', 'video/*'])
+                                ->acceptedFileTypes(['video/*'])
                                 ->maxSize(config('media-library.max_file_size'))
                                 ->columnSpan(8)->nullable(),
 //                                --
