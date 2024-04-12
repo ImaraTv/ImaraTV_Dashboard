@@ -47,9 +47,9 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
         $has_mage = collect($proposal->media)->filter(fn($i) => $i->collection_name === 'posters')->count();
 
         if ($has_mage > 0) {
-            $image = collect($proposal->media)->filter(fn($i) => $i->collection_name === 'posters')->last();
-            if ($image) {
-                $file_path = storage_path() . '/app/public/' . $image->id . '/' . $image->file_name;
+            $model = collect($proposal->media)->filter(fn($i) => $i->collection_name === 'posters')->last();
+            if ($model) {
+                $file_path = storage_path() . '/app/public/' . $model->id . '/' . $model->file_name;
                 if (file_exists($file_path)) {
                     $image = $this->imageToBase64($file_path);
                 }
