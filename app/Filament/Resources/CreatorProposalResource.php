@@ -24,12 +24,14 @@ use Filament\{
     Forms\Get,
     Resources\Resource,
     Tables,
+    Tables\Actions\Action,
     Tables\Columns\TextColumn,
     Tables\Enums\FiltersLayout,
     Tables\Filters\Filter,
     Tables\Filters\SelectFilter,
     Tables\Table
 };
+use Illuminate\Database\Eloquent\Builder;
 use function auth;
 use function collect;
 use function config;
@@ -182,16 +184,41 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
 
         return $table
                         ->filters([
+                            SelectFilter::make('sponsored_by')
+                            ->searchable()
+                            ->preload()
+                            ->label('Sponsor')
+                            ->relationship('sponsor', 'organization_name'),
+                            SelectFilter::make('film_genre')
+                            ->relationship('genre', 'genre_name')
+                            ->label('Genre')
+                            ,
                             SelectFilter::make('status')
-                            ->options([
-                                'draft' => 'Draft',
-                                'reviewing' => 'Reviewing',
-                                'published' => 'Published',
-                            ]),
+                            ->relationship('proposal_status', 'status'),
                             Filter::make('created_at')
-                            ->form([DatePicker::make('date')])
-                                ,
-                                ], layout: FiltersLayout::AboveContent)
+                            ->form([
+                                DatePicker::make('created_from')->label('From'),
+                                DatePicker::make('created_until')->label('To'),
+                            ])
+                            ->columns(2)
+                            ->columnSpan(2)
+                            ->query(function (Builder $query, array $data): Builder {
+                                return $query
+                                ->when(
+                                        $data['created_from'],
+                                        fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                )
+                                ->when(
+                                        $data['created_until'],
+                                        fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                );
+                            })
+                                ], layout: FiltersLayout::AboveContent)->filtersFormColumns(5)
+                        ->filtersTriggerAction(
+                                fn(Action $action) => $action
+                                ->button()
+                                ->label('Filter'),
+                        )
                         ->query($query)
                         ->columns([
                             TextColumn::make('working_title')
@@ -208,9 +235,6 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                             TextColumn::make('created_at')
                             ->label('Date Created')
                             ->date()
-                        ])
-                        ->filters([
-                                //
                         ])
                         ->actions([
                             Tables\Actions\EditAction::make()
