@@ -21,6 +21,7 @@ use Filament\{
     Forms\Components\Textarea,
     Forms\Components\TextInput,
     Forms\Form,
+    Forms\Get,
     Resources\Resource,
     Tables,
     Tables\Columns\TextColumn,
@@ -31,6 +32,7 @@ use Filament\{
 };
 use function auth;
 use function collect;
+use function config;
 
 class CreatorProposalResource extends Resource implements HasShieldPermissions
 {
@@ -100,15 +102,32 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->suggestions(FilmTopic::all()->pluck('topic_name'))
                                 ->label('Topics (Select All Related Topics)')->columnSpan(4)->nullable(),
                                 Textarea::make('synopsis')->label('Synopsis')->columnSpanFull()->nullable(),
-                                TextInput::make('film_budget')->label('Film Budget (KES)')->columnSpan(4)->nullable(),
-                                TextInput::make('film_length')->label('Film Length (Minutes)')->columnSpan(4)->nullable(),
-                                TextInput::make('production_time')->label('Production Time')->columnSpan(4)->nullable(),
-                                Select::make('film_genre')->label('Film Genre')->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(4)->nullable(),
-                                Select::make('film_type')->label('Film Type')->options([
+                                TextInput::make('film_budget')
+                                ->type('number')
+                                ->numeric()
+                                ->label('Film Budget (KES)')
+                                ->columnSpan(4)->nullable(),
+                                TextInput::make('film_length')
+                                ->type('number')
+                                ->numeric()
+                                ->label('Film Length (Minutes)')->columnSpan(4)->nullable(),
+                                TextInput::make('production_time')
+                                ->type('number')
+                                ->numeric()
+                                ->label('Production Time (Days)')->columnSpan(4)->nullable(),
+                                Select::make('film_genre')
+                                ->label('Film Genre  (Leave blank if optional)')
+                                ->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(4)->nullable(),
+                                Select::make('film_type')
+                                ->live()
+                                ->label('Film Type (Free or Premium)')->options([
                                     'free' => 'Free',
                                     'premium' => 'Premium',
                                 ])->columnSpan(4)->nullable(),
-                                TextInput::make('premium_file_price')->label('Premium File Price')->type('number')->columnSpan(4)->nullable(),
+                                TextInput::make('premium_file_price')
+                                ->disabled(fn(Get $get) => $get('film_type') == 'free')
+                                ->label('Premium Film Price per view (KES)')
+                                ->type('number')->columnSpan(4)->nullable(),
                                 SpatieMediaLibraryFileUpload::make('attachments')
                                 ->collection('scripts')
                                 ->acceptedFileTypes(['application/pdf'])
@@ -175,7 +194,8 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ], layout: FiltersLayout::AboveContent)
                         ->query($query)
                         ->columns([
-                            TextColumn::make('working_title'),
+                            TextColumn::make('working_title')
+                            ->label('Working Title'),
                             TextColumn::make('user.name')
                             ->name('user.name'),
                             TextColumn::make('sponsor')
@@ -183,8 +203,10 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                             TextColumn::make('genre')
                             ->name('genre.genre_name'),
                             TextColumn::make('status')
+                            ->label('Proposal Status')
                             ->name('proposal_status.status'),
                             TextColumn::make('created_at')
+                            ->label('Date Created')
                             ->date()
                         ])
                         ->filters([

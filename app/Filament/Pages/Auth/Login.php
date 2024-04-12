@@ -23,6 +23,7 @@ class Login extends BaseLogin
                             ->schema([
                                 $this->getEmailFormComponent(),
                                 $this->getPasswordFormComponent(),
+                                $this->getRememberFormComponent(),
                             ])
                             ->statePath('data'),
             ),

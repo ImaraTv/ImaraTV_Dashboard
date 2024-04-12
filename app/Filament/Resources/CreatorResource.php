@@ -10,7 +10,6 @@ use App\{
 use Filament\{
     Forms\Components\Card,
     Forms\Components\DatePicker,
-    Forms\Components\FileUpload,
     Forms\Components\Select,
     Forms\Components\SpatieMediaLibraryFileUpload,
     Forms\Components\TagsInput,
@@ -24,7 +23,12 @@ use Filament\{
     Tables,
     Tables\Table
 };
+use Illuminate\{
+    Database\Eloquent\Model,
+    Support\Carbon
+};
 use function auth;
+use function ddd;
 
 class CreatorResource extends Resource
 {
@@ -45,7 +49,8 @@ class CreatorResource extends Resource
 
     public static function table(Table $table): Table
     {
-        
+
+        $is_admin = auth()->user()->hasRole('super_admin|admin');
         return $table
                         ->columns([
                             Tables\Columns\TextColumn::make('name'),
@@ -66,16 +71,35 @@ class CreatorResource extends Resource
                                     ImageEntry::make('profile_banner')->columnSpan(2),
                                     TextEntry::make('name')->columnSpan(2),
                                     TextEntry::make('email')->columnSpan(2),
-                                    TextEntry::make('mobile_phone')->columnSpan(2),
+                                    TextEntry::make('mobile_phone')
+                                        ->visible($is_admin)
+                                        ->columnSpan(2),
                                     TextEntry::make('stage_name')->columnSpan(2),
                                     TextEntry::make('description')->columnSpan(4),
                                     TextEntry::make('skills_and_talents')->columnSpan(2),
-                                    TextEntry::make('identification_number')->columnSpan(2),
-                                    TextEntry::make('date_of_birth')->columnSpan(2),
-                                    TextEntry::make('payment_via')->columnSpan(2),
-                                    TextEntry::make('payment_account_number')->columnSpan(2),
-                                    TextEntry::make('kra_pin')->columnSpan(2),
-                                    TextEntry::make('location.location_name')->columnSpan(2)
+                                    TextEntry::make('identification_number')
+                                        ->visible($is_admin)
+                                        ->columnSpan(2),
+                                    TextEntry::make('date_of_birth')
+                                    ->label('Age (Years)')
+                                    ->getStateUsing(function (Model $record) {
+                                        if (!is_null($record->date_of_birth)) {
+                                            $t = Carbon::parse($record->date_of_birth)->age;
+                                            return $t;
+                                        }
+                                    })
+                                    ->columnSpan(2),
+                                    TextEntry::make('payment_via')
+                                            ->visible($is_admin)
+                                            ->columnSpan(2),
+                                    TextEntry::make('payment_account_number')
+                                            ->visible($is_admin)
+                                            ->columnSpan(2),
+                                    TextEntry::make('kra_pin')
+                                            ->visible($is_admin)
+                                            ->columnSpan(2),
+                                    TextEntry::make('location.location_name')
+                                            ->columnSpan(2)
                                 ])->columns(4)
                             ])
                         ])

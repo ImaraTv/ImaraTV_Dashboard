@@ -68,6 +68,8 @@ class SuperAdminPanelProvider extends PanelProvider
 
         return $panel->default()
                         ->id('admin')
+                        ->darkMode(false)
+                        ->favicon(asset('images/favicon.png'))
                         ->renderHook(PanelsRenderHook::TOPBAR_START, function () {
                             if (!self::profileComplete()) {
                                 $mes = "Please complete your profile to add film projects";
