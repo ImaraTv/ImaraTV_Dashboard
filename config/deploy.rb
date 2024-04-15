@@ -36,7 +36,7 @@ namespace :deploy do
         on roles(:app) do
             within release_path  do
 		stage = fetch(:stage)
-                execute :composer, "update --no-dev --quiet" # install dependencies
+                execute :composer, "update --no-dev" # install dependencies
 		execute :chmod, "u+x artisan" # make artisan executable
 		upload! ".env.#{stage}", "#{release_path}/.env"
 		execute :php, "artisan migrate --force --env=#{fetch(:stage)}"
@@ -46,6 +46,7 @@ namespace :deploy do
 		execute :php, "artisan view:clear"
 		execute :php, "artisan optimize:clear"
 		execute :chown, "-R www-data:www-data #{deploy_to}"
+		execute :screen, "-dmS itv /bin/sh -c 'cd #{release_path} && php artisan queue:work'"
             end
         end
     end
