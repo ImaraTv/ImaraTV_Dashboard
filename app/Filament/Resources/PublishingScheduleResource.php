@@ -14,6 +14,7 @@ use App\{
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{
     Forms\Components\Card,
+    Forms\Components\DatePicker,
     Forms\Components\DateTimePicker,
     Forms\Components\Select,
     Forms\Components\TagsInput,
@@ -28,9 +29,15 @@ use Filament\{
     Resources\Resource,
     Tables,
     Tables\Columns\TextColumn,
+    Tables\Enums\FiltersLayout,
+    Tables\Filters\Filter,
+    Tables\Filters\SelectFilter,
     Tables\Table
 };
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{
+    Builder,
+    Model
+};
 use function auth;
 use function dispatch_sync;
 
@@ -122,8 +129,8 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 ])->columnSpan(4)->nullable(),
 //                                --
                                 TextInput::make('premium_film_price')
-                                        ->disabled(fn(Get $get) => $get('film_type') == 'free')
-                                        ->label('Premium Film Price')->type('number')->columnSpan(4)->nullable(),
+                                ->disabled(fn(Get $get) => $get('film_type') == 'free')
+                                ->label('Premium Film Price')->type('number')->columnSpan(4)->nullable(),
 //                                --
                                 Select::make('creator_id')
                                 ->label('Created By')
@@ -154,11 +161,11 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
     {
         return $table
                         ->columns([
-                            TextColumn::make('film_title'),
-                            TextColumn::make('release_date')
+                            TextColumn::make('film_title')->searchable(),
+                            TextColumn::make('release_date')->sortable()
                             ->date(),
-                            TextColumn::make('film_type.genre_name'),
-                            TextColumn::make('sponsor.organization_name'),
+                            TextColumn::make('film_type'),
+                            TextColumn::make('sponsor.organization_name')->searchable(),
                             TextColumn::make('creator.name'),
                         ])
                         ->recordUrl(function () {
@@ -167,8 +174,33 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                             }
                         })
                         ->filters([
-                                //
-                        ])
+                            SelectFilter::make('sponsor_id')
+                            ->searchable()
+                            ->preload()
+                            ->label('Sponsor')
+                            ->relationship('sponsor', 'organization_name'),
+                            SelectFilter::make('film_type')
+                            ->options(['free' => 'free', 'premium' => 'premium'])
+                            ->label('Film Type'),
+                            Filter::make('release_date')
+                            ->form([
+                                DatePicker::make('release_from')->label('From'),
+                                DatePicker::make('release_until')->label('To'),
+                            ])
+                            ->columns(2)
+                            ->columnSpan(2)
+                            ->query(function (Builder $query, array $data): Builder {
+                                return $query
+                                ->when(
+                                        $data['release_from'],
+                                        fn(Builder $query, $date): Builder => $query->whereDate('release_date', '>=', $date),
+                                )
+                                ->when(
+                                        $data['release_until'],
+                                        fn(Builder $query, $date): Builder => $query->whereDate('release_date', '<=', $date),
+                                );
+                            })
+                                ], layout: FiltersLayout::AboveContent)->filtersFormColumns(4)
                         ->actions([
                             Tables\Actions\EditAction::make()
                             ->visible(auth()->user()->can('update_publishing::schedule')),
@@ -179,7 +211,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 ->schema([
                                     TextEntry::make('film_title'),
                                     TextEntry::make('release_date'),
-                                    TextEntry::make('film_type.genre_name'),
+                                    TextEntry::make('film_type'),
                                     TextEntry::make('sponsor.organization_name'),
                                     TextEntry::make('creator.name'),
                                     TextEntry::make('synopsis'),
