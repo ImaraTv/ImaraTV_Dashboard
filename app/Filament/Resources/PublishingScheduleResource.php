@@ -20,6 +20,8 @@ use Filament\{
     Forms\Components\Textarea,
     Forms\Components\TextInput,
     Forms\Form,
+    Forms\Get,
+    Forms\Set,
     Infolists\Components\Section,
     Infolists\Components\TextEntry,
     Notifications\Notification,
@@ -80,10 +82,25 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                         ->schema([
                             Card::make()->schema([
                                 Select::make('proposal_id')
+                                ->live()
+                                ->afterStateUpdated(function (Set $set, ?string $state) {
+                                    $film_project = CreatorProposal::whereId($state)->first();
+                                    if (!$film_project) {
+                                        return null;
+                                    }
+
+                                    $set('film_title', $film_project->working_title);
+                                    $set('synopsis', $film_project->synopsis);
+                                    $set('creator_id', $film_project->user_id);
+                                    $set('sponsor_id', $film_project->sponsored_by);
+                                    $set('topics', explode(',', $film_project->topics));
+                                    $set('film_type', $film_project->film_type);
+                                    $set('premium_film_price', $film_project->premium_film_price);
+                                })
                                 ->label('Select Film')
                                 ->options(
                                         CreatorProposal::all()->pluck('working_title', 'id')
-                                )->live()
+                                )
                                 ->columnSpan(5)
                                 ->nullable(),
 //                            --
@@ -95,7 +112,6 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 ->columnSpan(4)
                                 ->required(),
                                 TagsInput::make('topics')
-                                ->separator(',')
                                 ->suggestions(FilmTopic::all()->pluck('topic_name'))
                                 ->label('Topics (Select All Related Topics)')->columnSpan(4)->nullable(),
 //                                --
@@ -105,7 +121,9 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                     'premium' => 'Premium',
                                 ])->columnSpan(4)->nullable(),
 //                                --
-                                TextInput::make('premium_film_price')->label('Premium Film Price')->type('number')->columnSpan(4)->nullable(),
+                                TextInput::make('premium_film_price')
+                                        ->disabled(fn(Get $get) => $get('film_type') == 'free')
+                                        ->label('Premium Film Price')->type('number')->columnSpan(4)->nullable(),
 //                                --
                                 Select::make('creator_id')
                                 ->label('Created By')
@@ -165,9 +183,6 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                     TextEntry::make('sponsor.organization_name'),
                                     TextEntry::make('creator.name'),
                                     TextEntry::make('synopsis'),
-                                    
-                                    
-                                    
                                 ])
                             ])
                             ->fillForm(function (PublishingSchedule $schedule) {
