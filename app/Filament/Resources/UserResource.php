@@ -9,14 +9,18 @@ use App\{
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{
     Forms,
+    Forms\Components\DatePicker,
     Forms\Form,
     Resources\Pages\CreateRecord,
     Resources\Pages\Page,
     Resources\Resource,
     Tables,
+    Tables\Enums\FiltersLayout,
+    Tables\Filters\Filter,
     Tables\Table
 };
 use Illuminate\{
+    Database\Eloquent\Builder,
     Database\Eloquent\Model,
     Support\Facades\Hash
 };
@@ -99,22 +103,52 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function table(Table $table): Table
     {
-        $query = User::withoutRole(['super_admin']);
-        
+        $query = User::withoutRole(['super_admin'])->with('roles');
+
         return $table
                         ->query($query)
                         ->columns([
                             Tables\Columns\TextColumn::make('id')->sortable(),
                             Tables\Columns\TextColumn::make('name')->searchable(),
                             Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
-                            Tables\Columns\TextColumn::make('role')->getStateUsing(function(Model $record){
-                                return collect($record->roles)->filter(fn($i)=>$i->name!='panel_user')->first()?->name;
+                            Tables\Columns\TextColumn::make('role')->getStateUsing(function (Model $record) {
+                                return collect($record->roles)->filter(fn($i) => $i->name != 'panel_user')->first()?->name;
                             }),
                             Tables\Columns\TextColumn::make('created_at')->dateTime()
                         ])
                         ->filters([
-                                //
-                        ])
+                            Tables\Filters\SelectFilter::make('role')
+                            ->query(function (Builder $query, $data) {
+                                $data = collect($data)->filter(fn($i)=>!is_null($i))->toArray();
+                                
+                                if (!empty($data)) {
+                                    return $query->whereHas('roles', fn($q) => $q->where('id', $data));
+                                }
+                                return $query;
+                            })
+                            ->options(collect(Role::whereNotIn('name', ['super_admin', 'panel_user'])->get())->pluck('name', 'id'))
+                            ->searchable()
+                            ->preload(),
+                            Filter::make('created_at')
+                            ->form([
+                                DatePicker::make('created_from')->label('From'),
+                                DatePicker::make('created_until')->label('To'),
+                            ])
+                            ->columns(2)
+                            ->columnSpan(2)
+                            ->query(function (Builder $query, array $data): Builder {
+                                return $query
+                                ->when(
+                                        $data['created_from'],
+                                        fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                                )
+                                ->when(
+                                        $data['created_until'],
+                                        fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                                );
+                            })
+                                ], layout: FiltersLayout::AboveContent)
+                                ->filtersFormColumns(3)
                         ->actions([
                             Tables\Actions\EditAction::make(),
                         ])
