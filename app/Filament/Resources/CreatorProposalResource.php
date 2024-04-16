@@ -54,7 +54,6 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
     public ?array $data = [];
 
 
-    
     public static function getPermissionPrefixes(): array
     {
         return [
@@ -186,12 +185,12 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         }
 
         return $table
-                ->headerActions([
-                        Tables\Actions\Action::make('Export')
-                        ->action(function(){
-                            return Excel::download(new FilmProjectsExport(), 'fprojects.csv');
-                        })
-                ])
+                        ->headerActions([
+                            Tables\Actions\Action::make('Export')
+                            ->action(function () {
+                                return Excel::download(new FilmProjectsExport(), 'fprojects.csv');
+                            })
+                        ])
                         ->filters([
                             SelectFilter::make('sponsored_by')
                             ->searchable()

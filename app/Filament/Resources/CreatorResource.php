@@ -53,17 +53,17 @@ class CreatorResource extends Resource
 
         $is_admin = auth()->user()->hasRole('super_admin|admin');
         return $table
-                ->headerActions([
-                        Tables\Actions\Action::make('Export')
-                        ->action(function(){
-                            return Excel::download(new CreatorProfiles(), 'creator_pfiles.csv');
-                        })
-                ])
+                        ->headerActions([
+                            Tables\Actions\Action::make('Export')
+                            ->action(function () {
+                                return Excel::download(new CreatorProfiles(), 'creator_pfiles.csv');
+                            })
+                        ])
                         ->columns([
-                            Tables\Columns\TextColumn::make('name'),
-                            Tables\Columns\TextColumn::make('stage_name'),
-                            Tables\Columns\TextColumn::make('email'),
-                            Tables\Columns\TextColumn::make('mobile_phone')
+                            Tables\Columns\TextColumn::make('name')->searchable(),
+                            Tables\Columns\TextColumn::make('stage_name')->searchable(),
+                            Tables\Columns\TextColumn::make('email')->searchable(),
+                            Tables\Columns\TextColumn::make('mobile_phone')->searchable()
                         ])
                         ->filters([
                                 //
@@ -79,14 +79,14 @@ class CreatorResource extends Resource
                                     TextEntry::make('name')->columnSpan(2),
                                     TextEntry::make('email')->columnSpan(2),
                                     TextEntry::make('mobile_phone')
-                                        ->visible($is_admin)
-                                        ->columnSpan(2),
+                                    ->visible($is_admin)
+                                    ->columnSpan(2),
                                     TextEntry::make('stage_name')->columnSpan(2),
                                     TextEntry::make('description')->columnSpan(4),
                                     TextEntry::make('skills_and_talents')->columnSpan(2),
                                     TextEntry::make('identification_number')
-                                        ->visible($is_admin)
-                                        ->columnSpan(2),
+                                    ->visible($is_admin)
+                                    ->columnSpan(2),
                                     TextEntry::make('date_of_birth')
                                     ->label('Age (Years)')
                                     ->getStateUsing(function (Model $record) {
@@ -97,16 +97,16 @@ class CreatorResource extends Resource
                                     })
                                     ->columnSpan(2),
                                     TextEntry::make('payment_via')
-                                            ->visible($is_admin)
-                                            ->columnSpan(2),
+                                    ->visible($is_admin)
+                                    ->columnSpan(2),
                                     TextEntry::make('payment_account_number')
-                                            ->visible($is_admin)
-                                            ->columnSpan(2),
+                                    ->visible($is_admin)
+                                    ->columnSpan(2),
                                     TextEntry::make('kra_pin')
-                                            ->visible($is_admin)
-                                            ->columnSpan(2),
+                                    ->visible($is_admin)
+                                    ->columnSpan(2),
                                     TextEntry::make('location.location_name')
-                                            ->columnSpan(2)
+                                    ->columnSpan(2)
                                 ])->columns(4)
                             ])
                         ])
