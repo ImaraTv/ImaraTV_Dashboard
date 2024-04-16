@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\{
+    Exports\SponsorProfiles,
     Filament\Resources\SponsorResource\Pages,
     Models\FilmTopic,
     Models\Location,
@@ -19,6 +20,7 @@ use Filament\{
     Tables,
     Tables\Table
 };
+use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 
 class SponsorResource extends Resource
@@ -105,10 +107,17 @@ class SponsorResource extends Resource
         });
 
         return $table
+                        ->headerActions([
+                            Tables\Actions\Action::make('Export')
+                            ->hidden(!auth()->user()->hasRole(['admin', 'super_admin']))
+                            ->action(function () {
+                                return Excel::download(new SponsorProfiles(), 'sponsor_pfiles.csv');
+                            })
+                        ])
                         ->query($query)
                         ->columns([
-                            Tables\Columns\TextColumn::make('organization_name'),
-                            Tables\Columns\TextColumn::make('user.name')->label('User Name'),
+                            Tables\Columns\TextColumn::make('organization_name')->searchable(),
+                            Tables\Columns\TextColumn::make('user.name')->searchable()->label('User Name'),
                             Tables\Columns\TextColumn::make('user.email')->label('User Email'),
                             Tables\Columns\TextColumn::make('contact_person_name'),
                             Tables\Columns\TextColumn::make('contact_person_email'),

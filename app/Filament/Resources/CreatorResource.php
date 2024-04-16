@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\{
+    Exports\CreatorProfiles,
     Filament\Resources\CreatorResource\Pages,
     Models\CreatorProfile,
     Models\Location
@@ -27,8 +28,8 @@ use Illuminate\{
     Database\Eloquent\Model,
     Support\Carbon
 };
+use Maatwebsite\Excel\Facades\Excel;
 use function auth;
-use function ddd;
 
 class CreatorResource extends Resource
 {
@@ -52,6 +53,12 @@ class CreatorResource extends Resource
 
         $is_admin = auth()->user()->hasRole('super_admin|admin');
         return $table
+                ->headerActions([
+                        Tables\Actions\Action::make('Export')
+                        ->action(function(){
+                            return Excel::download(new CreatorProfiles(), 'creator_pfiles.csv');
+                        })
+                ])
                         ->columns([
                             Tables\Columns\TextColumn::make('name'),
                             Tables\Columns\TextColumn::make('stage_name'),

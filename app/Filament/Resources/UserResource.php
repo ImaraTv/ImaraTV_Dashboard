@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\{
+    Exports\Users,
     Filament\Resources\UserResource\Pages,
     Models\User
 };
@@ -24,6 +25,7 @@ use Illuminate\{
     Database\Eloquent\Model,
     Support\Facades\Hash
 };
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 use function auth;
 use function collect;
@@ -106,6 +108,13 @@ class UserResource extends Resource implements HasShieldPermissions
         $query = User::withoutRole(['super_admin'])->with('roles');
 
         return $table
+                 ->headerActions([
+                            Tables\Actions\Action::make('Export')
+                            ->hidden(!auth()->user()->hasRole(['admin', 'super_admin']))
+                            ->action(function () {
+                                return Excel::download(new Users(), 'users.csv');
+                            })
+                        ])
                         ->query($query)
                         ->columns([
                             Tables\Columns\TextColumn::make('id')->sortable(),

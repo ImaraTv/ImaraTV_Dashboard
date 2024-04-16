@@ -17,12 +17,13 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.4",
+        "maatwebsite/excel": "^3.1",
         "owenvoke/blade-fontawesome": "^2.6",
+        "symfony/http-client": "^6.3",
+        "symfony/mailgun-mailer": "^6.3",
         "tymon/jwt-auth": "^2.1",
         "vimeo/laravel": "^5.9",
-        "vimeo/vimeo-api": "^3.0",
-        "symfony/http-client": "^6.3",
-        "symfony/mailgun-mailer": "^6.3"
+        "vimeo/vimeo-api": "^3.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.12",

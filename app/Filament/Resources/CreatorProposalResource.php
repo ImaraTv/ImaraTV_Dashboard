@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\{
+    Exports\FilmProjectsExport,
     Filament\Resources\CreatorProposalResource\Pages,
     Models\CreatorProfile,
     Models\CreatorProposal,
@@ -32,6 +33,7 @@ use Filament\{
     Tables\Table
 };
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 use function collect;
 use function config;
@@ -52,6 +54,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
     public ?array $data = [];
 
 
+    
     public static function getPermissionPrefixes(): array
     {
         return [
@@ -183,6 +186,12 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         }
 
         return $table
+                ->headerActions([
+                        Tables\Actions\Action::make('Export')
+                        ->action(function(){
+                            return Excel::download(new FilmProjectsExport(), 'fprojects.csv');
+                        })
+                ])
                         ->filters([
                             SelectFilter::make('sponsored_by')
                             ->searchable()

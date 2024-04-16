@@ -27,7 +27,10 @@ class CreatorProposal extends Model implements HasMedia
     {
         return $this->belongsTo(User::class);
     }
-
+    public function creator()
+    {
+        return $this->belongsTo(CreatorProfile::class, 'user_id', 'user_id');
+    }
     public function genre()
     {
         return $this->belongsTo(FilmGenre::class, 'film_genre', 'id');

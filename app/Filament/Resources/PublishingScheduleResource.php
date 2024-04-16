@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\{
+    Exports\FilmSchedules,
     Filament\Resources\PublishingScheduleResource\Pages,
     Jobs\UploadVideoToVimeo,
     Models\CreatorProfile,
@@ -34,10 +35,13 @@ use Filament\{
     Tables\Filters\SelectFilter,
     Tables\Table
 };
-use Illuminate\Database\Eloquent\{
-    Builder,
-    Model
+use Illuminate\{
+    Database\Eloquent\Builder,
+    Database\Eloquent\Model,
+    Support\Carbon,
+    Support\Str
 };
+use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 use function dispatch_sync;
 
@@ -160,6 +164,13 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
     public static function table(Table $table): Table
     {
         return $table
+                    ->headerActions([
+                            Tables\Actions\Action::make('Export')
+                            ->action(function(){
+                                $f_name = Str::snake( 'f_schedules_'.Carbon::now()->format('d-m-Y H:i:s').'.csv');
+                                return Excel::download(new FilmSchedules(), $f_name);
+                            })
+                    ])
                         ->columns([
                             TextColumn::make('film_title')->searchable(),
                             TextColumn::make('release_date')->sortable()

@@ -36,7 +36,7 @@ class CreatorProfile extends Model implements HasMedia
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function location()
+    public function loc()
     {
         return $this->belongsTo(Location::class, 'location');
     }
