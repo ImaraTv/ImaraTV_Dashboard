@@ -20,4 +20,12 @@ class CreatorsController extends Controller
         $creators = CreatorProfile::with(['user'])->paginate(10);
         return new CreatorResource($creators);
     }
+
+    public function creator(Request $request, $id): CreatorResource
+    {
+        $creator = CreatorProfile::with(['user'])->whereId($id)->first();
+        $resource = (new CreatorResource([$creator]));
+        return $resource;
+
+    }
 }

@@ -67,6 +67,7 @@ class SuperAdminPanelProvider extends PanelProvider
     {
 
         return $panel->default()
+                
                         ->id('admin')
                         ->darkMode(false)
                         ->favicon(asset('images/favicon.png'))
@@ -135,6 +136,7 @@ class SuperAdminPanelProvider extends PanelProvider
                         ->path('admin')
                         ->registration(Register::class)
                         ->login(Login::class)
+                                ->passwordReset()
                         ->emailVerification()
                         ->profile(EditProfile::class)
                         ->userMenuItems([
