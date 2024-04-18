@@ -123,6 +123,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 ->columnSpan(4)
                                 ->required(),
                                 TagsInput::make('topics')
+                                ->separator(',')
                                 ->suggestions(FilmTopic::all()->pluck('topic_name'))
                                 ->label('Topics (Select All Related Topics)')->columnSpan(4)->nullable(),
 //                                --
@@ -164,13 +165,13 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
     public static function table(Table $table): Table
     {
         return $table
-                    ->headerActions([
+                        ->headerActions([
                             Tables\Actions\Action::make('Export')
-                            ->action(function(){
-                                $f_name = Str::snake( 'f_schedules_'.Carbon::now()->format('d-m-Y H:i:s').'.csv');
+                            ->action(function () {
+                                $f_name = Str::snake('f_schedules_' . Carbon::now()->format('d-m-Y H:i:s') . '.csv');
                                 return Excel::download(new FilmSchedules(), $f_name);
                             })
-                    ])
+                        ])
                         ->columns([
                             TextColumn::make('film_title')->searchable(),
                             TextColumn::make('release_date')->sortable()
