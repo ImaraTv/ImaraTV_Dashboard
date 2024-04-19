@@ -9,6 +9,7 @@ use App\{
     Models\CreatorProposal,
     Models\FilmGenre,
     Models\FilmTopic,
+    Models\PotentialSponsor,
     Models\ProposalStatus,
     Models\SponsorProfile
 };
@@ -23,6 +24,9 @@ use Filament\{
     Forms\Components\TextInput,
     Forms\Form,
     Forms\Get,
+    Infolists\Components\RepeatableEntry,
+    Infolists\Components\TextEntry,
+    Notifications\Notification,
     Resources\Resource,
     Tables,
     Tables\Actions\Action,
@@ -155,6 +159,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('hd_fil_upload')
+                                ->previewable(false)
                                 ->label('HD file upload')
                                 ->collection('videos')
                                 ->acceptedFileTypes(['video/*'])
@@ -175,13 +180,27 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ])->statePath('data');
     }
 
+    public static function sponsorTable(Table $table, $propsal_id = null): Table
+    {
+        return $table->query(PotentialSponsor::where('proposal_id', $propsal_id))
+                        ->columns([
+                            TextColumn::make('id')
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
-        $admins_only = auth()->user()->can('update');
+        $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
 
         $query = CreatorProposal::query()->with(['sponsor', 'genre']);
         if (auth()->user()->hasRole('creator')) {
             $query = $query->where('user_id', auth()->id());
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            $query = $query->where(function ($q) {
+                $q->where('sponsored_by', auth()->id())
+                        ->orWhereNull('sponsored_by');
+            });
         }
 
         return $table
@@ -247,8 +266,41 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->actions([
                             Tables\Actions\EditAction::make()
                             ->label('Update Project'),
-                            Tables\Actions\Action::make('updateStatus')
+                            Tables\Actions\Action::make('potentialSponsors')
+                            ->infolist([
+                                RepeatableEntry::make('potential_sponsors')
+                                ->schema([
+                                    TextEntry::make('sponsor.organization_name')->label('Organization'),
+                                    TextEntry::make('sponsor.contact_person_name')->label('Contact Person Name'),
+                                    TextEntry::make('sponsor.contact_person_email')->label('Contact Person Email')
+                                ])
+                                ->grid(2)
+                            ])
+                            ->label('Potential Sponsors')
                             ->visible(fn() => $admins_only),
+                            Action::make('selectForFunding')
+                            ->action(function (CreatorProposal $record) {
+                                $data = [
+                                    'sponsor_id' => auth()->id(),
+                                    'proposal_id' => $record->id
+                                ];
+                                $saved = PotentialSponsor::updateOrCreate($data, $data);
+
+                                if ($saved) {
+                                    Notification::make()
+                                    ->success()
+                                    ->title('Updated');
+                                } else {
+                                    Notification::make()
+                                    ->warning()
+                                    ->title('Failed to update');
+                                }
+                                return;
+                            })
+                            ->visible(function (CreatorProposal $record) {
+                                return auth()->user()->hasRole('sponsor') && $record->sponsored_by !== null;
+                            })
+                            ->label('Select for funding'),
                             Tables\Actions\DeleteAction::make()
                             ->visible(auth()->user()->can('delete_creator::proposal'))
                         ])

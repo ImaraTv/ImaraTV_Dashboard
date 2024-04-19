@@ -27,10 +27,12 @@ class CreatorProposal extends Model implements HasMedia
     {
         return $this->belongsTo(User::class);
     }
+
     public function creator()
     {
         return $this->belongsTo(CreatorProfile::class, 'user_id', 'user_id');
     }
+
     public function genre()
     {
         return $this->belongsTo(FilmGenre::class, 'film_genre', 'id');
@@ -44,5 +46,10 @@ class CreatorProposal extends Model implements HasMedia
     public function proposal_status()
     {
         return $this->belongsTo(ProposalStatus::class, 'status', 'id');
+    }
+
+    public function potential_sponsors()
+    {
+        return $this->hasMany(PotentialSponsor::class, 'proposal_id', 'id');
     }
 }
