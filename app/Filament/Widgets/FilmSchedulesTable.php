@@ -12,7 +12,7 @@ use Filament\{
 class FilmSchedulesTable extends BaseWidget
 {
 
-     public function getTableHeading(): string
+    public function getTableHeading(): string
     {
         return "Latest Film Schedules (5)";
     }
@@ -21,11 +21,21 @@ class FilmSchedulesTable extends BaseWidget
     {
         return 'full';
     }
+
     public function table(Table $table): Table
     {
         $query = (new PublishingSchedule())
+                ->with(['creator', 'sponsor', 'proposal'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5);
+
+        if (auth()->user()->hasRole('creator')) {
+            $query = $query->whereHas('creator', fn($q) => $q->where('user_id', auth()->id()));
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            $query = $query->whereHas('sponsor', fn($q) => $q->where('user_id', auth()->id()));
+        }
+
         return $table
                         ->paginated(false)
                         ->query(

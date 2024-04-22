@@ -43,7 +43,6 @@ class StatsOverview extends BaseWidget
     protected function sponsorWidgets(): array
     {
         return [
-            Stat::make('Total Creators', CreatorProfile::count()),
             Stat::make('Total Projects', $this->getProjects()),
         ];
     }
@@ -60,6 +59,12 @@ class StatsOverview extends BaseWidget
         $projects = (new CreatorProposal());
         if (auth()->user()->hasRole('creator')) {
             $projects = $projects->where('user_id', auth()->id());
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            $projects = $projects->where(function ($q) {
+                $q->where('sponsored_by', auth()->id())
+                ->orWhere('user_id', auth()->id());
+            });
         }
         return $projects = $projects->count();
     }

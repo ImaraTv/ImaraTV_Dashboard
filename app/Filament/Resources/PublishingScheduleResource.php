@@ -53,7 +53,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
     protected static ?string $navigationIcon = 'heroicon-s-clock';
 
     protected static ?string $modelLabel = 'Film Schedules';
-    
+
     protected static ?int $navigationSort = 3;
 
 
@@ -166,7 +166,17 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
 
     public static function table(Table $table): Table
     {
+        $query = PublishingSchedule::with(['sponsor', 'creator', 'proposal']);
+
+        if (auth()->user()->hasRole('creator')) {
+            $query = $query->whereHas('creator', fn($q) => $q->where('user_id', auth()->id()));
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            $query = $query->whereHas('sponsor', fn($q) => $q->where('user_id', auth()->id()));
+        }
+
         return $table
+                        ->query($query)
                         ->headerActions([
                             Tables\Actions\Action::make('Export')
                             ->action(function () {

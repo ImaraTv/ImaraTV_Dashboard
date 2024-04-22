@@ -39,7 +39,7 @@ class CreatorResource extends Resource
     public static ?string $label = 'Creator Profile';
 
     protected static ?string $navigationIcon = 'heroicon-m-user-group';
-    
+
     protected static ?int $navigationSort = 6;
 
 
@@ -137,10 +137,10 @@ class CreatorResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        if (auth()->user()->hasRole('creator')) {
-            return false;
+        if (auth()->user()->hasRole(['admin', 'super_admin'])) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     protected static function creatorForm()
