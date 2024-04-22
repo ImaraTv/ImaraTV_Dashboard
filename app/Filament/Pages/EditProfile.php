@@ -60,6 +60,8 @@ class EditProfile extends Page implements HasForms
     public ?CreatorProfile $creatorProfile = null;
 
     public ?AdminProfile $adminProfile = null;
+    
+    
 
 
     public static function getLabel(): string

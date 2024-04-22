@@ -54,6 +54,8 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-s-film';
 
     protected static ?string $navigationLabel = 'Film Projects';
+    
+    protected static ?int $navigationSort = 2;
 
     public ?array $data = [];
 

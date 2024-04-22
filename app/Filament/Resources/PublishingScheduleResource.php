@@ -53,6 +53,8 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
     protected static ?string $navigationIcon = 'heroicon-s-clock';
 
     protected static ?string $modelLabel = 'Film Schedules';
+    
+    protected static ?int $navigationSort = 3;
 
 
 //    public static function canEdit(Model $record): bool

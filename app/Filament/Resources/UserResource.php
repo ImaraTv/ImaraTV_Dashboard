@@ -39,6 +39,8 @@ class UserResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-m-user';
 
     public ?array $data = [];
+    
+    protected static ?int $navigationSort = 4;
 
 
     public static function getPermissionPrefixes(): array

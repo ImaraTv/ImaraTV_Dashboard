@@ -24,10 +24,11 @@ class FilmTopic extends Page implements HasTable
     use InteractsWithTable,
         HasPageShield;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+//    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static string $view = 'filament.pages.film-topic';
 
+    protected static ?string $navigationGroup = 'Settings';
 
     protected function getHeaderActions(): array
     {

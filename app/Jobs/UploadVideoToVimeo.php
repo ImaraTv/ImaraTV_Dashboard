@@ -61,7 +61,8 @@ class UploadVideoToVimeo implements ShouldQueue
             }
             
             $this->proposal->vimeo_link = $response;
-            $this->proposal->save();
+            $saved = $this->proposal->save();
+           
             return $response;
         } catch (Exception $exc) {
             echo $exc->getTraceAsString();

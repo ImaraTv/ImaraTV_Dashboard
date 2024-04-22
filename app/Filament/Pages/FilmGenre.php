@@ -25,11 +25,13 @@ class FilmGenre extends Page implements HasTable
 
 
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+//    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static string $view = 'filament.pages.film-genre';
 
     protected static ?string $model = Genre::class;
+    
+    protected static ?string $navigationGroup = 'Settings';
 
 
     protected function getHeaderActions(): array

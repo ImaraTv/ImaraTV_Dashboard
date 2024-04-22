@@ -29,6 +29,8 @@ class SponsorResource extends Resource
     protected static ?string $model = SponsorProfile::class;
 
     protected static ?string $navigationIcon = 'heroicon-m-building-office';
+    
+    protected static ?int $navigationSort = 5;
 
 
     public static function sponsorForm()

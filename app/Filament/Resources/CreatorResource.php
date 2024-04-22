@@ -39,6 +39,8 @@ class CreatorResource extends Resource
     public static ?string $label = 'Creator Profile';
 
     protected static ?string $navigationIcon = 'heroicon-m-user-group';
+    
+    protected static ?int $navigationSort = 6;
 
 
     public static function form(Form $form): Form

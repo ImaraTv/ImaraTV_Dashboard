@@ -25,9 +25,11 @@ class ProposalStatus extends Page implements HasTable
     use InteractsWithTable,
         HasPageShield;
 
-    protected static ?string $navigationIcon = 'heroicon-c-check';
+//    protected static ?string $navigationIcon = 'heroicon-c-check';
 
     protected static string $view = 'filament.pages.proposal-status';
+    
+    protected static ?string $navigationGroup = 'Settings';
 
 
     protected function getHeaderActions(): array
