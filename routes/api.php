@@ -40,5 +40,6 @@ Route::group(['middleware' => 'api'], function () {
         Route::post('change-password', [AuthController::class, 'changePassword']);
         Route::get('/bookmarks', [UsersController::class, 'videoBookmarks']);
         Route::post('/bookmark', [UsersController::class, 'bookmarkVideo']);
+        Route::post('/rate', [UsersController::class, 'rateVideo']);
     });
 });

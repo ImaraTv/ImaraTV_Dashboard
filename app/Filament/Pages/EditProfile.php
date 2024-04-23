@@ -95,7 +95,7 @@ class EditProfile extends Page implements HasForms
         }
         if (auth()->user()->hasRole('creator')) {
             self::$model = CreatorProfile::class;
-            $creator_form = CreatorProfile::with(['user', 'location'])->where('user_id', auth()->id())->first();
+            $creator_form = CreatorProfile::with(['user', 'loc'])->where('user_id', auth()->id())->first();
             if ($creator_form) {
 
                 $d = [
