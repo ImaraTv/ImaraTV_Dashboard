@@ -32,6 +32,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'vimeo_link' => $item->proposal->vimeo_link,
                 'call_to_action' => $item->call_to_action_text,
                 'call_to_action_link' => $item->call_to_action_link,
+                'creator'=>$item->creator?->name,
                 'image' => $image,
             ];
         });
@@ -39,7 +40,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
             'data' => $collection
         ];
     }
-
+    
     protected function getPoster($proposal)
     {
         $image = '';
