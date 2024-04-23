@@ -11,7 +11,8 @@ use App\{
     Models\FilmTopic,
     Models\PotentialSponsor,
     Models\ProposalStatus,
-    Models\SponsorProfile
+    Models\SponsorProfile,
+    Models\User
 };
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{
@@ -54,7 +55,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-s-film';
 
     protected static ?string $navigationLabel = 'Film Projects';
-    
+
     protected static ?int $navigationSort = 2;
 
     public ?array $data = [];
@@ -70,7 +71,8 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             'delete',
             'delete_any',
             'change_status',
-            'assign_sponsor'
+            'assign_sponsor',
+            'assign_creator',
         ];
     }
 
@@ -101,6 +103,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
 
         $can_change_status = auth()->user()->can('change_status_creator::proposal');
         $can_assign_sponsor = auth()->user()->can('assign_sponsor_creator::proposal');
+        $can_assign_creator = auth()->user()->can('assign_creator_creator::proposal');
         $can_create_proposal = self::profileComplete();
         return $form
                         ->disabled(!$can_create_proposal)
@@ -139,41 +142,77 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->label('Premium Film Price per view (KES)')
                                 ->type('number')->columnSpan(4)->nullable(),
                                 SpatieMediaLibraryFileUpload::make('attachments')
+                                ->label('Script')
+                                ->maxSize(100000)
                                 ->collection('scripts')
-                                ->acceptedFileTypes(['application/pdf'])
+                                ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('contracts')
+                                ->label('Contract')
+                                ->maxSize(100000)
                                 ->collection('contracts')
-                                ->acceptedFileTypes(['application/pdf'])
+                                ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('trailer_upload')
+                                ->label('Trailer')
                                 ->collection('trailers')
-                                ->acceptedFileTypes(['video/*'])
+                                ->acceptedFileTypes(['video/x-msvideo', 'video/mpeg', 'video/mp4'])
                                 ->maxSize(config('media-library.max_file_size'))
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('poster_upload')
+                                ->label('Poster')
                                 ->collection('posters')
                                 ->acceptedFileTypes(['image/*'])
-                                ->maxSize(30000)
+                                ->maxSize(100000)
                                 ->columnSpan(4)->nullable(),
 //                                --
                                 SpatieMediaLibraryFileUpload::make('hd_fil_upload')
                                 ->previewable(false)
                                 ->label('HD file upload')
                                 ->collection('videos')
-                                ->acceptedFileTypes(['video/*'])
+                                ->acceptedFileTypes(['video/x-msvideo', 'video/mpeg', 'video/mp4'])
                                 ->maxSize(config('media-library.max_file_size'))
                                 ->columnSpan(8)->nullable(),
 //                                --
                                 Select::make('sponsored_by')
+                                ->hidden(function ($record) {
+                                    $user = User::whereId($record->user_id)->first();
+                                    if ($user) {
+                                        $role = collect($user->roles)->filter(fn($r) => $r->name == 'sponsor')->first();
+                                        if ($role) {
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                })
                                 ->disabled(!$can_assign_sponsor)
                                 ->label('Sponsored By')
                                 ->options(
                                         SponsorProfile::all()->pluck('organization_name', 'user_id')
                                 )->columnSpan(4)->nullable(),
+                                //--
+                                Select::make('creator_id')
+                                ->label('Assign Creator')
+                                ->options(
+                                        CreatorProfile::all()->pluck('name', 'user_id')
+                                )
+                                ->disabled(!$can_assign_creator)
+                                ->hidden(
+                                        function ($record) {
+                                            $user = User::whereId($record->user_id)->first();
+                                            if ($user) {
+                                                $role = collect($user->roles)->filter(fn($r) => $r->name == 'creator')->first();
+                                                if ($role) {
+                                                    return true;
+                                                }
+                                            }
+                                            return false;
+                                        }
+                                )
+                                ->columnSpan(4)->nullable(),
                                 Select::make('status')
                                 ->disabled(!$can_change_status)
                                 ->label('Status')->options(ProposalStatus::all()->pluck('status', 'id'))
@@ -300,7 +339,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 return;
                             })
                             ->visible(function (CreatorProposal $record) {
-                                return auth()->user()->hasRole('sponsor') && $record->sponsored_by !== null;
+                                return auth()->user()->hasRole('sponsor') && $record->sponsored_by == null;
                             })
                             ->label('Select for funding'),
                             Tables\Actions\DeleteAction::make()
