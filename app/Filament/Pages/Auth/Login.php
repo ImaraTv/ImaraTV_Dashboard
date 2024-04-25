@@ -10,8 +10,6 @@ class Login extends BaseLogin
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static string $view = 'filament.pages.auth.login';
-    
-    
 
 
     protected function getForms(): array

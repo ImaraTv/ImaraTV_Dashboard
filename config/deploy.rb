@@ -46,7 +46,6 @@ namespace :deploy do
 		execute :php, "artisan view:clear"
 		execute :php, "artisan optimize:clear"
 		execute :chown, "-R www-data:www-data #{deploy_to}"
-		execute :screen, "-dmS itv /bin/sh -c 'cd #{release_path} && php artisan queue:work'"
             end
         end
     end

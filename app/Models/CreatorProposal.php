@@ -52,4 +52,9 @@ class CreatorProposal extends Model implements HasMedia
     {
         return $this->hasMany(PotentialSponsor::class, 'proposal_id', 'id');
     }
+
+    public function assigned_creator()
+    {
+       return $this->belongsTo(CreatorProfile::class, 'creator_id', 'user_id');
+    }
 }

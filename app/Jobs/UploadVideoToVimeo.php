@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\CreatorProposal;
+use Exception;
 use Illuminate\{
     Bus\Queueable,
     Contracts\Queue\ShouldQueue,
@@ -11,7 +12,6 @@ use Illuminate\{
     Queue\SerializesModels
 };
 use Vimeo\Laravel\Facades\Vimeo;
-use function env;
 
 class UploadVideoToVimeo implements ShouldQueue
 {
@@ -24,7 +24,7 @@ class UploadVideoToVimeo implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected CreatorProposal $proposal)
+    public function __construct(protected CreatorProposal $proposal, protected $media = '')
     {
         //
     }
@@ -36,9 +36,8 @@ class UploadVideoToVimeo implements ShouldQueue
     {
         $proposal = $this->proposal;
         if ($proposal) {
-            $video = $proposal->getMedia("videos")->first();
 
-            $path = $video->getPath();
+            $path = $this->media->getPath();
 
             if (file_exists($path)) {
                 $this->upload($path, $proposal->working_title);
@@ -47,7 +46,7 @@ class UploadVideoToVimeo implements ShouldQueue
         return;
     }
 
-    public function upload($file, $name = ""): string
+    public function upload(?string $file, ?string $name = ""): string
     {
 
 
@@ -57,15 +56,22 @@ class UploadVideoToVimeo implements ShouldQueue
 
                 $response = Vimeo::replace($this->proposal->vimeo_link, $file);
             } else {
-                $response = Vimeo::upload($file);
+                $response = Vimeo::upload($file, ['name' => $name, 'privacy' => ['view' => 'anybody']]);
             }
-            
+
             $this->proposal->vimeo_link = $response;
             $saved = $this->proposal->save();
-           
+            if ($saved) {
+                $this->removeMedia();
+            }
             return $response;
         } catch (Exception $exc) {
-            echo $exc->getTraceAsString();
+            logger($exc->getTraceAsString());
         }
+    }
+
+    public function removeMedia()
+    {
+        $this->media->delete();
     }
 }

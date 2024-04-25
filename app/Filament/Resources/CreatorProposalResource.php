@@ -25,6 +25,7 @@ use Filament\{
     Forms\Components\TextInput,
     Forms\Form,
     Forms\Get,
+    Infolists\Components\Grid,
     Infolists\Components\RepeatableEntry,
     Infolists\Components\TextEntry,
     Notifications\Notification,
@@ -37,7 +38,10 @@ use Filament\{
     Tables\Filters\SelectFilter,
     Tables\Table
 };
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\{
+    Builder,
+    Model
+};
 use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 use function collect;
@@ -72,7 +76,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             'delete_any',
             'change_status',
             'assign_sponsor',
-            'assign_creator',
+            'assign_creator'
         ];
     }
 
@@ -179,7 +183,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
 //                                --
                                 Select::make('sponsored_by')
                                 ->hidden(function ($record) {
-                                    $user = User::whereId($record->user_id)->first();
+                                    $user = User::whereId($record?->user_id)->first();
                                     if ($user) {
                                         $role = collect($user->roles)->filter(fn($r) => $r->name == 'sponsor')->first();
                                         if ($role) {
@@ -192,7 +196,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->label('Sponsored By')
                                 ->options(
                                         SponsorProfile::all()->pluck('organization_name', 'user_id')
-                                )->columnSpan(4)->nullable(),
+                                )->columnSpan(3)->nullable(),
                                 //--
                                 Select::make('creator_id')
                                 ->label('Assign Creator')
@@ -202,7 +206,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->disabled(!$can_assign_creator)
                                 ->hidden(
                                         function ($record) {
-                                            $user = User::whereId($record->user_id)->first();
+                                            $user = User::whereId($record?->user_id)->first();
                                             if ($user) {
                                                 $role = collect($user->roles)->filter(fn($r) => $r->name == 'creator')->first();
                                                 if ($role) {
@@ -212,11 +216,11 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                             return false;
                                         }
                                 )
-                                ->columnSpan(4)->nullable(),
+                                ->columnSpan(3)->nullable(),
                                 Select::make('status')
                                 ->disabled(!$can_change_status)
                                 ->label('Status')->options(ProposalStatus::all()->pluck('status', 'id'))
-                                ->columnSpan(4)->nullable(),
+                                ->columnSpan(2)->nullable(),
                             ])->columns(8),
                         ])->statePath('data');
     }
@@ -229,13 +233,52 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         ]);
     }
 
+    public static function canEdit(Model $model): bool
+    {
+        if (auth()->user()->hasRole('sponsor')) {
+            if ($model->user_id == auth()->id()) {
+                return true;
+            }
+        }
+        if (auth()->user()->hasRole('creator')) {
+            if ($model->user_id == auth()->id()) {
+                return true;
+            }
+        }
+        if (auth()->user()->hasRole(['admin', 'super_admin'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public static function canDelete(Model $model): bool
+    {
+        if (auth()->user()->hasRole('sponsor')) {
+            if ($model->user_id == auth()->id()) {
+                return true;
+            }
+        }
+        if (auth()->user()->hasRole('creator')) {
+            if ($model->user_id == auth()->id()) {
+                return true;
+            }
+        }
+        if (auth()->user()->hasRole(['admin', 'super_admin'])) {
+            return true;
+        }
+        return false;
+    }
+
     public static function table(Table $table): Table
     {
         $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
 
-        $query = CreatorProposal::query()->with(['sponsor', 'genre']);
+        $query = CreatorProposal::query()->with(['sponsor', 'genre', 'creator', 'assigned_creator']);
         if (auth()->user()->hasRole('creator')) {
-            $query = $query->where('user_id', auth()->id());
+            $query = $query->where(function ($q) {
+                $q->where('user_id', auth()->id())
+                        ->orwhere('creator_id', auth()->id());
+            });
         }
         if (auth()->user()->hasRole('sponsor')) {
             $query = $query->where(function ($q) {
@@ -243,6 +286,9 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->orWhereNull('sponsored_by');
             });
         }
+
+
+
 
         return $table
                         ->headerActions([
@@ -292,9 +338,13 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                             TextColumn::make('working_title')
                             ->label('Working Title'),
                             TextColumn::make('user.name')
+                            ->label('Created By')
                             ->name('user.name'),
                             TextColumn::make('sponsor')
                             ->name('sponsor.organization_name'),
+                            TextColumn::make('assigned_creator')
+                            ->label('Assigned Creator')
+                            ->name('assigned_creator.name'),
                             TextColumn::make('genre')
                             ->name('genre.genre_name'),
                             TextColumn::make('status')
@@ -307,6 +357,33 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->actions([
                             Tables\Actions\EditAction::make()
                             ->label('Update Project'),
+                            Tables\Actions\ViewAction::make()
+                            ->infolist([
+                                Grid::make([
+                                    'default' => 2
+                                ])
+                                ->schema([
+                                    TextEntry::make('working_title'),
+                                    TextEntry::make('topics')
+                                    ->label('Topics'),
+                                    TextEntry::make('synopsis')
+                                    ->columnSpanFull()
+                                    ->label('Synopsis'),
+                                    TextEntry::make('film_budget')
+                                    ->label('Film Budget'),
+                                    TextEntry::make('user.name')
+                                    ->label('Created By'),
+                                    TextEntry::make('sponsor.organization_name')
+                                    ->label('Sponsor'),
+                                    TextEntry::make('genre.genre_name')
+                                    ->label('Genre'),
+                                    TextEntry::make('proposal_status.status')
+                                    ->label('Status')
+                                ])
+                            ])
+                            ->fillForm(function ($record) {
+                                return collect($record)->toArray();
+                            }),
                             Tables\Actions\Action::make('potentialSponsors')
                             ->infolist([
                                 RepeatableEntry::make('potential_sponsors')

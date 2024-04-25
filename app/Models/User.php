@@ -38,6 +38,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'name',
         'email',
         'password',
+        'role'
     ];
 
     /**
@@ -77,7 +78,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
     protected static function booted()
     {
         static::created(function ($model) {
-            $model->assignRole('creator');
+            $model->assignRole($model->role);
         });
     }
 }

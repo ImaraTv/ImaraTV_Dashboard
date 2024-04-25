@@ -3,8 +3,11 @@
 namespace App\Filament\Resources\CreatorProposalResource\Pages;
 
 use App\Filament\Resources\CreatorProposalResource;
-use Filament\Actions;
-use Filament\Resources\Pages\EditRecord;
+use Filament\{
+    Actions,
+    Resources\Pages\EditRecord
+};
+use Override;
 
 class EditCreatorProposal extends EditRecord
 {
@@ -21,7 +24,19 @@ class EditCreatorProposal extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-       info($data);
-       return $data;
+
+        return $data;
+    }
+
+    #[Override]
+    protected function mutateFormDataBeforeSave(array $data):array
+    {
+        if (auth()->user()->hasRole('creator')) {
+            $data['creator_id'] = auth()->id();
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            $data['sponsored_by'] = auth()->id();
+        }
+        return $data;
     }
 }

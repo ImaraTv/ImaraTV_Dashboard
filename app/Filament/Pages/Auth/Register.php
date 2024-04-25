@@ -2,7 +2,10 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Pages\Auth\Register as BaseRegister;
+use Filament\{
+    Forms\Components\Select,
+    Pages\Auth\Register as BaseRegister
+};
 
 class Register extends BaseRegister
 {
@@ -22,10 +25,13 @@ class Register extends BaseRegister
                                 $this->getEmailFormComponent(),
                                 $this->getPasswordFormComponent(),
                                 $this->getPasswordConfirmationFormComponent(),
+                                Select::make('role')
+                                ->required()
+                                ->default('creator')
+                                ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor'])
                             ])
                             ->statePath('data'),
             ),
         ];
     }
-    
 }
