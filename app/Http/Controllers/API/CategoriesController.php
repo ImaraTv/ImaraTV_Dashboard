@@ -14,7 +14,13 @@ class CategoriesController extends Controller
 
     public function categories(Request $request): CategoriesResource
     {
-        $categories = FilmGenre::paginate(1000);
+        $filter = $request->has('filter') ? $request->get('filter') : '';
+
+        $categories = (new FilmGenre());
+        if ($filter != '') {
+            $categories = $categories->where('genre_name', '=', $filter);
+        }
+        $categories = $categories->paginate(1000);
         return new CategoriesResource($categories);
     }
 }
