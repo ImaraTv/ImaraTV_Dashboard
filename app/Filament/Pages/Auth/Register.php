@@ -17,6 +17,7 @@ class Register extends BaseRegister
 
     protected function getForms(): array
     {
+        $role = request()->get('r', 'creator');
         return [
             'form' => $this->form(
                     $this->makeForm()
@@ -26,8 +27,9 @@ class Register extends BaseRegister
                                 $this->getPasswordFormComponent(),
                                 $this->getPasswordConfirmationFormComponent(),
                                 Select::make('role')
+                                ->label('Register as?')
                                 ->required()
-                                ->default('creator')
+                                ->default($role)
                                 ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor'])
                             ])
                             ->statePath('data'),
