@@ -6,6 +6,8 @@ use Filament\{
     Forms\Components\Select,
     Pages\Auth\Register as BaseRegister
 };
+use Illuminate\Support\Facades\Validator;
+use function request;
 
 class Register extends BaseRegister
 {
@@ -17,7 +19,14 @@ class Register extends BaseRegister
 
     protected function getForms(): array
     {
-        $role = request()->get('r', 'creator');
+        $validator = Validator::make(request()->all(), [
+                    'r' => 'in:creator,sponsor'
+        ]);
+        if ($validator->fails()) {
+            $role = 'creator';
+        } else {
+            $role = request()->get('r', 'creator');
+        }
         return [
             'form' => $this->form(
                     $this->makeForm()
