@@ -29,10 +29,11 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'duration' => $item->proposal->film_length,
                 'category' => $item->proposal?->genre?->genre_name,
                 'description' => $item->synopsis,
-                'vimeo_link' => $item->proposal->vimeo_link,
+                'vimeo_link' => $item->proposal->vimeo_link,    
                 'call_to_action' => $item->call_to_action_text,
                 'call_to_action_link' => $item->call_to_action_link,
                 'creator'=>$item->creator?->name,
+                'rating'=>$item->proposal?->film_rating,
                 'image' => $image,
             ];
         });

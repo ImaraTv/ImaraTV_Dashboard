@@ -135,6 +135,14 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 Select::make('film_genre')
                                 ->label('Film Genre  (Leave blank if optional)')
                                 ->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(4)->nullable(),
+                                Select::make('film_rating')
+                                ->columnSpan(4)
+                                ->label('Film Rating')
+                                ->options([
+                                    'pre-teen' => 'Pre-Teens',
+                                    'teen' => 'Teens',
+                                    'adult' => 'Adults'
+                                ]),
                                 Select::make('film_type')
                                 ->live()
                                 ->label('Film Type (Free or Premium)')->options([
@@ -179,7 +187,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->collection('videos')
                                 ->acceptedFileTypes(['video/x-msvideo', 'video/mpeg', 'video/mp4'])
                                 ->maxSize(config('media-library.max_file_size'))
-                                ->columnSpan(8)->nullable(),
+                                ->columnSpan(4)->nullable(),
 //                                --
                                 Select::make('sponsored_by')
                                 ->hidden(function ($record) {

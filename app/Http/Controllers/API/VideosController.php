@@ -20,6 +20,7 @@ class VideosController extends Controller
         $search = $request->has('search') ? $request->get('search') : '';
         $filter = $request->has('filter') ? $request->get('filter') : '';
         $category = $request->has('category') ? $request->get('category') : '';
+        $rating = $request->has('rating') ? $request->get('rating') : '';
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre'])
                 ->where('release_date', "<=", Carbon::now());
@@ -42,6 +43,11 @@ class VideosController extends Controller
         if ($category != '') {
             $videos = $videos->whereHas('proposal.genre', function ($q) use ($category) {
                 $q->where('genre_name', '=', $category);
+            });
+        }
+        if ($rating != '') {
+            $videos = $videos->whereHas('proposal', function ($q) use ($rating) {
+                $q->where('film_rating', $rating);
             });
         }
 
