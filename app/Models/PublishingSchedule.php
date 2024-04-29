@@ -38,4 +38,9 @@ class PublishingSchedule extends Model
     {
         return $this->belongsTo(\App\Models\CreatorProposal::class, 'proposal_id', 'id');
     }
+
+    public function stars()
+    {
+        return $this->hasMany(FilmRating::class, 'video_id', 'id');
+    }
 }
