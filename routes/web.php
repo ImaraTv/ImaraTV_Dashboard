@@ -8,7 +8,11 @@ use Illuminate\Support\Facades\{
     Mail,
     Route
 };
+use Livewire\Livewire;
 
+Livewire::setScriptRoute(function ($handle) {
+    return Route::get('/admin/livewire/livewire.js', $handle);
+});
 Route::get('/', function () {
     return \redirect()->to('/admin/login');
 });
