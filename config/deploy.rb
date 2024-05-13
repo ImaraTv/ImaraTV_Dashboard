@@ -2,7 +2,7 @@
 lock "~> 3.18.1"
 
 set :application, "imaratv-dash"
-set :repo_url, "git@github.com:anselmelly/imaraTV_v1.git"
+set :repo_url, "git@github.com:ImaraTv/ImaraTV_Dashboard.git"
 
 # Default branch is :main
 ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
@@ -15,7 +15,7 @@ set :ssh_options, {
   keys: "~/.ssh/id_rsa" 
 }
 
-set :stages, ["staging", "production"]
+set :stages, ["staging", "production","live"]
 
 # Shared paths/files
 set :linked_dirs, [

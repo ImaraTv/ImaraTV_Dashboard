@@ -133,7 +133,7 @@ class SuperAdminPanelProvider extends PanelProvider
                             ->icon('heroicon-o-cog-6-tooth')
                             ->collapsed(false),
                         ])
-                        ->path('admin')
+                        ->path('')
                         ->registration(Register::class)
                         ->login(Login::class)
                                 ->passwordReset()
