@@ -13,9 +13,7 @@ use Livewire\Livewire;
 Livewire::setScriptRoute(function ($handle) {
     return Route::get('/admin/livewire/livewire.js', $handle);
 });
-Route::get('/', function () {
-    return \redirect()->to('/admin/login');
-});
+
 Route::get('/mail',function(){
     $user = User::whereId(5)->first();
     
