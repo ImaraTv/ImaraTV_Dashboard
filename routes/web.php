@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\{
 };
 
 Route::get('/', function () {
-    return \redirect()->to('/login');
+    return \redirect()->to('/admin/login');
 });
 Route::get('/mail',function(){
     $user = User::whereId(5)->first();
