@@ -14,11 +14,13 @@ Livewire::setScriptRoute(function ($handle) {
     return Route::get('/admin/livewire/livewire.js', $handle);
 });
 
-Route::get('/mail',function(){
+Livewire::setUpdateRoute(function ($handle) {
+    return Route::post('/admin/livewire/update', $handle);
+});
+Route::get('/mail', function () {
     $user = User::whereId(5)->first();
-    
-    $mail = new UserRegistrationEmail('http://127.0.0.1:8000/verify',$user);
+
+    $mail = new UserRegistrationEmail('http://127.0.0.1:8000/verify', $user);
     Mail::to($user)->send($mail);
-    
 });
 
