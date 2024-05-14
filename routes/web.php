@@ -24,6 +24,4 @@ Route::get('/mail', function () {
     Mail::to($user)->send($mail);
 });
 
-Route::match(['post', 'get'], '/', function () {
-    return redirect('admin/dashboard');
-});
+
