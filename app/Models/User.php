@@ -6,7 +6,10 @@ namespace App\Models;
 
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
-use Filament\Models\Contracts\FilamentUser;
+use Filament\{
+    Models\Contracts\FilamentUser,
+    Panel
+};
 use Illuminate\{
     Contracts\Auth\MustVerifyEmail,
     Database\Eloquent\Factories\HasFactory,
@@ -38,7 +41,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'approved'
     ];
 
     /**
