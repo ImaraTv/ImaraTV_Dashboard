@@ -10,6 +10,7 @@ use App\{
     Models\SocialiteUser,
     Models\User
 };
+use App\Models\SponsorProfile;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Blade;
 use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
@@ -46,7 +47,7 @@ use function collect;
 class SuperAdminPanelProvider extends PanelProvider
 {
 
-    public static function profileComplete()
+    public static function coachProfileComplete()
     {
         if (auth()->user()->hasRole('creator')) {
             $profile = CreatorProfile::where(['user_id' => auth()->id()])->first();
@@ -59,6 +60,26 @@ class SuperAdminPanelProvider extends PanelProvider
                 }
             }
             return false;
+        
+        }
+            //make function here
+        return true;
+    }
+
+    public static function sponsorProfileComplete()
+    {
+        if (auth()->user()->hasRole('sponsor')) {
+            $profile = SponsorProfile::where(['user_id' => auth()->id()])->first();
+            if ($profile) {
+                $nc = collect($profile)->except('deleted_at', 'created_at', 'updated_at')
+                        ->filter(fn($i) => is_null($i) || $i = "" || strlen($i) == 0)
+                        ->count();
+                if ($nc == 0) {
+                    return true;
+                }
+            }
+            return false;
+        
         }
         return true;
     }
@@ -72,8 +93,12 @@ class SuperAdminPanelProvider extends PanelProvider
                         ->darkMode(false)
                         ->favicon(asset('images/favicon.png'))
                         ->renderHook(PanelsRenderHook::TOPBAR_START, function () {
-                            if (!self::profileComplete()) {
+                            if (!self::coachProfileComplete()) {
                                 $mes = "Please complete your profile to add film projects";
+                                return Blade::render("<div class='bg-gray-400 p-2 rounded-lg text-center text-white w-full'>{$mes}</div>");
+                            }
+                            if (!self::sponsorProfileComplete()) {
+                                $mes = "Please complete your profile for sponsorship approval.";
                                 return Blade::render("<div class='bg-gray-400 p-2 rounded-lg text-center text-white w-full'>{$mes}</div>");
                             }
                         })
@@ -169,7 +194,6 @@ class SuperAdminPanelProvider extends PanelProvider
                             SubstituteBindings::class,
                             DisableBladeIconComponents::class,
                             DispatchServingFilamentEvent::class,
-                            \App\Http\Middleware\RedirectIfUnApproved::class
                         ])
                         ->authMiddleware([
                             Authenticate::class,
