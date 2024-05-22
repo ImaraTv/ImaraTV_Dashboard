@@ -43,6 +43,12 @@ class CreatorResource extends Resource
     protected static ?int $navigationSort = 6;
 
 
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([

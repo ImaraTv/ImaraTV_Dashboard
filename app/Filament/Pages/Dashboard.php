@@ -20,9 +20,16 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $title = 'Dashboard';
 
-    protected int | string | array $columnSpan = 'full';
-    
+    protected int|string|array $columnSpan = 'full';
+
     protected static ?int $navigationSort = 1;
+
+
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
 
     public function getColumns(): int|string|array
     {
@@ -37,9 +44,9 @@ class Dashboard extends BaseDashboard
             FilmSchedulesTable::class
         ];
     }
-    
+
     public function getTitle(): string
     {
-        return "Welcome ". filament()->getUserName(auth()->user());
+        return "Welcome " . filament()->getUserName(auth()->user());
     }
 }

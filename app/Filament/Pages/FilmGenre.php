@@ -21,18 +21,23 @@ use Filament\{
 class FilmGenre extends Page implements HasTable
 {
 
-    use InteractsWithTable,HasPageShield;
-
-
+    use InteractsWithTable,
+        HasPageShield;
 
 //    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static string $view = 'filament.pages.film-genre';
 
     protected static ?string $model = Genre::class;
-    
+
     protected static ?string $navigationGroup = 'Settings';
 
+
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
 
     protected function getHeaderActions(): array
     {
@@ -48,7 +53,6 @@ class FilmGenre extends Page implements HasTable
                     ->using(function (array $data): Genre {
                         return Genre::create($data);
                     })
-                    
         ];
     }
 
@@ -70,7 +74,7 @@ class FilmGenre extends Page implements HasTable
                             EditAction::make()
                             ->form([
                                 TextInput::make('genre_name')
-                                ->label('Genre') 
+                                ->label('Genre')
                                 ->name('genre_name')
                                 ->maxLength(255)
                             ])
@@ -79,7 +83,7 @@ class FilmGenre extends Page implements HasTable
 
                                 return $record;
                             }),
-                                    DeleteAction::make(),
+                            DeleteAction::make(),
                         ])
                         ->bulkActions([
                             BulkActionGroup::make([

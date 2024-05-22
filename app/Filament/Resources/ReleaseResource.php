@@ -15,41 +15,49 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReleaseResource extends Resource
 {
+
     protected static ?string $model = Release::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                //
-            ]);
+                        ->schema([
+                                //
+        ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                //
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+                        ->columns([
+                                //
+                        ])
+                        ->filters([
+                                //
+                        ])
+                        ->actions([
+                            Tables\Actions\EditAction::make(),
+                        ])
+                        ->bulkActions([
+                            Tables\Actions\BulkActionGroup::make([
+                                Tables\Actions\DeleteBulkAction::make(),
+                            ]),
+        ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+                //
         ];
     }
 
@@ -61,8 +69,9 @@ class ReleaseResource extends Resource
             'edit' => Pages\EditRelease::route('/{record}/edit'),
         ];
     }
-     public static function shouldRegisterNavigation(): bool
+
+    public static function shouldRegisterNavigation(): bool
     {
-       return false;
+        return false;
     }
 }

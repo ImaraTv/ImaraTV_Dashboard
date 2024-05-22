@@ -29,9 +29,15 @@ class SponsorResource extends Resource
     protected static ?string $model = SponsorProfile::class;
 
     protected static ?string $navigationIcon = 'heroicon-m-building-office';
-    
+
     protected static ?int $navigationSort = 5;
 
+
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
 
     public static function sponsorForm()
     {

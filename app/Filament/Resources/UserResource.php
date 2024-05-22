@@ -39,7 +39,7 @@ class UserResource extends Resource implements HasShieldPermissions
     protected static ?string $navigationIcon = 'heroicon-m-user';
 
     public ?array $data = [];
-    
+
     protected static ?int $navigationSort = 4;
 
 
@@ -70,6 +70,12 @@ class UserResource extends Resource implements HasShieldPermissions
             'create_statuses',
             'update_statuses',
         ];
+    }
+
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
     }
 
     public static function form(Form $form): Form
@@ -110,7 +116,7 @@ class UserResource extends Resource implements HasShieldPermissions
         $query = User::withoutRole(['super_admin'])->with('roles');
 
         return $table
-                 ->headerActions([
+                        ->headerActions([
                             Tables\Actions\Action::make('Export')
                             ->hidden(!auth()->user()->hasRole(['admin', 'super_admin']))
                             ->action(function () {
@@ -130,8 +136,8 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->filters([
                             Tables\Filters\SelectFilter::make('role')
                             ->query(function (Builder $query, $data) {
-                                $data = collect($data)->filter(fn($i)=>!is_null($i))->toArray();
-                                
+                                $data = collect($data)->filter(fn($i) => !is_null($i))->toArray();
+
                                 if (!empty($data)) {
                                     return $query->whereHas('roles', fn($q) => $q->where('id', $data));
                                 }
@@ -159,7 +165,7 @@ class UserResource extends Resource implements HasShieldPermissions
                                 );
                             })
                                 ], layout: FiltersLayout::AboveContent)
-                                ->filtersFormColumns(3)
+                        ->filtersFormColumns(3)
                         ->actions([
                             Tables\Actions\EditAction::make(),
                         ])

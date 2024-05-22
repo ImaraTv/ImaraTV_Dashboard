@@ -169,6 +169,7 @@ class SuperAdminPanelProvider extends PanelProvider
                             SubstituteBindings::class,
                             DisableBladeIconComponents::class,
                             DispatchServingFilamentEvent::class,
+                            \App\Http\Middleware\RedirectIfUnApproved::class
                         ])
                         ->authMiddleware([
                             Authenticate::class,

@@ -80,6 +80,12 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         ];
     }
 
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
+
     public static function canCreate(): bool
     {
         return self::profileComplete();

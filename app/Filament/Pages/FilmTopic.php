@@ -30,6 +30,13 @@ class FilmTopic extends Page implements HasTable
 
     protected static ?string $navigationGroup = 'Settings';
 
+
+    #[\Override]
+    public static function canAccess(): bool
+    {
+        return auth()->user()->approved;
+    }
+
     protected function getHeaderActions(): array
     {
 
