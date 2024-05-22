@@ -106,6 +106,15 @@ class UserResource extends Resource implements HasShieldPermissions
                                 ->dehydrated(false)
                                 ->minLength(6),
                                 Forms\Components\Select::make('role')
+                                ->formatStateUsing(function (Model $record) {
+                                    $user = User::with(['roles'])->whereId($record->id)->first();
+                                    $role = collect($user->roles)->filter(fn($i) => $i != 'panel_user')->last();
+                                    if (isset($role)) {
+
+                                        return $role->name;
+                                    }
+                                    return'user';
+                                })
                                 ->options($roles)
                             ])
                         ])->statePath('data');
@@ -131,7 +140,9 @@ class UserResource extends Resource implements HasShieldPermissions
                             Tables\Columns\TextColumn::make('role')->getStateUsing(function (Model $record) {
                                 return collect($record->roles)->filter(fn($i) => $i->name != 'panel_user')->first()?->name;
                             }),
-                            Tables\Columns\TextColumn::make('created_at')->dateTime()
+                            Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                            Tables\Columns\ToggleColumn::make('approved')
+                            ->label('Approve')
                         ])
                         ->filters([
                             Tables\Filters\SelectFilter::make('role')
