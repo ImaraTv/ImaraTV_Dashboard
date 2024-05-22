@@ -62,7 +62,6 @@ class SuperAdminPanelProvider extends PanelProvider
             return false;
         
         }
-            //make function here
         return true;
     }
 
@@ -98,7 +97,7 @@ class SuperAdminPanelProvider extends PanelProvider
                                 return Blade::render("<div class='bg-gray-400 p-2 rounded-lg text-center text-white w-full'>{$mes}</div>");
                             }
                             if (!self::sponsorProfileComplete()) {
-                                $mes = "Please complete your profile for sponsorship approval.";
+                                $mes = "Please complete your profile to be an approved sponsor.";
                                 return Blade::render("<div class='bg-gray-400 p-2 rounded-lg text-center text-white w-full'>{$mes}</div>");
                             }
                         })
