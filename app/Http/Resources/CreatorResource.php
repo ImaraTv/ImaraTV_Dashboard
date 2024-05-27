@@ -37,14 +37,21 @@ class CreatorResource extends ResourceCollection
 //                }
 //            }
 
-            return [
-        'id' => $item->id,
-        'name' => $item->name,
-        'stage_name' => $item->stage_name,
-        'user_id' => $item->user_id,
-        'about' => $item->description,
-        'skills_and_talents' => $item->skills_and_talents,
-        'image' => collect($item->media)->last()?->getFullUrl(),
+            $image = '';
+            $user_image = collect($item->media)->last();
+            if (!is_null($user_image)) {
+                $image = $user_image->getFullUrl();
+            }
+
+            return
+            [
+                'id' => $item->id,
+                'name' => $item->name,
+                'stage_name' => $item->stage_name,
+                'user_id' => $item->user_id,
+                'about' => $item->description,
+                'skills_and_talents' => $item->skills_and_talents,
+                'image' => $user_image,
             ];
         });
 
