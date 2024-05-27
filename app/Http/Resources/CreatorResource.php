@@ -24,18 +24,18 @@ class CreatorResource extends ResourceCollection
                 return [];
             }
 
-            $image = '';
-            $has_mage = collect($item->media)->filter(fn($i) => $i->collection_name === 'profile_pictures')->count();
-
-            if ($has_mage > 0) {
-                $image = collect($item->media)->last();
-                if ($image) {
-                    $file_path = storage_path() . '/app/public/' . $image->id . '/' . $image->file_name;
-                    if (file_exists($file_path)) {
-                        $image = $this->imageToBase64($file_path);
-                    }
-                }
-            }
+//            $image = '';
+//            $has_mage = collect($item->media)->filter(fn($i) => $i->collection_name === 'profile_pictures')->count();
+//
+//            if ($has_mage > 0) {
+//                $image = collect($item->media)->last();
+//                if ($image) {
+//                    $file_path = storage_path() . '/app/public/' . $image->id . '/' . $image->file_name;
+//                    if (file_exists($file_path)) {
+//                        $image = $this->imageToBase64($file_path);
+//                    }
+//                }
+//            }
 
             return [
         'id' => $item->id,
@@ -44,7 +44,7 @@ class CreatorResource extends ResourceCollection
         'user_id' => $item->user_id,
         'about' => $item->description,
         'skills_and_talents' => $item->skills_and_talents,
-        'image' => $image,
+        'image' => collect($item->media)->last()?->getFullUrl(),
             ];
         });
 
