@@ -26,7 +26,7 @@ class RedirectIfUnApproved
                 auth()->logout();
                 redirect()->to(env('APP_LIVE_URL'));
             }
-            if (!(bool) auth()->user()->approved && !in_array(($request->segment(2)), ['my-profile', 'logout','email-verification'])) {
+            if (!(bool) auth()->user()->approved && !in_array(($request->segment(1)), ['my-profile', 'logout','email-verification'])) {
                 abort(405, 'Registration Pending Approval.<br/> <a class="underline" href="' . $profile_url . '" style="">Go to Profile</a>');
             }
         }
