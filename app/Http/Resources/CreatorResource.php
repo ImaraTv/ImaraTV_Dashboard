@@ -51,7 +51,7 @@ class CreatorResource extends ResourceCollection
                 'user_id' => $item->user_id,
                 'about' => $item->description,
                 'skills_and_talents' => $item->skills_and_talents,
-                'image' => $user_image,
+                'image' => $image,
             ];
         });
 
