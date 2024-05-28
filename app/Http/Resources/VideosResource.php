@@ -17,10 +17,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
     {
         $collection = $this->collection->map(function ($item) {
             // name, duration,quality,category,description,image
-
-
-
-            $image = $this->getPoster($item->proposal);
+//            $image = $this->getPoster($item->proposal);
 
             return
             [
@@ -35,7 +32,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'creator' => $item->creator?->name,
                 'rating' => $item->proposal?->film_rating,
                 'stars' => ceil(collect($item->stars)->average('stars')),
-                'image' => $image,
+                'image' => collect($item->proposal?->media)->last()?->getFullUrl(),
             ];
         });
         return [

@@ -24,27 +24,34 @@ class CreatorResource extends ResourceCollection
                 return [];
             }
 
-            $image = '';
-            $has_mage = collect($item->media)->filter(fn($i) => $i->collection_name === 'profile_pictures')->count();
+//            $image = '';
+//            $has_mage = collect($item->media)->filter(fn($i) => $i->collection_name === 'profile_pictures')->count();
+//
+//            if ($has_mage > 0) {
+//                $image = collect($item->media)->last();
+//                if ($image) {
+//                    $file_path = storage_path() . '/app/public/' . $image->id . '/' . $image->file_name;
+//                    if (file_exists($file_path)) {
+//                        $image = $this->imageToBase64($file_path);
+//                    }
+//                }
+//            }
 
-            if ($has_mage > 0) {
-                $image = collect($item->media)->last();
-                if ($image) {
-                    $file_path = storage_path() . '/app/public/' . $image->id . '/' . $image->file_name;
-                    if (file_exists($file_path)) {
-                        $image = $this->imageToBase64($file_path);
-                    }
-                }
+            $image = '';
+            $user_image = collect($item->media)->last();
+            if (!is_null($user_image)) {
+                $image = $user_image->getFullUrl();
             }
 
-            return [
-        'id' => $item->id,
-        'name' => $item->name,
-        'stage_name' => $item->stage_name,
-        'user_id' => $item->user_id,
-        'about' => $item->description,
-        'skills_and_talents' => $item->skills_and_talents,
-        'image' => $image,
+            return
+            [
+                'id' => $item->id,
+                'name' => $item->name,
+                'stage_name' => $item->stage_name,
+                'user_id' => $item->user_id,
+                'about' => $item->description,
+                'skills_and_talents' => $item->skills_and_talents,
+                'image' => $image,
             ];
         });
 
