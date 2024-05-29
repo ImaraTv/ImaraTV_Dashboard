@@ -1,20 +1,12 @@
 <x-mail::message>
-    {{-- Greeting --}}
-    @if (! empty($greeting))
-    # {{ $greeting }}
-    @else
-    @if ($level === 'error')
-    # @lang('Whoops!')
-    @else
-    # @lang('Hello!')
-    @endif
-    @endif
-    <p>
-        You requested to reset your password. Click on the link below to reset.
-        <br/>
-        if you did not request a reset password, you can ignore this email
-    </p>
-    {{-- Action Button --}}
+
+    # Hello!
+
+    You requested to reset your password. Click on the link below to reset.
+
+    if you did not request a reset password, you can ignore this email
+
+
     @isset($actionText)
     <?php
     $color = match ($level) {
@@ -27,15 +19,12 @@
     </x-mail::button>
     @endisset
 
-    {{-- Salutation --}}
-    @if (! empty($salutation))
-    {{ $salutation }}
-    @else
-    @lang('Regards'),<br>
-    {{ config('app.name') }}
-    @endif
 
-    {{-- Subcopy --}}
+    Regards,<br>
+    {{ config('app.name') }}
+
+
+   
     @isset($actionText)
     <x-slot name="subcopy">
         @lang(
