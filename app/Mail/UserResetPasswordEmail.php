@@ -46,7 +46,7 @@ class UserResetPasswordEmail extends Mailable
                 [
                     'actionUrl' => $this->url,
                     'name' => $this->user->name,
-                    'level' => '',
+                    'level' => 'success',
                     'actionText' => 'Reset Password',
                     'displayableActionUrl' => $this->url
                 ]

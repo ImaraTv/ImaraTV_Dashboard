@@ -48,7 +48,7 @@ class RegistrationEmail extends Mailable
                 view: 'emails.user-register',
                 with:
                 [
-                    'level' => '',
+                    'level' => 'success',
                     'actionUrl' => $this->url,
                     'name' => $this->user->name,
                     'actionText' => 'Reset Password',
