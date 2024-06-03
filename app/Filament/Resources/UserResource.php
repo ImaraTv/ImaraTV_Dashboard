@@ -80,7 +80,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function form(Form $form): Form
     {
-        $roles = collect(Role::whereNotIn('name', ['panel_user', 'super_admin'])->get())->pluck('name', 'name');
+        $roles = collect(Role::whereNotIn('name', ['panel_user'])->get())->pluck('name', 'name');
         return $form
                         ->schema([
                             Forms\Components\Card::make()->schema([
