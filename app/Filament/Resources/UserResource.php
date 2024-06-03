@@ -122,7 +122,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function table(Table $table): Table
     {
-        $query = User::withoutRole(['super_admin'])->with('roles');
+        $query = User::with('roles');
 
         return $table
                         ->headerActions([
