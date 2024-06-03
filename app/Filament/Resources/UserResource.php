@@ -154,7 +154,7 @@ class UserResource extends Resource implements HasShieldPermissions
                                 }
                                 return $query;
                             })
-                            ->options(collect(Role::whereNotIn('name', ['super_admin', 'panel_user'])->get())->pluck('name', 'id'))
+                            ->options(collect(Role::whereNotIn('name', ['panel_user'])->get())->pluck('name', 'id'))
                             ->searchable()
                             ->preload(),
                             Filter::make('created_at')
