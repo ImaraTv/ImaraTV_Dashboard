@@ -1,10 +1,10 @@
 <x-mail::message>
 
-# Hello!
+### Dear {{$name}},
 
-You requested to reset your password. Click on the link below to reset.
+We have received a request to reset the password for your account at Imara TV.
 
-if you did not request a reset password, you can ignore this email
+To reset your password, please click on the following link: 
 
 
 @isset($actionText)
@@ -19,6 +19,11 @@ $color = match ($level) {
 </x-mail::button>
 @endisset
 
+If you did not request this change, please disregard this email.
+
+If you have any concerns or need further assistance, please don't hesitate to contact us at
+
+support@imaratelevision.com
 
 Regards,<br>
 {{ config('app.name') }}
