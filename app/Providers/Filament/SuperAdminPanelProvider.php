@@ -27,6 +27,7 @@ use Filament\{
     View\PanelsRenderHook,
     Widgets
 };
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\{
     Contracts\Auth\Authenticatable,
     Cookie\Middleware\AddQueuedCookiesToResponse,
@@ -65,6 +66,9 @@ class SuperAdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        $panel->sidebarWidth('13rem')
+            ->sidebarCollapsibleOnDesktop();
+        $panel->maxContentWidth(MaxWidth::Full);
 
         return $panel->default()
                 
