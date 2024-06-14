@@ -24,7 +24,13 @@ class VideosController extends Controller
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars'])
                 ->where('release_date', "<=", Carbon::now());
-        
+
+        // fetch videos where vimeo_link is not null
+
+        $videos = $videos->whereHas('proposal', function ($q) {
+            $q->whereNotNull('vimeo_link')->where('vimeo_link', '<>', '');
+        });
+
         if ($search != '') {
             $videos = $videos->where(function ($q) use ($search) {
                 $q->where('film_title', 'like', '%' . $search . '%')
