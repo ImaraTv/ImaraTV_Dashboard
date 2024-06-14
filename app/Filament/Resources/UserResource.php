@@ -80,7 +80,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function form(Form $form): Form
     {
-        $roles = collect(Role::whereNotIn('name', ['panel_user', 'super_admin'])->get())->pluck('name', 'name');
+        $roles = collect(Role::whereNotIn('name', ['panel_user'])->get())->pluck('name', 'name');
         return $form
                         ->schema([
                             Forms\Components\Card::make()->schema([
@@ -122,7 +122,7 @@ class UserResource extends Resource implements HasShieldPermissions
 
     public static function table(Table $table): Table
     {
-        $query = User::withoutRole(['super_admin'])->with('roles');
+        $query = User::with('roles');
 
         return $table
                         ->headerActions([
@@ -154,7 +154,7 @@ class UserResource extends Resource implements HasShieldPermissions
                                 }
                                 return $query;
                             })
-                            ->options(collect(Role::whereNotIn('name', ['super_admin', 'panel_user'])->get())->pluck('name', 'id'))
+                            ->options(collect(Role::whereNotIn('name', ['panel_user'])->get())->pluck('name', 'id'))
                             ->searchable()
                             ->preload(),
                             Filter::make('created_at')
