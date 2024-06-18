@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\CreatorProfile;
+use App\Models\SponsorProfile;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class CreatorProfilePolicy
+class SponsorProfilePolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class CreatorProfilePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_creator');
+        return $user->can('view_any_sponsor');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, CreatorProfile $creatorProfile): bool
+    public function view(User $user, SponsorProfile $sponsorProfile): bool
     {
-        return $user->can('view_creator');
+        return $user->can('view_sponsor');
     }
 
     /**
@@ -31,23 +31,23 @@ class CreatorProfilePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_creator');
+        return $user->can('create_sponsor');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, CreatorProfile $creatorProfile): bool
+    public function update(User $user, SponsorProfile $sponsorProfile): bool
     {
-        return $user->can('update_creator');
+        return $user->can('update_sponsor');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, CreatorProfile $creatorProfile): bool
+    public function delete(User $user, SponsorProfile $sponsorProfile): bool
     {
-        return $user->can('delete_creator');
+        return $user->can('delete_sponsor');
     }
 
     /**
@@ -55,15 +55,15 @@ class CreatorProfilePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_creator');
+        return $user->can('delete_any_sponsor');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, CreatorProfile $creatorProfile): bool
+    public function forceDelete(User $user, SponsorProfile $sponsorProfile): bool
     {
-        return $user->can('force_delete_creator');
+        return $user->can('force_delete_sponsor');
     }
 
     /**
@@ -71,15 +71,15 @@ class CreatorProfilePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_creator');
+        return $user->can('force_delete_any_sponsor');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, CreatorProfile $creatorProfile): bool
+    public function restore(User $user, SponsorProfile $sponsorProfile): bool
     {
-        return $user->can('restore_creator');
+        return $user->can('restore_sponsor');
     }
 
     /**
@@ -87,15 +87,15 @@ class CreatorProfilePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_creator');
+        return $user->can('restore_any_sponsor');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, CreatorProfile $creatorProfile): bool
+    public function replicate(User $user, SponsorProfile $sponsorProfile): bool
     {
-        return $user->can('replicate_creator');
+        return $user->can('replicate_sponsor');
     }
 
     /**
@@ -103,6 +103,6 @@ class CreatorProfilePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_creator');
+        return $user->can('reorder_sponsor');
     }
 }
