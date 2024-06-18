@@ -21,6 +21,7 @@ class VideosController extends Controller
         $filter = $request->has('filter') ? $request->get('filter') : '';
         $category = $request->has('category') ? $request->get('category') : '';
         $rating = $request->has('rating') ? $request->get('rating') : '';
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars'])
                 ->where('release_date', "<=", Carbon::now());
@@ -57,9 +58,7 @@ class VideosController extends Controller
                 $q->where('film_rating', $rating);
             });
         }
-
-        $videos = $videos
-                ->paginate(10);
+        $videos = $videos->paginate($limit);
 
         return new VideosResource($videos);
     }

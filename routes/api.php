@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\API\{
-    AuthController,
+use App\Http\Controllers\API\{AuthController,
     CategoriesController,
     CreatorsController,
+    FilmTopicsController,
+    LocationsController,
     UsersController,
-    VideosController
-};
+    VideosController};
 use Illuminate\Support\Facades\Route;
 use function Safe\date;
 
@@ -34,6 +34,8 @@ Route::group(['middleware' => 'api'], function () {
     Route::get('/creators', [CreatorsController::class, 'creators']);
     Route::get('/creators/{id}', [CreatorsController::class, 'creator']);
     Route::get('/categories', [CategoriesController::class, 'categories']);
+    Route::get('/topics', [FilmTopicsController::class, 'list']);
+    Route::get('/locations', [LocationsController::class, 'list']);
 
     Route::group(['middleware' => 'jwt.auth'], function () {
         Route::get('/profile', [AuthController::class, 'profile']);
