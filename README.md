@@ -21,7 +21,8 @@ This is the backend code for the [Imara TV](https://imara.tv).
 7. run `php artisan key:generate` to generate app key
 8. run `php artisan migrate` to migrate db tables
 9. run `php artisan shield:super-admin` to create admin user
-10. Navigate to installation url e.g http://localhost/imaratv-dashboard/login
+10. run `php artisan shield:install` to install the roles and permissions
+11. Navigate to installation url e.g http://localhost/imaratv-dashboard/login
 
 ## Troubleshooting
 
