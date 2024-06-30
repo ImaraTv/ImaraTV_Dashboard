@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\{
-    Exports\CreatorProfiles,
+use App\{Exports\CreatorProfiles,
     Filament\Resources\CreatorResource\Pages,
     Models\CreatorProfile,
-    Models\Location
-};
+    Models\Location,
+    Models\User};
 use Filament\{
     Forms\Components\Card,
     Forms\Components\DatePicker,
@@ -161,6 +160,12 @@ class CreatorResource extends Resource
                                     ->name('profile_banner')
                                     ->collection('profile_banners')
                                     ->columnSpan(3),
+                                    Select::make('user_id')
+                                        ->label('User')
+                                        ->options(
+                                            User::where('role', 'creator')->pluck('name', 'id')
+                                        )
+                                        ->columnSpan(3)->required(),
                                     TextInput::make('name')
                                     ->columnSpan(3),
                                     TextInput::make('stage_name')

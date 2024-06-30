@@ -5,6 +5,7 @@ use App\Http\Controllers\API\{AuthController,
     CreatorsController,
     FilmTopicsController,
     LocationsController,
+    SiteController,
     UsersController,
     VideosController};
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,7 @@ Route::group(['middleware' => 'api'], function () {
     Route::get('/categories', [CategoriesController::class, 'categories']);
     Route::get('/topics', [FilmTopicsController::class, 'list']);
     Route::get('/locations', [LocationsController::class, 'list']);
+    Route::post('/contact', [SiteController::class, 'contact']);
 
     Route::group(['middleware' => 'jwt.auth'], function () {
         Route::get('/profile', [AuthController::class, 'profile']);

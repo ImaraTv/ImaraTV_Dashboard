@@ -32,6 +32,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'creator' => $item->creator?->name,
                 'rating' => $item->proposal?->film_rating,
                 'sponsored_by' => $item->sponsor?->name,
+                'sponsor' => $item->sponsor,
                 'stars' => ceil(collect($item->stars)->average('stars')),
                 'image' => collect($item->proposal?->media)->last()?->getFullUrl(),
             ];
