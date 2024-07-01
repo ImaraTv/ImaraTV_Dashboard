@@ -15,7 +15,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        $collection = $this->collection->map(function ($item) {
+        $collection = $this->collection->map(function ($item) use ($request) {
             // name, duration,quality,category,description,image
 //            $image = $this->getPoster($item->proposal);
 
@@ -27,12 +27,17 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'category' => $item->proposal?->genre?->genre_name,
                 'description' => $item->synopsis,
                 'vimeo_link' => $item->proposal->vimeo_link,
-                'call_to_action' => $item->call_to_action_text,
+                'call_to_action_btn' => $item->call_to_action_text,
                 'call_to_action_link' => $item->call_to_action_link,
                 'creator' => $item->creator?->name,
                 'rating' => $item->proposal?->film_rating,
                 'sponsored_by' => $item->sponsor?->name,
-                'sponsor' => $item->sponsor,
+                'sponsor' => [
+                    'name' => $item->sponsor?->organization_name,
+                    'about' => $item->sponsor?->about_us,
+                    'website' => $item->sponsor?->organization_website,
+                    'logo' => $item->sponsor?->getMedia('logo')->first()?->getFullUrl(),
+                ],
                 'stars' => ceil(collect($item->stars)->average('stars')),
                 'image' => collect($item->proposal?->media)->last()?->getFullUrl(),
             ];
