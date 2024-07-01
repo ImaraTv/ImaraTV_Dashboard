@@ -22,6 +22,7 @@ This is the backend code for the [Imara TV](https://imara.tv).
 8. run `php artisan migrate` to migrate db tables
 9. run `php artisan shield:super-admin` to create admin user
 10. run `php artisan shield:install` to install the roles and permissions
+11. run `php artisan storage:link` to add a symbolic link to the `storage/app/public` directory to make files stored in `storage/app/public/` to be publicly available
 11. Navigate to installation url e.g http://localhost/imaratv-dashboard/login
 
 ## Troubleshooting
