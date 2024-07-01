@@ -29,7 +29,7 @@ class FilmScheduleCreatedEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Film Schedule Created Email',
+            subject: 'Film Schedule Created at Imara TV',
         );
     }
 
