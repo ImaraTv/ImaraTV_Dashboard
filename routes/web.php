@@ -24,4 +24,6 @@ Route::get('/mail', function () {
     Mail::to($user)->send($mail);
 });
 
-
+Route::get('/help', function() {
+    return view('user-manual');
+});
