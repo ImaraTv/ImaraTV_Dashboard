@@ -2,15 +2,13 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
-use App\{
-    Filament\Resources\UserResource,
-    Models\User
-};
+use App\{Filament\Resources\UserResource, Mail\UserApprovalEmail, Models\User};
 use Filament\{
     Actions,
     Resources\Pages\EditRecord
 };
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
 
 class EditUser extends EditRecord
 {
@@ -35,7 +33,7 @@ class EditUser extends EditRecord
         return $record;
     }
 
-    protected function afterSave()
+    protected function afterSave(): void
     {
         $user = User::whereId($this->data['id'])->first();
         if ($user) {

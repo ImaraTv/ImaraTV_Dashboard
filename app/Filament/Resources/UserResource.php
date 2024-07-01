@@ -2,11 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\{
-    Exports\Users,
-    Filament\Resources\UserResource\Pages,
-    Models\User
-};
+use App\{Exports\Users, Filament\Resources\UserResource\Pages, Mail\UserApprovalEmail, Models\User};
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{
     Forms,
@@ -20,11 +16,7 @@ use Filament\{
     Tables\Filters\Filter,
     Tables\Table
 };
-use Illuminate\{
-    Database\Eloquent\Builder,
-    Database\Eloquent\Model,
-    Support\Facades\Hash
-};
+use Illuminate\{Database\Eloquent\Builder, Database\Eloquent\Model, Support\Facades\Hash, Support\Facades\Mail};
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 use function auth;
@@ -106,14 +98,17 @@ class UserResource extends Resource implements HasShieldPermissions
                                 ->dehydrated(false)
                                 ->minLength(6),
                                 Forms\Components\Select::make('role')
-                                ->formatStateUsing(function (Model $record) {
-                                    $user = User::with(['roles'])->whereId($record->id)->first();
-                                    $role = collect($user->roles)->filter(fn($i) => $i != 'panel_user')->last();
-                                    if (isset($role)) {
+                                ->formatStateUsing(function (?Model $record) {
+                                    if ($record) {
+                                        $user = User::with(['roles'])->whereId($record->id)->first();
+                                        $role = collect($user->roles)->filter(fn($i) => $i != 'panel_user')->last();
+                                        if (isset($role)) {
 
-                                        return $role->name;
+                                            return $role->name;
+                                        }
                                     }
-                                    return'user';
+
+                                    return 'user';
                                 })
                                 ->options($roles)
                             ])
@@ -142,7 +137,12 @@ class UserResource extends Resource implements HasShieldPermissions
                             }),
                             Tables\Columns\TextColumn::make('created_at')->dateTime(),
                             Tables\Columns\ToggleColumn::make('approved')
-                            ->label('Approve')
+                                ->label('Approve')
+                                ->afterStateUpdated(function (Model $record) {
+                                    if ($record->approved) {
+                                        Mail::to($record)->send(new UserApprovalEmail($record));
+                                    }
+                                }),
                         ])
                         ->filters([
                             Tables\Filters\SelectFilter::make('role')

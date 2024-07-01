@@ -2,15 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use App\{
-    Exports\SponsorProfiles,
+use App\{Exports\SponsorProfiles,
     Filament\Resources\SponsorResource\Pages,
     Models\FilmTopic,
     Models\Location,
-    Models\SponsorProfile
-};
-use Filament\{
-    Forms\Components\Card,
+    Models\SponsorProfile,
+    Models\User};
+use Filament\{Forms\Components\Card,
+    Forms\Components\Select,
     Forms\Components\SpatieMediaLibraryFileUpload,
     Forms\Components\TagsInput,
     Forms\Components\Textarea,
@@ -18,8 +17,7 @@ use Filament\{
     Forms\Form,
     Resources\Resource,
     Tables,
-    Tables\Table
-};
+    Tables\Table};
 use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 
@@ -79,6 +77,12 @@ class SponsorResource extends Resource
                                     ->columnSpanFull()
                                     ->label('Locations of Interest')->nullable(),
 //                            --
+                            Select::make('user_id')
+                                    ->label('User')
+                                    ->options(
+                                        User::where('role', 'sponsor')->pluck('name', 'id')
+                                    )
+                                    ->columnSpan(3)->required(),
                             TextInput::make('contact_person_name')
                                     ->columnSpan(3)
                                     ->label('Contact Person Name')->nullable(),

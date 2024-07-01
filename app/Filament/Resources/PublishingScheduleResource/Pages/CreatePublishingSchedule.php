@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\PublishingScheduleResource\Pages;
 
 use App\Filament\Resources\PublishingScheduleResource;
+use App\Mail\FilmScheduleCreatedEmail;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Mail;
 
 class CreatePublishingSchedule extends CreateRecord
 {
@@ -18,5 +20,14 @@ class CreatePublishingSchedule extends CreateRecord
         $data['topics'] = collect($data['topics'])->implode(',');
 
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        $record = $this->record;
+        $users = array_filter([$record->user, $record?->creator?->user, $record?->sponsor?->user]);
+        foreach ( $users as $user) {
+            Mail::to($user)->send(new FilmScheduleCreatedEmail($user, $record));
+        }
     }
 }
