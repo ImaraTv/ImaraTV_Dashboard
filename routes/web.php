@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\{
     Route
 };
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 Livewire::setScriptRoute(function ($handle) {
     return Route::get('/vendor/livewire/livewire.js', $handle);
@@ -24,4 +26,16 @@ Route::get('/mail', function () {
     Mail::to($user)->send($mail);
 });
 
+
+Route::get('/help', function() {
+    if (Auth::user()->hasRole('creator')){
+        return view('creator-manual');
+    }
+    if (Auth::user()->hasRole('sponsor')){
+        return view('sponsor-manual');
+    }
+    else{
+        return view('user-manual');
+    }
+});
 
