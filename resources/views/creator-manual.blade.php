@@ -74,7 +74,7 @@
                         </ol>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Creator User Manual/slide2.png')}}" alt="">
+                        <img src="{{asset('/images/Creator-User-Manual/slide2.png')}}" alt="">
                     </div>
                 </div>
 
@@ -90,7 +90,7 @@
                         </ol>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Creator User Manual/slide3.png')}}" alt="">
+                        <img src="{{asset('/images/Creator-User-Manual/slide3.png')}}" alt="">
                     </div>
                 </div>
 
@@ -103,14 +103,14 @@
                         
                     </div>
                     <div>
-                        <img src="{{asset('/images/Creator User Manual/slide4.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Creator-User-Manual/slide4.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
                 
                 <div  class="cont2">
                     <div>
                         <h3>How To Update Film Projects</h3>
-                        <img src="{{asset('/images/Creator User Manual/slide5.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Creator-User-Manual/slide5.png')}}" alt="" class="ssimage">
                         <p>To update Film Project, simply click on the edit icon as shown above. Once clicked, a pop-up <br>
                             window will appear, as illustrated in the image below. In this window, input the new name for <br>
                             the Film Project. After entering the new name, click on "Save Changes" to update and save <br>
@@ -119,7 +119,7 @@
                         
                     </div>
                     <div>
-                        <img src="{{asset('/images/Creator User Manual/slide5-2.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Creator-User-Manual/slide5-2.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
@@ -130,7 +130,7 @@
                             on sponsors, genre, status, and dates. Once you've entered the desired details, click on <br>
                             "Reset" to apply the filters.
                         </p>
-                        <img src="{{asset('/images/Creator User Manual/slide6.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Creator-User-Manual/slide6.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
@@ -142,11 +142,11 @@
                             <li>Navigate to the Film Project Feature and locate the delete button, highlighted <br>
                                 in red. Click on it, and a pop-up will appear, asking you to confirm the deletion. <br>
                                 Click "Confirm" to proceed with the deletion.</li>
-                                <img src="{{asset('/images/Creator User Manual/slide7.png')}}" alt="" class="ssimage">
+                                <img src="{{asset('/images/Creator-User-Manual/slide7.png')}}" alt="" class="ssimage">
                             <li>Alternatively, you can click on the Film Project Name itself. <br>
                                 Select the number of films you want to delete, then click on "Bulk Actions." <br>
                                 From the dropdown menu, choose "Delete Selected" to remove them</li>
-                                <img src="{{asset('/images/Creator User Manual/slide7-2.png')}}" alt="" class="ssimage">
+                                <img src="{{asset('/images/Creator-User-Manual/slide7-2.png')}}" alt="" class="ssimage">
                         </ul>
                     </div>
                 </div>
@@ -160,7 +160,7 @@
                             view or experience the latest films on the platform.
                     </div>
                     <div>
-                        <img src="{{asset('/images/Creator User Manual/slide8.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Creator-User-Manual/slide8.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
@@ -173,16 +173,16 @@
                             apply the filters.
                     </div>
                     <div>
-                        <img src="{{asset('/images/Creator User Manual/slide9.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Creator-User-Manual/slide9.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
                 <div  class="cont2">
                     <h3>How to View Film Schedules</h3>
-                    <img src="{{asset('/images/Creator User Manual/slide10.png')}}" alt="" class="ssimage">
+                    <img src="{{asset('/images/Creator-User-Manual/slide10.png')}}" alt="" class="ssimage">
                     <p>To view Film Schedules click on View as shown above.Once you click on it a pop up will appear <br>
                         with the film title,type,synopsis,creator,release date and sponsor</p>
-                    <img src="{{asset('/images/Creator User Manual/slide10-2.png')}}" alt="" class="ssimage">
+                    <img src="{{asset('/images/Creator-User-Manual/slide10-2.png')}}" alt="" class="ssimage">
                 </div>
             </div> 
             <a href="#top"><h3>Back to Top</h3></a>

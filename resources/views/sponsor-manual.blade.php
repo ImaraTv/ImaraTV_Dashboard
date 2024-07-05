@@ -70,7 +70,7 @@
                         </ol>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Sponsor User Manual/slide2.png')}}" alt="">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide2.png')}}" alt="">
                     </div>
                 </div>
 
@@ -85,7 +85,7 @@
                         </ol>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Sponsor User Manual/slide3.png')}}" alt="">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide3.png')}}" alt="">
                     </div>
                 </div>
 
@@ -101,7 +101,7 @@
                         </ol>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Sponsor User Manual/slide4.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide4.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
@@ -116,7 +116,7 @@
                         </p>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Sponsor User Manual/slide5.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide5.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
@@ -132,20 +132,20 @@
                         </p>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Sponsor User Manual/slide6.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide6.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
                 <div  class="cont2">
                     <div>
                         <h3>How to Add a New Film Project</h3>
-                        <img src="{{asset('/images/Sponsor User Manual/slide7.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide7.png')}}" alt="" class="ssimage">
                         <p>
                             To add a New Film Project , click on the "Create New Proposal" button as depicted above. 
                             This action will direct you to a page where you can input the Project details from title,
                             synopsis,budget ,Film length and so on.Once you are done with that click on the create button
                         </p>
-                        <img src="{{asset('/images/Sponsor User Manual/slide7-2.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide7-2.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
                 
@@ -157,7 +157,7 @@
                             sponsor, creator, admin, and dates. Once you've entered the desired details, click on "Reset" 
                             to apply the filters
                         </p>
-                        <img src="{{asset('/images/Sponsor User Manual/slide8.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide8.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
@@ -173,13 +173,13 @@
                                 red. Click on it, and a pop-up will appear, asking you to confirm the deletion. Click "Confirm" 
                                 to proceed with the deletion.
                             </li>
-                            <img src="{{asset('/images/Sponsor User Manual/slide10.png')}}" alt="" class="ssimage">
+                            <img src="{{asset('/images/Sponsor-User-Manual/slide10.png')}}" alt="" class="ssimage">
                             <li>
                                 The other option is to Click on the Edit Icon. A page will appear displaying the project film details.
                                 On top of the page there is a delete button click on it.A pop up will appear asking you to confirm if 
                                 you want to delete it.Once you have confirmed the role will be deleted
                             </li>
-                            <img src="{{asset('/images/Sponsor User Manual/slide10-2.png')}}" alt="" class="ssimage">
+                            <img src="{{asset('/images/Sponsor-User-Manual/slide10-2.png')}}" alt="" class="ssimage">
                         </ul>
                     </div>
                 </div>
@@ -187,7 +187,7 @@
                 <div  class="cont2">
                     <div>
                         <h3>How to Edit A Film Project</h3>
-                        <img src="{{asset('/images/Sponsor User Manual/slide9.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide9.png')}}" alt="" class="ssimage">
                         <p>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut 
                             labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -195,7 +195,7 @@
                             esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
                             in culpa qui officia deserunt mollit anim id est laborum.
                         </p>
-                        <img src="{{asset('/images/Sponsor User Manual/slide9-2.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide9-2.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
                 
@@ -209,19 +209,19 @@
                         </p>
                     </div>
                     <div>
-                        <img src="{{asset('/images/Sponsor User Manual/slide11.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide11.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
                 <div  class="cont2">
                     <div>
                         <h3>How to View a Creator's Profile</h3>
-                        <img src="{{asset('/images/Sponsor User Manual/slide12-2.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide12-2.png')}}" alt="" class="ssimage">
                         <p>
                             To view a creator profile click on the view icon then it will take you to the page where 
                             you will be able to view the Creators Details
                         </p>
-                        <img src="{{asset('/images/Sponsor User Manual/slide12.png')}}" alt="" class="ssimage">
+                        <img src="{{asset('/images/Sponsor-User-Manual/slide12.png')}}" alt="" class="ssimage">
                     </div>
                 </div>
 
