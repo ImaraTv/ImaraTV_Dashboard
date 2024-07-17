@@ -13,8 +13,7 @@ use App\{
     Models\SponsorProfile
 };
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\{
-    Forms\Components\Card,
+use Filament\{Forms\Components\Card,
     Forms\Components\DatePicker,
     Forms\Components\DateTimePicker,
     Forms\Components\Select,
@@ -28,13 +27,14 @@ use Filament\{
     Infolists\Components\TextEntry,
     Notifications\Notification,
     Resources\Resource,
+    Support\Enums\ActionSize,
     Tables,
+    Tables\Actions\ActionGroup,
     Tables\Columns\TextColumn,
     Tables\Enums\FiltersLayout,
     Tables\Filters\Filter,
     Tables\Filters\SelectFilter,
-    Tables\Table
-};
+    Tables\Table};
 use Illuminate\{
     Database\Eloquent\Builder,
     Database\Eloquent\Model,
@@ -168,6 +168,54 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                         ])->statePath('data');
     }
 
+    public static function tableActions()
+    {
+        return [
+            ActionGroup::make([
+                Tables\Actions\EditAction::make()
+                    ->visible(auth()->user()->can('update_publishing::schedule')),
+                Tables\Actions\ViewAction::make()
+                    ->infolist([
+                        Section::make()
+                            ->columns(2)
+                            ->schema([
+                                TextEntry::make('film_title'),
+                                TextEntry::make('release_date'),
+                                TextEntry::make('film_type'),
+                                TextEntry::make('sponsor.organization_name'),
+                                TextEntry::make('creator.name'),
+                                TextEntry::make('synopsis'),
+                            ])
+                    ])
+                    ->fillForm(function (PublishingSchedule $schedule) {
+                        $data = $schedule->toArray();
+
+                        return $data;
+                    }),
+                Tables\Actions\Action::make('upload_to_vimeo')
+                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
+                    ->requiresConfirmation(function (PublishingSchedule $schedule) {
+                        return $schedule->proposal->vimeo_link != null;
+                    })
+                    ->modalHeading('Overwrite Video')
+                    ->modalDescription('This schedule has a video on vimeo. Do you want ot overwrite it?')
+                    ->action(function (PublishingSchedule $schedule): void {
+                        $job = (new UploadVideoToVimeo($schedule->proposal));
+                        dispatch_sync($job);
+
+                        Notification::make()
+                            ->title('upload has been queued')
+                            ->success()
+                            ->send();
+                    })
+            ])->label('Actions')
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->size(ActionSize::Small)
+                ->color('primary')
+                ->button(),
+        ];
+    }
+
     public static function table(Table $table): Table
     {
         $query = PublishingSchedule::with(['sponsor', 'creator', 'proposal']);
@@ -229,44 +277,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 );
                             })
                                 ], layout: FiltersLayout::AboveContent)->filtersFormColumns(4)
-                        ->actions([
-                            Tables\Actions\EditAction::make()
-                            ->visible(auth()->user()->can('update_publishing::schedule')),
-                            Tables\Actions\ViewAction::make()
-                            ->infolist([
-                                Section::make()
-                                ->columns(2)
-                                ->schema([
-                                    TextEntry::make('film_title'),
-                                    TextEntry::make('release_date'),
-                                    TextEntry::make('film_type'),
-                                    TextEntry::make('sponsor.organization_name'),
-                                    TextEntry::make('creator.name'),
-                                    TextEntry::make('synopsis'),
-                                ])
-                            ])
-                            ->fillForm(function (PublishingSchedule $schedule) {
-                                $data = $schedule->toArray();
-
-                                return $data;
-                            }),
-                            Tables\Actions\Action::make('upload_to_vimeo')
-                            ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
-                            ->requiresConfirmation(function (PublishingSchedule $schedule) {
-                                return $schedule->proposal->vimeo_link != null;
-                            })
-                            ->modalHeading('Overwrite Video')
-                            ->modalDescription('This schedule has a video on vimeo. Do you want ot overwrite it?')
-                            ->action(function (PublishingSchedule $schedule): void {
-                                $job = (new UploadVideoToVimeo($schedule->proposal));
-                                dispatch_sync($job);
-
-                                Notification::make()
-                                ->title('upload has been queued')
-                                ->success()
-                                ->send();
-                            })
-                        ])
+                        ->actions(static::tableActions())
                         ->bulkActions([
         ]);
     }
