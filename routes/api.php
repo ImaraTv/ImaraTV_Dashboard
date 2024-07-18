@@ -3,8 +3,10 @@
 use App\Http\Controllers\API\{AuthController,
     CategoriesController,
     CreatorsController,
+    FilmGenreController,
     FilmTopicsController,
     LocationsController,
+    ProposalStatusController,
     SiteController,
     UsersController,
     VideosController};
@@ -36,6 +38,8 @@ Route::group(['middleware' => 'api'], function () {
     Route::get('/creators/{id}', [CreatorsController::class, 'creator']);
     Route::get('/categories', [CategoriesController::class, 'categories']);
     Route::get('/topics', [FilmTopicsController::class, 'list']);
+    Route::get('/genres', [FilmGenreController::class, 'list']);
+    Route::get('/proposal-status', [ProposalStatusController::class, 'list']);
     Route::get('/locations', [LocationsController::class, 'list']);
     Route::post('/contact', [SiteController::class, 'contact']);
 
