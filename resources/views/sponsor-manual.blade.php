@@ -46,9 +46,9 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">>
         <div style="text-align:center;">
+            <img src="{{asset('/images/imara_tv_logo_r.png')}}" alt="" style="width:30%; display:block; margin-left:auto; margin-right:auto;">
             <title id="#top">Imara.TV User Manual</title>
             <h1>Imara.TV User Manual</h1>
-            <img src="{{asset('/images/imara_tv_logo_r.png')}}" alt="" style="width:30%; display:block; margin-left:auto; margin-right:auto;">
         </div>
     </head>
 
