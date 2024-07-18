@@ -15,8 +15,7 @@ use App\{
     Models\User
 };
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\{
-    Forms\Components\Card,
+use Filament\{Forms\Components\Card,
     Forms\Components\DatePicker,
     Forms\Components\Select,
     Forms\Components\SpatieMediaLibraryFileUpload,
@@ -30,14 +29,15 @@ use Filament\{
     Infolists\Components\TextEntry,
     Notifications\Notification,
     Resources\Resource,
+    Support\Enums\ActionSize,
     Tables,
     Tables\Actions\Action,
+    Tables\Actions\ActionGroup,
     Tables\Columns\TextColumn,
     Tables\Enums\FiltersLayout,
     Tables\Filters\Filter,
     Tables\Filters\SelectFilter,
-    Tables\Table
-};
+    Tables\Table};
 use Illuminate\Database\Eloquent\{
     Builder,
     Model
@@ -283,6 +283,87 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         return false;
     }
 
+    public static function tableActions()
+    {
+        $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
+
+        return [
+            Action::make('potentialSponsors')
+                ->infolist([
+                    RepeatableEntry::make('potential_sponsors')
+                        ->schema([
+                            TextEntry::make('sponsor.organization_name')->label('Organization'),
+                            TextEntry::make('sponsor.contact_person_name')->label('Contact Person Name'),
+                            TextEntry::make('sponsor.contact_person_email')->label('Contact Person Email')
+                        ])
+                        ->grid(2)
+                ])
+                ->label('Potential Sponsors')
+                ->visible(fn() => $admins_only),
+            Action::make('selectForFunding')
+                ->action(function (CreatorProposal $record) {
+                    $data = [
+                        'sponsor_id' => auth()->id(),
+                        'proposal_id' => $record->id
+                    ];
+                    $saved = PotentialSponsor::updateOrCreate($data, $data);
+
+                    if ($saved) {
+                        Notification::make()
+                            ->success()
+                            ->title('Updated');
+                    } else {
+                        Notification::make()
+                            ->warning()
+                            ->title('Failed to update');
+                    }
+                    return;
+                })
+                ->visible(function (CreatorProposal $record) {
+                    return auth()->user()->hasRole('sponsor') && $record->sponsored_by == null;
+                })
+                ->label('Select for funding'),
+            ActionGroup::make([
+                Tables\Actions\EditAction::make()
+                    ->label('Update Project'),
+                Tables\Actions\ViewAction::make()
+                    ->infolist([
+                        Grid::make([
+                            'default' => 2
+                        ])
+                            ->schema([
+                                TextEntry::make('working_title'),
+                                TextEntry::make('topics')
+                                    ->label('Topics'),
+                                TextEntry::make('synopsis')
+                                    ->columnSpanFull()
+                                    ->label('Synopsis'),
+                                TextEntry::make('film_budget')
+                                    ->label('Film Budget'),
+                                TextEntry::make('user.name')
+                                    ->label('Created By'),
+                                TextEntry::make('sponsor.organization_name')
+                                    ->label('Sponsor'),
+                                TextEntry::make('genre.genre_name')
+                                    ->label('Genre'),
+                                TextEntry::make('proposal_status.status')
+                                    ->label('Status')
+                            ])
+                    ])
+                    ->fillForm(function ($record) {
+                        return collect($record)->toArray();
+                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(auth()->user()->can('delete_creator::proposal'))
+            ])
+            ->label('Actions')
+            ->icon('heroicon-m-ellipsis-vertical')
+            ->size(ActionSize::Small)
+            ->color('primary')
+            ->button(),
+        ];
+    }
+
     public static function table(Table $table): Table
     {
         $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
@@ -300,9 +381,6 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->orWhereNull('sponsored_by');
             });
         }
-
-
-
 
         return $table
                         ->headerActions([
@@ -368,74 +446,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                             ->label('Date Created')
                             ->date()
                         ])
-                        ->actions([
-                            Tables\Actions\EditAction::make()
-                            ->label('Update Project'),
-                            Tables\Actions\ViewAction::make()
-                            ->infolist([
-                                Grid::make([
-                                    'default' => 2
-                                ])
-                                ->schema([
-                                    TextEntry::make('working_title'),
-                                    TextEntry::make('topics')
-                                    ->label('Topics'),
-                                    TextEntry::make('synopsis')
-                                    ->columnSpanFull()
-                                    ->label('Synopsis'),
-                                    TextEntry::make('film_budget')
-                                    ->label('Film Budget'),
-                                    TextEntry::make('user.name')
-                                    ->label('Created By'),
-                                    TextEntry::make('sponsor.organization_name')
-                                    ->label('Sponsor'),
-                                    TextEntry::make('genre.genre_name')
-                                    ->label('Genre'),
-                                    TextEntry::make('proposal_status.status')
-                                    ->label('Status')
-                                ])
-                            ])
-                            ->fillForm(function ($record) {
-                                return collect($record)->toArray();
-                            }),
-                            Tables\Actions\Action::make('potentialSponsors')
-                            ->infolist([
-                                RepeatableEntry::make('potential_sponsors')
-                                ->schema([
-                                    TextEntry::make('sponsor.organization_name')->label('Organization'),
-                                    TextEntry::make('sponsor.contact_person_name')->label('Contact Person Name'),
-                                    TextEntry::make('sponsor.contact_person_email')->label('Contact Person Email')
-                                ])
-                                ->grid(2)
-                            ])
-                            ->label('Potential Sponsors')
-                            ->visible(fn() => $admins_only),
-                            Action::make('selectForFunding')
-                            ->action(function (CreatorProposal $record) {
-                                $data = [
-                                    'sponsor_id' => auth()->id(),
-                                    'proposal_id' => $record->id
-                                ];
-                                $saved = PotentialSponsor::updateOrCreate($data, $data);
-
-                                if ($saved) {
-                                    Notification::make()
-                                    ->success()
-                                    ->title('Updated');
-                                } else {
-                                    Notification::make()
-                                    ->warning()
-                                    ->title('Failed to update');
-                                }
-                                return;
-                            })
-                            ->visible(function (CreatorProposal $record) {
-                                return auth()->user()->hasRole('sponsor') && $record->sponsored_by == null;
-                            })
-                            ->label('Select for funding'),
-                            Tables\Actions\DeleteAction::make()
-                            ->visible(auth()->user()->can('delete_creator::proposal'))
-                        ])
+                        ->actions(static::tableActions())
                         ->bulkActions([
                             Tables\Actions\BulkActionGroup::make([
                                 Tables\Actions\DeleteBulkAction::make(),
