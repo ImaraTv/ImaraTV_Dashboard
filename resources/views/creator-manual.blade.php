@@ -61,17 +61,15 @@
     .cont1 {
         font-family: 'Trebuchet MS', 'sans-serif';
         display: flex;
-        width: 90%;
+        width: 100%;
         flex-direction: row;
         justify-content: space-between;
         border: 1px solid #D0D0D0;
-        border-radius: 25px;
+        border-radius: 10px;
         flex-wrap: wrap;
         padding: 20px;
-        margin-bottom: 10px;
-
+        margin-bottom: 15px;
         background: #FFFFFF;
-
         box-shadow: 0px 2px 5px 4px rgba(0, 0, 0, 0.23);
         -webkit-box-shadow: 0px 2px 5px 4px rgba(0, 0, 0, 0.23);
         -moz-box-shadow: 0px 2px 5px 4px rgba(0, 0, 0, 0.23);
@@ -79,14 +77,12 @@
 
     .cont2 {
         font-family: 'Trebuchet MS', 'sans-serif';
-        width: 90%;
-        border-radius: 25px;
+        width: 100%;
+        border-radius: 10px;
         border-bottom: 1px solid #D0D0D0;
         padding: 20px;
-        margin-bottom: 10px;
-
+        margin-bottom: 15px;
         background: #FFFFFF;
-
         box-shadow: 0px 2px 5px 4px rgba(0, 0, 0, 0.23);
         -webkit-box-shadow: 0px 2px 5px 4px rgba(0, 0, 0, 0.23);
         -moz-box-shadow: 0px 2px 5px 4px rgba(0, 0, 0, 0.23);
