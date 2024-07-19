@@ -2,14 +2,13 @@
 
 namespace App\Providers\Filament;
 
-use App\{
-    Filament\Pages\Auth\Login,
+use App\{Filament\Pages\Auth\Login,
     Filament\Pages\Auth\Register,
     Filament\Pages\EditProfile,
+    Filament\Pages\UserManual,
     Models\CreatorProfile,
     Models\SocialiteUser,
-    Models\User
-};
+    Models\User};
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Blade;
 use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
@@ -71,7 +70,7 @@ class SuperAdminPanelProvider extends PanelProvider
         $panel->maxContentWidth(MaxWidth::Full);
 
         return $panel->default()
-                
+
                         ->id('admin')
                         ->darkMode(false)
                         ->favicon(asset('images/favicon.png'))
@@ -144,7 +143,11 @@ class SuperAdminPanelProvider extends PanelProvider
                         ->emailVerification()
                         ->profile(EditProfile::class)
                         ->userMenuItems([
-                            'profile' => MenuItem::make()->url(fn(): string => EditProfile::getUrl())
+                            'profile' => MenuItem::make()->url(fn(): string => EditProfile::getUrl()),
+                            'help' => MenuItem::make()
+                                ->label('User Manual')
+                                ->icon(UserManual::getNavigationIcon())
+                                ->url(fn(): string => UserManual::getUrl()),
                         ])
                         ->loginRouteSlug('login')
                         ->registrationRouteSlug('register')
@@ -157,7 +160,7 @@ class SuperAdminPanelProvider extends PanelProvider
                         ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
                         ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
                         ->pages([
-                            
+
                         ])
                         ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
                         ->widgets([
