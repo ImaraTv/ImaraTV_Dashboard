@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserRegistrationEmail;
+use App\Models\RegisterToken;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth,
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Monolog\Logger;
 
@@ -32,12 +37,23 @@ class SocialiteController extends Controller
                 'email'           => $response->getEmail(),
                 'password'        => '',
             ]);
+
+            if ($user) {
+                $user->assignRole('user');
+                /*$token = Str::random(18);
+                (new RegisterToken())
+                    ->updateOrCreate(['email' => $user->email], ['email' => $user->email, 'token' => $token]);
+
+                // send registration email here...
+                // return the user email
+                $url = env('APP_URL') . '/email-verified' . '?token=' . $token . '&email=' . $user->email;
+                $mail = new UserRegistrationEmail($url, $user);
+                Mail::to($user)->send($mail);
+                */
+            }
         }
 
-        // Assign role if necessary
-        $user->assignRole('user');
-
-        auth()->login($user);
+        Auth::login($user, true);
 
         return redirect()->intended(route('filament.admin.pages.dashboard'));
     }
