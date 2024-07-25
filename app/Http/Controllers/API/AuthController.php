@@ -6,7 +6,7 @@
  * @author Ansel Melly <ansel@anselmelly.com> @anselmelly
  * @date Apr 1, 2024
  * @link https://anselmelly.com
- * 
+ *
  */
 
 namespace App\Http\Controllers\API;
@@ -46,7 +46,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        
+
     }
 
     /**
@@ -157,7 +157,7 @@ class AuthController extends Controller
         (new RegisterToken())
                 ->updateOrCreate(['email' => $request->email], ['email' => $request->email, 'token' => $token]);
 
-        // send registration email here... 
+        // send registration email here...
         // return the user email
         $url = $request->get('url') . '?token=' . $token . '&email=' . $request->email;
         $mail = new UserRegistrationEmail($url, $user);
@@ -172,7 +172,7 @@ class AuthController extends Controller
         (new RegisterToken())
                 ->updateOrCreate(['email' => $request->email], ['email' => $request->email, 'token' => $token]);
 
-        // send registration email here... 
+        // send registration email here...
         // return the user email
         $url = $request->get('url') . '?token=' . $token . '&email=' . $request->email;
         $mail = new UserRegistrationEmail($url, $user);
@@ -311,8 +311,8 @@ class AuthController extends Controller
         }
         return response()->json(['status' => 'error', 'message' => 'user details update failed'], 401);
     }
-}
- /**
+
+    /**
      * Handle Google login.
      *
      * @param  Request  $request
@@ -356,3 +356,5 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid Google token'], 401);
         }
     }
+}
+
