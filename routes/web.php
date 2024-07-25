@@ -1,6 +1,7 @@
 <?php
 
 use App\{
+    Http\Controllers\SocialiteController,
     Mail\UserRegistrationEmail,
     Models\User
 };
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\{
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use App\Http\Controllers\Auth\GoogleLoginController;
+//use App\Http\Controllers\Auth\GoogleLoginController;
 
 Livewire::setScriptRoute(function ($handle) {
     return Route::get('/vendor/livewire/livewire.js', $handle);
@@ -41,4 +42,9 @@ Route::get('/help', function() {
 });
 
 // This route to handle Google login callback
-Route::post('/auth/google/login', [GoogleLoginController::class, 'handleGoogleLogin'])->name('google.login');
+//Route::post('/auth/google/login', [GoogleLoginController::class, 'handleGoogleLogin'])->name('google.login');
+
+Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
+    ->name('socialite.redirect');
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
+    ->name('socialite.callback');

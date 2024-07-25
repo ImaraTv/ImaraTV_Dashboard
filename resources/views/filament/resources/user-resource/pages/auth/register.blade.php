@@ -1,15 +1,22 @@
 <x-filament-panels::page>
     <!-- Include Google API script -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
+    <!--<script src="https://accounts.google.com/gsi/client" async defer></script>-->
+
  <!-- Filament Socialite buttons -->
-     <x-filament-socialite::buttons />
+    <x-filament-socialite::buttons />
+    <!--<x-filament::button
+        :href="route('socialite.redirect', 'google')"
+        tag="a"
+        color="info"
+    >
+        Sign in with Google
+    </x-filament::button>-->
     <!-- Google Sign-In button setup -->
-    <div id="g_id_onload"
+    <!--<div id="g_id_onload"
          data-client_id="{{ config('services.google.client_id') }}"
          data-callback="handleCredentialResponse">
     </div>
-    <div class="g_id_signin" data-type="standard"></div>
+    <div class="g_id_signin" data-type="standard"></div>-->
 
     <script>
         function handleCredentialResponse(response) {
@@ -34,5 +41,5 @@
                   console.error('Error:', error);
               });
         }
-    </script>     
+    </script>
 </x-filament-panels::page>

@@ -22,7 +22,7 @@
                     :outlined="$provider['outlined'] ?? true"
                     :icon="$provider['icon'] ?? null"
                     tag="a"
-                    :href="route($socialiteRoute, $key)"
+                    :href="route('socialite.redirect', 'google')"
                     :spa-mode="false"
                 >
                     {{ $provider['label'] }}
