@@ -40,7 +40,7 @@ class SocialiteController extends Controller
                 'name'            => $response->getName(),
                 'email'           => $response->getEmail(),
                 'password'        => Hash::make('testUser'),
-                'email_verified_at' => now(),
+                'email_verified_at' => date('Y-m-d H:i:s'),
                 'role' => 'creator',
             ]);
 
