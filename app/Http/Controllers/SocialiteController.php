@@ -19,7 +19,7 @@ class SocialiteController extends Controller
     {
         $this->validateProvider($provider);
 
-        return Socialite::driver($provider)->stateless()->redirect();;
+        return Socialite::driver($provider)->stateless()->redirect();
     }
 
     public function callback(string $provider)
@@ -39,7 +39,7 @@ class SocialiteController extends Controller
                 $provider . '_id' => $response->getId(),
                 'name'            => $response->getName(),
                 'email'           => $response->getEmail(),
-                'password'        => Hash::make('testUser'),
+                'password'        => Hash::make(Str::random(8)),
                 'email_verified_at' => date('Y-m-d H:i:s'),
                 'role' => 'creator',
             ]);
@@ -62,7 +62,7 @@ class SocialiteController extends Controller
             }
         }
 
-        return redirect()->intended(route('filament.admin.pages.dashboard'));
+        return redirect()->intended();
     }
 
     protected function validateProvider(string $provider): array
