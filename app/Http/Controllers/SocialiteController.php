@@ -41,10 +41,11 @@ class SocialiteController extends Controller
                 'email'           => $response->getEmail(),
                 'password'        => Hash::make('testUser'),
                 'email_verified_at' => now(),
+                'role' => 'creator',
             ]);
 
             if ($user) {
-                $user->assignRole('user');
+                //$user->assignRole('user');
                 /*$token = Str::random(18);
                 (new RegisterToken())
                     ->updateOrCreate(['email' => $user->email], ['email' => $user->email, 'token' => $token]);
