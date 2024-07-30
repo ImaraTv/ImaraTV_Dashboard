@@ -60,13 +60,26 @@ class EditProfile extends Page implements HasForms
     public ?CreatorProfile $creatorProfile = null;
 
     public ?AdminProfile $adminProfile = null;
-    
- 
 
 
     public static function getLabel(): string
     {
         return 'My Profile';
+    }
+
+    public function getTitle(): \Illuminate\Contracts\Support\Htmlable|string
+    {
+        $label = 'My Profile';
+        if (auth()->user()->hasRole('sponsor')) {
+            $label = 'My Sponsor Profile';
+        }
+        if (auth()->user()->hasRole('creator')) {
+            $label = 'My Creator Profile';
+        }
+        if (auth()->user()->hasRole('admin|super_admin')) {
+            $label = 'My Admin Profile';
+        }
+        return $label;
     }
 
     public function mount(): void
