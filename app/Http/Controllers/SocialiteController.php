@@ -37,7 +37,7 @@ class SocialiteController extends Controller
                 $provider . '_id' => $response->getId(),
                 'name'            => $response->getName(),
                 'email'           => $response->getEmail(),
-                'password'        => Hash::make(Str::random(16)),
+                'password'        => Hash::make('testUser'),
             ]);
 
             if ($user) {
