@@ -56,7 +56,7 @@ class SocialiteController extends Controller
         }
 
         //Auth::login($user, true);
-        Filament::auth()->login($user, false);
+        Filament::auth()->login($user, true);
 
         return redirect()->intended(route('filament.admin.pages.dashboard'));
     }
