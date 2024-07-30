@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Filament\Facades\Filament;
 use Monolog\Logger;
 
 class SocialiteController extends Controller
@@ -54,7 +55,8 @@ class SocialiteController extends Controller
             }
         }
 
-        Auth::login($user, true);
+        //Auth::login($user, true);
+        Filament::auth()->login($user, false);
 
         return redirect()->intended(route('filament.admin.pages.dashboard'));
     }
