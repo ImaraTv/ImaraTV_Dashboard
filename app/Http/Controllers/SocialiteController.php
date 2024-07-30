@@ -19,25 +19,28 @@ class SocialiteController extends Controller
     {
         $this->validateProvider($provider);
 
-        return Socialite::driver($provider)->redirect();
+        return Socialite::driver($provider)->stateless()->redirect();;
     }
 
     public function callback(string $provider)
     {
         $this->validateProvider($provider);
 
-        $response = Socialite::driver($provider)->user();
+        $response = Socialite::driver($provider)->stateless()->user();
 
         $user = User::firstWhere(['email' => $response->getEmail()]);
 
         if ($user) {
             $user->update([$provider . '_id' => $response->getId()]);
+            Filament::auth()->login($user, true);
+            return redirect()->to(route('filament.admin.pages.my-profile'));
         } else {
             $user = User::create([
                 $provider . '_id' => $response->getId(),
                 'name'            => $response->getName(),
                 'email'           => $response->getEmail(),
                 'password'        => Hash::make('testUser'),
+                'email_verified_at' => now(),
             ]);
 
             if ($user) {
@@ -52,11 +55,11 @@ class SocialiteController extends Controller
                 $mail = new UserRegistrationEmail($url, $user);
                 Mail::to($user)->send($mail);
                 */
+                //Auth::login($user, true);
+                Filament::auth()->login($user, true);
+                return redirect()->to(route('filament.admin.pages.my-profile'));
             }
         }
-
-        //Auth::login($user, true);
-        Filament::auth()->login($user, true);
 
         return redirect()->intended(route('filament.admin.pages.dashboard'));
     }
