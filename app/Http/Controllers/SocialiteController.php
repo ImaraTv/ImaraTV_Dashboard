@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\UserRegistrationEmail;
 use App\Models\RegisterToken;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -35,7 +36,7 @@ class SocialiteController extends Controller
                 $provider . '_id' => $response->getId(),
                 'name'            => $response->getName(),
                 'email'           => $response->getEmail(),
-                'password'        => '',
+                'password'        => Hash::make(Str::random(16)),
             ]);
 
             if ($user) {
