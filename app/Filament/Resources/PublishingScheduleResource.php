@@ -35,12 +35,11 @@ use Filament\{Forms\Components\Card,
     Tables\Filters\Filter,
     Tables\Filters\SelectFilter,
     Tables\Table};
-use Illuminate\{
-    Database\Eloquent\Builder,
+use Illuminate\{Database\Eloquent\Builder,
     Database\Eloquent\Model,
+    Database\Eloquent\SoftDeletingScope,
     Support\Carbon,
-    Support\Str
-};
+    Support\Str};
 use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 use function dispatch_sync;
@@ -197,6 +196,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                     ->requiresConfirmation(function (PublishingSchedule $schedule) {
                         return $schedule->proposal->vimeo_link != null;
                     })
+                    ->icon('heroicon-m-video-camera')
                     ->modalHeading('Overwrite Video')
                     ->modalDescription('This schedule has a video on vimeo. Do you want ot overwrite it?')
                     ->action(function (PublishingSchedule $schedule): void {
@@ -207,7 +207,10 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                             ->title('upload has been queued')
                             ->success()
                             ->send();
-                    })
+                    }),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])->label('Actions')
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->size(ActionSize::Small)
@@ -227,58 +230,61 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
             $query = $query->whereHas('sponsor', fn($q) => $q->where('user_id', auth()->id()));
         }
 
-        return $table
-                        ->query($query)
-                        ->headerActions([
-                            Tables\Actions\Action::make('Export')
-                            ->action(function () {
-                                $f_name = Str::snake('f_schedules_' . Carbon::now()->format('d-m-Y H:i:s') . '.csv');
-                                return Excel::download(new FilmSchedules(), $f_name);
-                            })
-                        ])
-                        ->columns([
-                            TextColumn::make('film_title')->searchable(),
-                            TextColumn::make('release_date')->sortable()
-                            ->date(),
-                            TextColumn::make('film_type'),
-                            TextColumn::make('sponsor.organization_name')->searchable(),
-                            TextColumn::make('creator.name'),
-                        ])
-                        ->recordUrl(function () {
-                            if (!auth()->user()->can('update_publishing::schedule')) {
-                                return null;
-                            }
-                        })
-                        ->filters([
-                            SelectFilter::make('sponsor_id')
-                            ->searchable()
-                            ->preload()
-                            ->label('Sponsor')
-                            ->relationship('sponsor', 'organization_name'),
-                            SelectFilter::make('film_type')
-                            ->options(['free' => 'free', 'premium' => 'premium'])
-                            ->label('Film Type'),
-                            Filter::make('release_date')
-                            ->form([
-                                DatePicker::make('release_from')->label('From'),
-                                DatePicker::make('release_until')->label('To'),
-                            ])
-                            ->columns(2)
-                            ->columnSpan(2)
-                            ->query(function (Builder $query, array $data): Builder {
-                                return $query
-                                ->when(
-                                        $data['release_from'],
-                                        fn(Builder $query, $date): Builder => $query->whereDate('release_date', '>=', $date),
-                                )
-                                ->when(
-                                        $data['release_until'],
-                                        fn(Builder $query, $date): Builder => $query->whereDate('release_date', '<=', $date),
-                                );
-                            })
-                                ], layout: FiltersLayout::AboveContent)->filtersFormColumns(4)
-                        ->actions(static::tableActions())
-                        ->bulkActions([
+        return $table->query($query)
+            ->headerActions([
+                Tables\Actions\Action::make('Export')
+                ->action(function () {
+                    $f_name = Str::snake('f_schedules_' . Carbon::now()->format('d-m-Y H:i:s') . '.csv');
+                    return Excel::download(new FilmSchedules(), $f_name);
+                })
+            ])
+            ->columns([
+                TextColumn::make('film_title')->searchable(),
+                TextColumn::make('release_date')->sortable()
+                ->date(),
+                TextColumn::make('film_type'),
+                TextColumn::make('sponsor.organization_name')->searchable(),
+                TextColumn::make('creator.name'),
+            ])
+            ->recordUrl(function () {
+                if (!auth()->user()->can('update_publishing::schedule')) {
+                    return null;
+                }
+            })
+            ->filters([
+                SelectFilter::make('sponsor_id')
+                    ->searchable()
+                    ->preload()
+                    ->label('Sponsor')
+                    ->relationship('sponsor', 'organization_name'),
+                SelectFilter::make('film_type')
+                    ->options(['free' => 'free', 'premium' => 'premium'])
+                    ->label('Film Type'),
+                Filter::make('release_date')
+                    ->form([
+                        DatePicker::make('release_from')->label('From'),
+                        DatePicker::make('release_until')->label('To'),
+                    ])
+                    ->columns(2)
+                    ->columnSpan(2)
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                        ->when(
+                                $data['release_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('release_date', '>=', $date),
+                        )
+                        ->when(
+                                $data['release_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('release_date', '<=', $date),
+                        );
+                    }),
+                Tables\Filters\TrashedFilter::make(),
+                    ], layout: FiltersLayout::AboveContent)->filtersFormColumns(4)
+            ->actions(static::tableActions())
+            ->bulkActions([
+                //Tables\Actions\DeleteBulkAction::make(),
+                //Tables\Actions\ForceDeleteBulkAction::make(),
+                //Tables\Actions\RestoreBulkAction::make(),
         ]);
     }
 
@@ -287,6 +293,14 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
         return [
                 //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function getPages(): array
