@@ -82,6 +82,42 @@ class EditProfile extends Page implements HasForms
         return $label;
     }
 
+    public function getViewData(): array
+    {
+        $user = auth()->user();
+        $incomplete_fields = $this->incompleteFields();
+        $data = $this->fdata;
+        return compact('user', 'incomplete_fields', 'data');
+    }
+
+    public function incompleteFields(): array
+    {
+        $data = $this->fdata;
+        $incomplete_fields = [];
+        if (auth()->user()->hasRole('creator')) {
+            $mandatory_fields = ['name', 'email', 'mobile_phone', 'identification_number', 'profile_picture'];
+            foreach ($mandatory_fields as $field) {
+                if (array_key_exists($field, $data) && empty($data[$field])) {
+                    $incomplete_fields[] = $field;
+                }
+            }
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            $mandatory_fields = ['about_us', 'organization_name', 'contact_person_name', 'contact_person_email'];
+            foreach ($mandatory_fields as $field) {
+                if (array_key_exists($field, $data) && empty($data[$field])) {
+                    $incomplete_fields[] = $field;
+                }
+            }
+        }
+        return $incomplete_fields;
+    }
+
+    public function isProfileIncomplete(): bool
+    {
+        return empty($this->incompleteFields());
+    }
+
     public function mount(): void
     {
         if (auth()->user()->hasRole('sponsor')) {
