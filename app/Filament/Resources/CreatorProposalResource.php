@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\{
     Builder,
     Model
 };
+use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use function auth;
 use function collect;
@@ -288,6 +289,45 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
 
         return [
+            ActionGroup::make([
+                Action::make('previewTrailer')
+                    ->label('Preview Trailer')
+                    ->icon('heroicon-m-video-camera')
+                    ->modal()
+                    ->requiresConfirmation(false)
+                    ->modalContent(function (CreatorProposal $proposal) {
+                        $video = [
+                            'url' => $proposal->getMedia('trailers')->last()?->getFullUrl(),
+                            'vimeo_url' => '',
+                            'title' => $proposal->working_title,
+                            'type' => 'Trailer',
+                        ];
+                        return \view('filament.pages.video-preview', compact('proposal', 'video'));
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false),
+                Action::make('previewHdVideo')
+                    ->label('Preview HD Video')
+                    ->icon('heroicon-m-video-camera')
+                    ->modal()
+                    ->requiresConfirmation(false)
+                    ->modalContent(function (CreatorProposal $proposal) {
+                        $video = [
+                            'url' => $proposal->getMedia('videos')->last()?->getFullUrl(),
+                            'vimeo_url' => '/videos/951068539',
+                            'title' => $proposal->working_title,
+                            'type' => 'HD Video',
+                        ];
+                        return \view('filament.pages.video-preview', compact('proposal', 'video'));
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelAction(false)
+            ])->label('Preview')
+                ->icon('heroicon-m-video-camera')
+                ->size(ActionSize::Small)
+                ->color('primary')
+                ->button()
+                ->visible(fn() => $admins_only),
             Action::make('potentialSponsors')
                 ->infolist([
                     RepeatableEntry::make('potential_sponsors')
