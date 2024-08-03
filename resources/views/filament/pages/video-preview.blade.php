@@ -1,11 +1,11 @@
-@php
-    $segments = explode('/', $video['vimeo_url']);
-    $video_id = $segments[2];
-@endphp
+
 <h3>Preview {{ $video['type'] }} for <b>{{ $video['title'] }}</b></h3>
 <div>
     @if(!empty($video['vimeo_url']))
-
+        @php
+            $segments = explode('/', $video['vimeo_url']);
+            $video_id = $segments[2];
+        @endphp
         <div class="plyr__video-embed" id="player">
             <iframe
                 src="https://player.vimeo.com/video/{{$video_id}}?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
