@@ -244,6 +244,16 @@ class EditProfile extends Page implements HasForms
                                     ->columnSpan(3)
                                     ->label('Organization Website')->nullable(),
 //                            --
+                            TextInput::make('default_call_to_action')
+                                    ->columnSpan(3)
+                                    ->label('Call to Action')->required(),
+//                            --
+                            TextInput::make('default_call_to_action_link')
+                                    ->url()
+                                    ->suffixIcon('heroicon-m-globe-alt')
+                                    ->columnSpan(3)
+                                    ->label('Call to Action Link')->required(),
+//                            --
                             TagsInput::make('topics_of_interest')
                                     ->placeholder('Topics of Interst')
                                     ->suggestions(FilmTopic::all()->pluck('topic_name'))
@@ -345,6 +355,8 @@ class EditProfile extends Page implements HasForms
                                 TextEntry::make('about_us')->columnSpan(2),
                                 TextEntry::make('organization_name')->columnSpan(2),
                                 TextEntry::make('organization_website')->columnSpan(2),
+                                TextEntry::make('defeault_call_to_action')->columnSpan(2),
+                                TextEntry::make('default_call_to_action_link')->columnSpan(2),
                                 TextEntry::make('topics_of_interest')->columnSpan(2),
                                 TextEntry::make('locations_of_interest')->columnSpan(2),
                                 TextEntry::make('contact_person_name')->columnSpan(2),
@@ -397,6 +409,16 @@ class EditProfile extends Page implements HasForms
                             ->suffixIcon('heroicon-m-globe-alt')
                             ->columnSpan(2)
                             ->label('Organization Website')->nullable(),
+//                            --
+                    TextInput::make('default_call_to_action')
+                            ->columnSpan(2)
+                            ->label('Default Call to Action')->required(),
+//                            --
+                    TextInput::make('default_call_to_action_link')
+                            ->url()
+                            ->suffixIcon('heroicon-m-globe-alt')
+                            ->columnSpan(2)
+                            ->label('Call to Action Link')->required(),
 //                            --
                     TagsInput::make('topics_of_interest')
                             ->placeholder('Topics of Interst')
