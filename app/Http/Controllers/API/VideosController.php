@@ -21,6 +21,9 @@ class VideosController extends Controller
         $filter = $request->has('filter') ? $request->get('filter') : '';
         $category = $request->has('category') ? $request->get('category') : '';
         $rating = $request->has('rating') ? $request->get('rating') : '';
+        $sponsor_id = $request->has('sponsor_id') ? $request->get('sponsor_id') : '';
+        $creator_id = $request->has('creator_id') ? $request->get('creator_id') : '';
+        $location_id = $request->has('location_id') ? $request->get('location_id') : '';
         $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars'])
@@ -56,6 +59,17 @@ class VideosController extends Controller
         if ($rating != '') {
             $videos = $videos->whereHas('proposal', function ($q) use ($rating) {
                 $q->where('film_rating', $rating);
+            });
+        }
+        if (!empty($sponsor_id)) {
+            $videos = $videos->where('sponsor_id', $sponsor_id);
+        }
+        if (!empty($creator_id)) {
+            $videos = $videos->where('creator_id', $creator_id);
+        }
+        if (!empty($location_id)) {
+            $videos = $videos->whereHas('creator', function ($q) use ($location_id) {
+                $q->where('location', $location_id);
             });
         }
         $videos = $videos->paginate($limit);

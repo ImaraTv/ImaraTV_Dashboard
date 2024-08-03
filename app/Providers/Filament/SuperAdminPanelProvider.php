@@ -120,11 +120,13 @@ class SuperAdminPanelProvider extends PanelProvider
                                     'outlined' => true,
                                 ],
                             ])
+                            ->setSlug('')
+                            //->setLoginRouteName()
                             // (optional) Enable/disable registration of new (socialite-) users.
-                            ->setRegistrationEnabled(false)
+                            ->setRegistrationEnabled(true)
                             // (optional) Enable/disable registration of new (socialite-) users using a callback.
                             // In this example, a login flow can only continue if there exists a user (Authenticatable) already.
-                            ->setRegistrationEnabled(fn(string $provider, SocialiteUserContract $oauthUser, ?Authenticatable $user) => (bool) $user)
+                            //->setRegistrationEnabled(fn(string $provider, SocialiteUserContract $oauthUser, ?Authenticatable $user) => (bool) $user)
                             // (optional) Change the associated model class.
                             ->setUserModelClass(User::class)
                             // (optional) Change the associated socialite class (see below).
@@ -180,6 +182,6 @@ class SuperAdminPanelProvider extends PanelProvider
                         ])
                         ->authMiddleware([
                             Authenticate::class,
-        ]);
+                        ]);
     }
 }

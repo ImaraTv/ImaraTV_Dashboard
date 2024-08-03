@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
 {
@@ -38,8 +39,19 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                     'website' => $item->sponsor?->organization_website,
                     'logo' => $item->sponsor?->getMedia('logo')->first()?->getFullUrl(),
                 ],
+                'location' => [
+                    'id' => $item->creator?->loc?->id,
+                    'name' => $item->creator?->loc?->location_name,
+                ],
                 'stars' => ceil(collect($item->stars)->average('stars')),
-                'image' => collect($item->proposal?->media)->last()?->getFullUrl(),
+                'image' => $item->proposal?->getMedia('posters')->last()?->getFullUrl(),
+                'media' => [
+                    'poster' => $item->proposal?->getMedia('posters')->last()?->getFullUrl(),
+                    'trailer' => $item->proposal?->getMedia('trailers')->last()?->getFullUrl(),
+                    'trailer_vimeo' => '',
+                    'hd_film' => $item->proposal?->getMedia('videos')->last()?->getFullUrl(),
+                    'hd_film_vimeo' => $item->proposal->vimeo_link,
+                ]
             ];
         });
         return [

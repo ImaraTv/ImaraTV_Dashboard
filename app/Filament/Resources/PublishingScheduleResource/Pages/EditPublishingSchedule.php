@@ -16,4 +16,13 @@ class EditPublishingSchedule extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+    protected function getActions(): array
+    {
+        return [
+            Actions\DeleteAction::make(),
+            Actions\ForceDeleteAction::make(),
+            Actions\RestoreAction::make(),
+            // ...
+        ];
+    }
 }

@@ -1,4 +1,6 @@
 <x-filament-panels::page>
 
-     <x-filament-socialite::buttons />
+    <!-- Filament Socialite buttons -->
+    <x-filament-socialite::buttons />
+
 </x-filament-panels::page>
