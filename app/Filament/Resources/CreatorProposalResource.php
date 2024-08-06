@@ -321,7 +321,43 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         return \view('filament.pages.video-preview', compact('proposal', 'video'));
                     })
                     ->modalSubmitAction(false)
-                    ->modalCancelAction(false)
+                    ->modalCancelAction(false),
+                Action::make('downloadScript')
+                    ->label('Download Script')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->requiresConfirmation()
+                    ->action(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('scripts')->last();
+                        return response()->download($item->getPath(), $item->file_name);
+                    })
+                    ->visible(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('scripts')->last();
+                        return !is_null($item);
+                    }),
+                Action::make('downloadContract')
+                    ->label('Download Contract')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->requiresConfirmation()
+                    ->action(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('contracts')->last();
+                        return response()->download($item->getPath(), $item->file_name);
+                    })
+                    ->visible(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('contracts')->last();
+                        return !is_null($item);
+                    }),
+                Action::make('downloadPoster')
+                    ->label('Download Poster')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->requiresConfirmation()
+                    ->action(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('posters')->last();
+                        return response()->download($item->getPath(), $item->file_name);
+                    })
+                    ->visible(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('posters')->last();
+                        return !is_null($item);
+                    })
             ])->label('Preview')
                 ->icon('heroicon-m-video-camera')
                 ->size(ActionSize::Small)
