@@ -16,7 +16,7 @@ return new class extends Migration
             $table->index('slug');
         });
 
-        // update existing film schedules to generate the slugs 
+        // update existing film schedules to generate the slugs
         foreach (\App\Models\PublishingSchedule::all() as $schedule) {
             $schedule->save();
         }
