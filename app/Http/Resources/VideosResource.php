@@ -24,6 +24,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
             [
                 'id' => $item->id,
                 'name' => $item->film_title,
+                'slug' => $item->slug,
                 'duration' => $item->proposal->film_length,
                 'category' => $item->proposal?->genre?->genre_name,
                 'description' => $item->synopsis,
