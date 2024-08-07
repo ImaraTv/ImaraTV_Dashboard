@@ -27,7 +27,8 @@ class VideosController extends Controller
         $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars'])
-                ->where('release_date', "<=", Carbon::now());
+                //->where('DATE(release_date)', "<=", Carbon::now());
+                ->whereDate('release_date', '<=', Carbon::now()->toDateString());
 
         // fetch videos where vimeo_link is not null
 

@@ -27,6 +27,13 @@ class PublishingSchedule extends Model
     protected $fillable = [
         'film_title',
         'slug',
+        'release_date',
+        'proposal_id',
+        'creator_id', 'sponsor_id',
+        'topics',
+        'synopsis',
+        'film_type',
+        'call_to_action_text', 'call_to_action_link'
     ];
 
     public function sponsor()

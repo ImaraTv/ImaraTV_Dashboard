@@ -458,6 +458,8 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             });
         }
 
+        $query->orderBy('id', 'desc');
+
         return $table
                         ->headerActions([
                             Tables\Actions\Action::make('Export')

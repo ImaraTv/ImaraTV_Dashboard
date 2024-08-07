@@ -98,70 +98,81 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                         ->schema([
                             Card::make()->schema([
                                 Select::make('proposal_id')
-                                ->live()
-                                ->afterStateUpdated(function (Set $set, ?string $state) {
-                                    $film_project = CreatorProposal::whereId($state)->first();
-                                    if (!$film_project) {
-                                        return null;
-                                    }
+                                    ->live()
+                                    ->afterStateUpdated(function (Set $set, ?string $state) {
+                                        $film_project = CreatorProposal::whereId($state)->first();
+                                        if (!$film_project) {
+                                            return null;
+                                        }
 
-                                    $set('film_title', $film_project->working_title);
-                                    $set('synopsis', $film_project->synopsis);
-                                    $set('creator_id', $film_project->user_id);
-                                    $set('sponsor_id', $film_project->sponsored_by);
-                                    $set('topics', explode(',', $film_project->topics));
-                                    $set('film_type', $film_project->film_type);
-                                    $set('premium_film_price', $film_project->premium_film_price);
-                                })
-                                ->label('Select Film')
-                                ->options(
-                                        CreatorProposal::all()->pluck('working_title', 'id')
-                                )
-                                ->columnSpan(5)
-                                ->nullable(),
+                                        $set('film_title', $film_project->working_title);
+                                        $set('synopsis', $film_project->synopsis);
+                                        $set('creator_id', $film_project->user_id);
+                                        $set('sponsor_id', $film_project->sponsored_by);
+                                        $set('topics', explode(',', $film_project->topics));
+                                        $set('film_type', $film_project->film_type);
+                                        $set('premium_film_price', $film_project->premium_film_price);
+                                    })
+                                    ->label('Select Film')
+                                    ->options(CreatorProposal::all()->pluck('working_title', 'id'))
+                                    ->columnSpan(5)
+                                    ->nullable(),
 //                            --
                                 DateTimePicker::make('release_date')
-                                ->label('Premier On')
-                                ->columnSpan(3)->nullable(),
+                                    ->label('Premier On')
+                                    ->columnSpan(3)
+                                    ->nullable(),
 //                                --
                                 TextInput::make('film_title')
-                                ->columnSpan(4)
-                                ->required(),
+                                    ->columnSpan(4)
+                                    ->required(),
                                 TagsInput::make('topics')
-                                ->separator(',')
-                                ->suggestions(FilmTopic::all()->pluck('topic_name'))
-                                ->label('Topics (Select All Related Topics)')->columnSpan(4)->nullable(),
+                                    ->separator(',')
+                                    ->suggestions(FilmTopic::all()->pluck('topic_name'))
+                                    ->label('Topics (Select All Related Topics)')
+                                    ->columnSpan(4)
+                                    ->nullable(),
 //                                --
                                 Textarea::make('synopsis')->label('Synopsis')->columnSpanFull()->nullable(),
-                                Select::make('film_type')->label('Film Type')->options([
-                                    'free' => 'Free',
-                                    'premium' => 'Premium',
-                                ])->columnSpan(4)->nullable(),
+                                Select::make('film_type')
+                                    ->label('Film Type')
+                                    ->options([
+                                        'free' => 'Free',
+                                        'premium' => 'Premium',
+                                    ])
+                                    ->columnSpan(4)
+                                    ->nullable(),
 //                                --
                                 TextInput::make('premium_film_price')
-                                ->disabled(fn(Get $get) => $get('film_type') == 'free')
-                                ->label('Premium Film Price')->type('number')->columnSpan(4)->nullable(),
+                                    ->disabled(fn(Get $get) => $get('film_type') == 'free')
+                                    ->label('Premium Film Price')
+                                    ->type('number')
+                                    ->columnSpan(4)
+                                    ->nullable(),
 //                                --
                                 Select::make('creator_id')
-                                ->label('Created By')
-                                ->options(
-                                        CreatorProfile::all()->pluck('name', 'user_id')
-                                )->columnSpan(4)->nullable(),
+                                    ->label('Created By')
+                                    ->required()
+                                    ->options(CreatorProfile::all()->pluck('name', 'user_id'))
+                                    ->columnSpan(4)
+                                    ->nullable(),
 //                                --
                                 Select::make('sponsor_id')
-                                ->label('Sponsored By')
-                                ->options(
-                                        SponsorProfile::all()->pluck('organization_name', 'user_id')
-                                )->columnSpan(4)->nullable(),
+                                    ->label('Sponsored By')
+                                    ->options(SponsorProfile::all()->pluck('organization_name', 'user_id'))
+                                    ->columnSpan(4)
+                                    ->nullable(),
                                 TextInput::make('call_to_action_text')
-                                ->columnSpan(4)
-                                ->label('Call to action button text')->nullable(),
+                                    ->columnSpan(4)
+                                    ->label('Call to action button text')
+                                    ->nullable(),
 //                                --
                                 TextInput::make('call_to_action_link')
-                                ->url()
-                                ->suffixIcon('heroicon-m-globe-alt')
-                                ->columnSpan(4)
-                                ->label('Call to Action URL')->nullable(),
+                                    ->url()
+                                    ->suffixIcon('heroicon-m-globe-alt')
+                                    ->columnSpan(4)
+                                    ->label('Call to Action URL')
+                                    ->nullable(),
                             ])->columns(8),
 //                            --
                         ])->statePath('data');
@@ -230,6 +241,8 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
             $query = $query->whereHas('sponsor', fn($q) => $q->where('user_id', auth()->id()));
         }
 
+        $query->orderBy('id', 'desc');
+
         return $table->query($query)
             ->headerActions([
                 Tables\Actions\Action::make('Export')
@@ -240,8 +253,9 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
             ])
             ->columns([
                 TextColumn::make('film_title')->searchable(),
-                TextColumn::make('release_date')->sortable()
-                ->date(),
+                TextColumn::make('slug'),
+                TextColumn::make('updated_at')->date()->label('Last Updated'),
+                TextColumn::make('release_date')->sortable()->date(),
                 TextColumn::make('film_type'),
                 TextColumn::make('sponsor.organization_name')->searchable(),
                 TextColumn::make('creator.name'),
