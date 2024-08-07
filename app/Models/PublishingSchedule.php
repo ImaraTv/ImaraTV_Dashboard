@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\{
     Factories\HasFactory,
     Model,
@@ -10,14 +11,23 @@ use Illuminate\Database\Eloquent\{
 
 class PublishingSchedule extends Model
 {
-
+    use Sluggable;
     use HasFactory,
         SoftDeletes;
 
-    protected $guarded = [];
-
     protected $table = "publishing_schedules";
 
+    protected $guarded = [];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'film_title',
+        'slug',
+    ];
 
     public function sponsor()
     {
@@ -42,5 +52,19 @@ class PublishingSchedule extends Model
     public function stars()
     {
         return $this->hasMany(FilmRating::class, 'video_id', 'id');
+    }
+
+    /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'film_title'
+            ]
+        ];
     }
 }
