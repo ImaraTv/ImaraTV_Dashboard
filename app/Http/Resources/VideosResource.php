@@ -28,11 +28,15 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'release_date' => $item->release_date,
                 'duration' => $item->proposal->film_length,
                 'category' => $item->proposal?->genre?->genre_name,
+                'topic'=>collect($item->proposal?->topic?->topic_name)->all(),
                 'description' => $item->synopsis,
                 'vimeo_link' => $item->proposal->vimeo_link,
                 'call_to_action_btn' => $item->call_to_action_text,
                 'call_to_action_link' => $item->call_to_action_link,
-                'creator' => $item->creator?->name,
+                'creator' => [
+                    'name'=>$item->creator?->name,
+                    'id'=>$item->creator?->id,
+                ],
                 'rating' => $item->proposal?->film_rating,
                 'sponsored_by' => $item->sponsor?->name,
                 'sponsor' => [
@@ -87,4 +91,5 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
         $src = 'data: ' . mime_content_type($img_file) . ';base64,' . $imgData;
         return $src;
     }
+
 }
