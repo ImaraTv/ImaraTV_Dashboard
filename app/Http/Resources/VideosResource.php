@@ -28,7 +28,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'release_date' => $item->release_date,
                 'duration' => $item->proposal->film_length,
                 'category' => $item->proposal?->genre?->genre_name,
-                'topics' => collect([$item->proposal?->topics]),
+                'topics' => collect($item->proposal?->topics),
                 'description' => $item->synopsis,
                 'vimeo_link' => $item->proposal->vimeo_link,
                 'call_to_action_btn' => $item->call_to_action_text,
