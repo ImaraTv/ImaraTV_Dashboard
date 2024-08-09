@@ -101,12 +101,12 @@ class CreatorProposal extends Model implements HasMedia
     {
         $model = $proposal;
         $mail = new VimeoUploadComplete($model, $video_title, $vimeo_id);
-        Mail::to(['', env('APP_CONTACT_EMAIL')])->send($mail);
+        Mail::to(['support@imara.tv', env('APP_CONTACT_EMAIL')])->send($mail);
     }
 
     public static function notifyOnVimeoUploadFailed(CreatorProposal $proposal, string $video_title, string $failure_message){
         $model = CreatorProposal::where($proposal->id)->first();
         $mail = new VimeoUploadFail($model, $video_title, $failure_message);
-        Mail::to([env('APP_CONTACT_EMAIL')])->send($mail);
+        Mail::to(['support@imara.tv', env('APP_CONTACT_EMAIL')])->send($mail);
     }
 }
