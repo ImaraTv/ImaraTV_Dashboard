@@ -44,6 +44,7 @@ use Illuminate\Database\Eloquent\{
 };
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use function auth;
 use function collect;
 use function config;
@@ -296,9 +297,11 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     ->modal()
                     ->requiresConfirmation(false)
                     ->modalContent(function (CreatorProposal $proposal) {
+                        /* @var $media Media */
+                        $media = $proposal->getMedia('trailers')->last();
                         $video = [
-                            'url' => $proposal->getMedia('trailers')->last()?->getFullUrl(),
-                            'vimeo_url' => '',
+                            'url' => $media?->getFullUrl(),
+                            'vimeo_url' => $media?->getCustomProperty('vimeo_link'),
                             'title' => $proposal->working_title,
                             'type' => 'Trailer',
                         ];
@@ -314,7 +317,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     ->modalContent(function (CreatorProposal $proposal) {
                         $video = [
                             'url' => $proposal->getMedia('videos')->last()?->getFullUrl(),
-                            'vimeo_url' => '/videos/951068539',
+                            'vimeo_url' => $proposal->vimeo_link,
                             'title' => $proposal->working_title,
                             'type' => 'HD Video',
                         ];

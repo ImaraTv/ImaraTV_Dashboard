@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Mail\VimeoUploadComplete;
+use App\Mail\VimeoUploadFail;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Illuminate\Database\Eloquent\{
     Factories\HasFactory,
@@ -12,6 +14,7 @@ use Spatie\MediaLibrary\{
     HasMedia,
     InteractsWithMedia
 };
+use Illuminate\Support\Facades\Mail;
 
 class CreatorProposal extends Model implements HasMedia
 {
@@ -67,7 +70,7 @@ class CreatorProposal extends Model implements HasMedia
         $params = substr(parse_url($url, PHP_URL_PATH), 1);
         $segments = explode('/', $params);
 
-        $video_id = $segments[2];
+        $video_id = $segments[1];
         //$video_h = @$segments[1];
         $video_h = '';
 
@@ -92,5 +95,18 @@ class CreatorProposal extends Model implements HasMedia
             'duration' => gmdate("H:i:s", $hash->duration)
         );
 
+    }
+
+    public static function notifyOnVimeoUploadCompletion(CreatorProposal $proposal, string $video_title, string $vimeo_id)
+    {
+        $model = $proposal;
+        $mail = new VimeoUploadComplete($model, $video_title, $vimeo_id);
+        Mail::to(['support@imara.tv', env('APP_CONTACT_EMAIL')])->send($mail);
+    }
+
+    public static function notifyOnVimeoUploadFailed(CreatorProposal $proposal, string $video_title, string $failure_message){
+        $model = CreatorProposal::where($proposal->id)->first();
+        $mail = new VimeoUploadFail($model, $video_title, $failure_message);
+        Mail::to(['support@imara.tv', env('APP_CONTACT_EMAIL')])->send($mail);
     }
 }

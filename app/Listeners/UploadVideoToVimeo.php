@@ -29,10 +29,10 @@ class UploadVideoToVimeo
     {
         $media = $event->media;
 
-        if ($media->collection_name === 'videos') {
+        if ($media->collection_name === 'videos' || $media->collection_name === 'trailers') {
             $proposal = CreatorProposal::whereId($media->model_id)->first();
             if ($proposal) {
-                $job = (new UploadVidJob($proposal, $media));
+                $job = (new UploadVidJob($proposal, $media->collection_name));
                 dispatch($job);
             }
         }
