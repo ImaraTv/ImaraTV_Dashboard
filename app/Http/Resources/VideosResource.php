@@ -41,7 +41,6 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                     'skills' => $item->creator?->skills_and_talents,
                 ],
                 'rating' => $item->proposal?->film_rating,
-                'sponsored_by' => $item->sponsor?->name,
                 'sponsor' => [
                     'name' => $item->sponsor?->organization_name,
                     'about' => $item->sponsor?->about_us,
@@ -57,7 +56,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'media' => [
                     'poster' => $item->proposal?->getMedia('posters')->last()?->getFullUrl(),
                     'trailer' => $item->proposal?->getMedia('trailers')->last()?->getFullUrl(),
-                    'trailer_vimeo' => '',
+                    'trailer_vimeo' => $item->proposal?->getMedia('trailers')->last()?->getCustomProperty('vimeo_link'),
                     'hd_film' => $item->proposal?->getMedia('videos')->last()?->getFullUrl(),
                     'hd_film_vimeo' => $item->proposal->vimeo_link,
                 ]
