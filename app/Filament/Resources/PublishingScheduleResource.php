@@ -65,7 +65,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
     #[\Override]
     public static function canAccess(): bool
     {
-        return auth()->user()->approved;
+        return boolval(auth()->user()->approved);
     }
 
     public static function canCreate(): bool

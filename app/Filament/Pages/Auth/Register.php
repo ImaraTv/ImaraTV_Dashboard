@@ -41,7 +41,7 @@ class Register extends BaseRegister
                                     ->required()
                                     ->default($role)
                                     ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor']),
-                                GoogleRecaptcha::make('captcha')
+                                //GoogleRecaptcha::make('captcha')
                             ])
                             ->statePath('data'),
             ),
