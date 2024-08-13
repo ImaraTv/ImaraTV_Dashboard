@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "anhskohbo/no-captcha": "^3.6",
         "ankitpokhrel/tus-php": "^2.4",
         "bezhansalleh/filament-shield": "^3.2",
         "cviebrock/eloquent-sluggable": "^11.0",

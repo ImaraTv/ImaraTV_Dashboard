@@ -69,6 +69,14 @@ class SuperAdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop();
         $panel->maxContentWidth(MaxWidth::Full);
 
+        /*$panel->renderHook(
+            'panels::footer',
+            function () {
+                return view('filament.hooks.footer');
+            },
+        );
+        */
+
         return $panel->default()
 
                         ->id('admin')
