@@ -35,7 +35,7 @@ class ProposalStatus extends Page implements HasTable
     #[\Override]
     public static function canAccess(): bool
     {
-        return auth()->user()->approved;
+        return boolval(auth()->user()->approved);
     }
 
     protected function getHeaderActions(): array
