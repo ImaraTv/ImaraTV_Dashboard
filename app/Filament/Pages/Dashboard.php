@@ -28,7 +28,7 @@ class Dashboard extends BaseDashboard
     #[\Override]
     public static function canAccess(): bool
     {
-        return auth()->user()->approved;
+        return boolval(auth()->user()->approved);
     }
 
     public function getColumns(): int|string|array
