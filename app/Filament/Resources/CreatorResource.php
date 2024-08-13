@@ -45,7 +45,7 @@ class CreatorResource extends Resource
     #[\Override]
     public static function canAccess(): bool
     {
-        return auth()->user()->approved;
+        return boolval(auth()->user()->approved);
     }
 
     public static function form(Form $form): Form
