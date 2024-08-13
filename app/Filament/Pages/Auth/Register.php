@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Filament\Forms\Components\GoogleRecaptcha;
 use Filament\{
     Forms\Components\Select,
     Pages\Auth\Register as BaseRegister
@@ -36,10 +37,11 @@ class Register extends BaseRegister
                                 $this->getPasswordFormComponent(),
                                 $this->getPasswordConfirmationFormComponent(),
                                 Select::make('role')
-                                ->label('Register as?')
-                                ->required()
-                                ->default($role)
-                                ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor'])
+                                    ->label('Register as?')
+                                    ->required()
+                                    ->default($role)
+                                    ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor']),
+                                GoogleRecaptcha::make('captcha')
                             ])
                             ->statePath('data'),
             ),
