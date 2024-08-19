@@ -8,14 +8,14 @@ use App\{
     Models\PublishingSchedule
 };
 use Illuminate\{
+    Database\Eloquent\Builder,
     Http\Request,
     Support\Carbon
 };
 
 class VideosController extends Controller
 {
-
-    public function videos(Request $request): VideosResource
+    protected function videosFilter(Request $request): Builder
     {
         $search = $request->has('search') ? $request->get('search') : '';
         $filter = $request->has('filter') ? $request->get('filter') : '';
@@ -24,14 +24,11 @@ class VideosController extends Controller
         $sponsor_id = $request->has('sponsor_id') ? $request->get('sponsor_id') : '';
         $creator_id = $request->has('creator_id') ? $request->get('creator_id') : '';
         $location_id = $request->has('location_id') ? $request->get('location_id') : '';
-        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
 
-        $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars'])
-                //->where('DATE(release_date)', "<=", Carbon::now());
-                ->whereDate('release_date', '<=', Carbon::now()->toDateString());
+        $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars']);
+        $videos = $videos->whereDate('release_date', '<=', Carbon::now()->toDateString());
 
         // fetch videos where vimeo_link is not null
-
         $videos = $videos->whereHas('proposal', function ($q) {
             $q->whereNotNull('vimeo_link')->where('vimeo_link', '<>', '');
         });
@@ -39,13 +36,13 @@ class VideosController extends Controller
         if ($search != '') {
             $videos = $videos->where(function ($q) use ($search) {
                 $q->where('film_title', 'like', '%' . $search . '%')
-                        ->orWhere('synopsis', 'like', '%' . $search . '%');
+                    ->orWhere('synopsis', 'like', '%' . $search . '%');
                 $exS = explode(' ', $search);
                 if (count($exS) > 0) {
                     foreach ($exS as $S) {
                         if (strlen($S) > 2) {
                             $q->orWhere('synopsis', 'like', '%' . $S . '%')
-                                    ->orWhere('film_title', 'like', '%' . $S . '%');
+                                ->orWhere('film_title', 'like', '%' . $S . '%');
                         }
                     }
                 }
@@ -73,6 +70,13 @@ class VideosController extends Controller
                 $q->where('location', $location_id);
             });
         }
+
+        return $videos;
+    }
+    public function videos(Request $request): VideosResource
+    {
+        $videos = $this->videosFilter($request);
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
         $videos = $videos->paginate($limit);
 
         return new VideosResource($videos);
@@ -83,6 +87,38 @@ class VideosController extends Controller
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre'])
                         ->whereId($id)->get();
 
+        return new VideosResource($videos);
+    }
+
+    public function latest(Request $request)
+    {
+        $videos = $this->videosFilter($request);
+        $videos = $videos->orderBy('release_date', 'desc');
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+
+        $videos = $videos->paginate($limit);
+        return new VideosResource($videos);
+    }
+
+    public function recommended(Request $request)
+    {
+        $videos = $this->videosFilter($request);
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        $videos = $videos->inRandomOrder();
+        $videos = $videos->paginate($limit);
+
+        return new VideosResource($videos);
+    }
+
+    public function trending(Request $request)
+    {
+        $videos = $this->videosFilter($request);
+        //TODO: implement ordering by most views
+        $videos = $videos->withAvg('stars', 'stars');
+        $videos = $videos->orderBy('stars_avg_stars', 'desc');
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+
+        $videos = $videos->paginate($limit);
         return new VideosResource($videos);
     }
 }

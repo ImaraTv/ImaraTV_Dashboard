@@ -33,6 +33,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function () {
 Route::group(['middleware' => 'api'], function () {
 
     Route::get('/videos', [VideosController::class, 'videos']);
+    Route::get('/videos/latest', [VideosController::class, 'latest']);
+    Route::get('/videos/recommended', [VideosController::class, 'recommended']);
+    Route::get('/videos/trending', [VideosController::class, 'trending']);
     Route::get('/videos/{id}', [VideosController::class, 'video']);
     Route::get('/creators', [CreatorsController::class, 'creators']);
     Route::get('/creators/{id}', [CreatorsController::class, 'creator']);
