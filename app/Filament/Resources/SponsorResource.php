@@ -63,6 +63,16 @@ class SponsorResource extends Resource
                                     ->columnSpan(3)
                                     ->label('Organization Website')->nullable(),
 //                            --
+                            TextInput::make('default_call_to_action')
+                                    ->columnSpan(3)
+                                    ->label('Default Call to Action')->required(),
+                            //                            --
+                            TextInput::make('default_call_to_action_link')
+                                    ->url()
+                                    ->suffixIcon('heroicon-m-globe-alt')
+                                    ->columnSpan(3)
+                                    ->label('Default Call to Action Link')->required(),
+//                            --
                             TagsInput::make('topics_of_interest')
                                     ->placeholder('Topics of Interst')
                                     ->suggestions(FilmTopic::all()->pluck('topic_name'))
