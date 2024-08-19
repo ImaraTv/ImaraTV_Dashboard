@@ -42,6 +42,7 @@ use Illuminate\Database\Eloquent\{
     Builder,
     Model
 };
+use Illuminate\Support\Facades\File;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -335,7 +336,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->visible(function (CreatorProposal $proposal) {
                         $item = $proposal->getMedia('scripts')->last();
-                        return !is_null($item);
+                        return !is_null($item) && File::exists($item->getPath());
                     }),
                 Action::make('downloadContract')
                     ->label('Download Contract')
@@ -347,7 +348,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->visible(function (CreatorProposal $proposal) {
                         $item = $proposal->getMedia('contracts')->last();
-                        return !is_null($item);
+                        return !is_null($item) && File::exists($item->getPath());
                     }),
                 Action::make('downloadPoster')
                     ->label('Download Poster')
@@ -359,7 +360,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->visible(function (CreatorProposal $proposal) {
                         $item = $proposal->getMedia('posters')->last();
-                        return !is_null($item);
+                        return !is_null($item) && File::exists($item->getPath());
                     })
             ])->label('Preview')
                 ->icon('heroicon-m-video-camera')
