@@ -94,7 +94,7 @@ class VideosController extends Controller
     {
         $videos = $this->videosFilter($request);
         $videos = $videos->orderBy('release_date', 'desc');
-        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 10;
 
         $videos = $videos->paginate($limit);
         return new VideosResource($videos);
@@ -116,7 +116,7 @@ class VideosController extends Controller
         //TODO: implement ordering by most views
         $videos = $videos->withAvg('stars', 'stars');
         $videos = $videos->orderBy('stars_avg_stars', 'desc');
-        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 10;
 
         $videos = $videos->paginate($limit);
         return new VideosResource($videos);
