@@ -41,7 +41,7 @@ class SocialiteController extends Controller
                 'email'           => $response->getEmail(),
                 'password'        => Hash::make(Str::random(8)),
                 'email_verified_at' => date('Y-m-d H:i:s'),
-                'role' => 'creator',
+                'role' => 'panel_user',
             ]);
 
             if ($user) {

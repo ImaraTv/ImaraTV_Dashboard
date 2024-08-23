@@ -2,13 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\{
-    AdminProfile,
-    CreatorProfile,
-    FilmTopic,
-    Location,
-    SponsorProfile
-};
+use App\Models\{AdminProfile, CreatorProfile, FilmTopic, Location, SponsorProfile, User};
 use Filament\{
     Forms\Components\Card,
     Forms\Components\DatePicker,
@@ -196,26 +190,34 @@ class EditProfile extends Page implements HasForms
                     $this->fdata
             );
         }
+
+        if(!auth()->user()->hasRole(['sponsor', 'creator', 'admin', 'super_admin'])) {
+            self::$model = User::class;
+            $this->fdata = ['role' => ''];
+            $this->form->fill(
+                $this->fdata
+            );
+        }
     }
 
     protected function adminForm()
     {
         return Card::make()->schema(
-                        [
-                                    SpatieMediaLibraryFileUpload::make('profile_picture')
-                                    ->image()
-                                    ->name('profile_picture')
-                                    ->label('Profile Picture')
-                                    ->columnSpanFull(),
-                                    TextInput::make('name')
-                                    ->columnSpan(2),
-                                    TextInput::make('email')
-                                    ->email()
-                                    ->columnSpan(2),
-                                    TextInput::make('mobile_phone')
-                                    ->columnSpan(2),
-                        ]
-                )->columns(6);
+            [
+                SpatieMediaLibraryFileUpload::make('profile_picture')
+                ->image()
+                ->name('profile_picture')
+                ->label('Profile Picture')
+                ->columnSpanFull(),
+                TextInput::make('name')
+                ->columnSpan(2),
+                TextInput::make('email')
+                ->email()
+                ->columnSpan(2),
+                TextInput::make('mobile_phone')
+                ->columnSpan(2),
+            ]
+    )->columns(6);
     }
 
     protected function sponsorForm()
@@ -344,6 +346,21 @@ class EditProfile extends Page implements HasForms
                                     ->label('Location'),
                         ]
                 )->columns(6);
+    }
+
+    protected function chooseRoleForm()
+    {
+        $role = 'creator';
+        return Card::make()->schema(
+            [
+                Select::make('role')
+                    ->label('Continue Profile Registration as?')
+                    ->required()
+                    ->default($role)
+                    ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor']),
+
+            ]
+        )->columns(6);
     }
 
     protected function sponsorProfileInfo(Infolist $list): Infolist
@@ -591,54 +608,82 @@ class EditProfile extends Page implements HasForms
                         ->state($this->fdata);
     }
 
+    protected function chooseRoleInfo(Infolist $list): Infolist
+    {
+        $role = 'creator';
+        return $list->schema([
+            Section::make()
+                ->columns(2)
+                ->schema([
+                    //TextEntry::make('role')->columnSpan(2),
+                    Actions::make([
+                        Action::make('Click to Choose Role')
+                            ->mountUsing(function (Form $form): void {
+                                $form->fill($this->fdata);
+                            })
+                            ->icon('heroicon-m-star')
+                            ->form(
+                                [
+                                    Select::make('role')
+                                        ->columnSpan(2)
+                                        ->label('Continue Profile Registration as?')
+                                        ->required()
+                                        ->default($role)
+                                        ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor']),
+                                ]
+                            )->action(function (array $data): void {
+                                $this->saveUpdatedUserRole($data);
+                                Notification::make()
+                                    ->title('Role updated!')
+                                    ->success()
+                                    ->send();
+                            })
+                            ->closeModalByClickingAway(false),
+                    ])
+                ])->columns(4)->state($this->fdata)
+        ])
+            ->state($this->fdata);
+    }
+
     public function profileInfo(Infolist $list): Infolist
     {
 
         if (auth()->user()->hasRole('admin|super_admin')) {
             return $this->adminProfileInfo($list);
         }
-        if (auth()->user()->hasRole('creator')) {
+        else if (auth()->user()->hasRole('creator')) {
             return $this->creatorProfileInfo($list);
         }
-        if (auth()->user()->hasRole('sponsor')) {
+        else if (auth()->user()->hasRole('sponsor')) {
             return $this->sponsorProfileInfo($list);
+        }
+        else {
+            return $this->chooseRoleInfo($list);
         }
     }
 
     public function form(Form $form): Form
     {
         if (auth()->user()->hasRole('creator')) {
-            return $form
-                            ->schema([
-                                $this->creatorForm()
-                            ])
-                            ->statePath('data')
-            ;
+            return $form->schema([$this->creatorForm()])->statePath('data');
         }
-        if (auth()->user()->hasRole('sponsor')) {
-            return $form
-                            ->schema([
-                                $this->sponsorForm()
-                            ])->statePath('data');
+        else if (auth()->user()->hasRole('sponsor')) {
+            return $form->schema([$this->sponsorForm()])->statePath('data');
         }
-//        dd(!auth()->user()->hasRole(['admin','super']));
-        if (auth()->user()->hasRole('admin|super_admin')) {
-
-
-            return $form
-                            ->schema([
-                                $this->adminForm()
-                            ])
-                            ->statePath('data');
+        else if (auth()->user()->hasRole('admin|super_admin')) {
+            return $form->schema([$this->adminForm()])->statePath('data');
+        }
+        else {
+            return $form->schema([$this->chooseRoleForm()])->statePath('data');
         }
     }
 
     protected function getFormActions(): array
     {
         return [
-                    Action::make('Update')
-                    ->color('primary')
-                    ->submit('Update'),
+            Action::make('Update')
+            ->color('primary')
+            ->submit('Update'),
         ];
     }
 
@@ -691,12 +736,9 @@ class EditProfile extends Page implements HasForms
         }
         if (auth()->user()->hasRole('creator')) {
 
-
             creatorProfile::updateOrCreate(['user_id' => auth()->user()->id], $this->form->getState());
         }
         if (auth()->user()->hasRole('admin|super_admin')) {
-
-
 
             $data = collect($this->data)->only('mobile_phone')->toArray();
 
@@ -736,6 +778,14 @@ class EditProfile extends Page implements HasForms
                 }
             }
         }
+    }
+
+    protected function saveUpdatedUserRole(array $data): void
+    {
+        $data = collect($data)->only('role')->toArray();
+        $user = User::updateOrCreate(['id' => auth()->user()->id], $data);
+        $user->assignRole($data['role']);
+        // then refresh the page
     }
 
     public static function shouldRegisterNavigation(): bool
