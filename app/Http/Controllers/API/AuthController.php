@@ -207,6 +207,23 @@ class AuthController extends Controller
         return response()->json(['message' => 'invalid token']);
     }
 
+    public function getUserByEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+        $user = User::where(['email' => $request->email])->first();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'User cannot be found with that email', 'user' => null], 404);
+        }
+        else {
+            return response()->json(['success' => true, 'message' => 'User Found', 'user' => $user]);
+        }
+    }
+
     public function forgotPassword(Request $request)
     {
         $validator = Validator::make($request->all(), ['url' => 'required', 'email' => 'required|email|exists:users']);
