@@ -24,6 +24,7 @@ class VideosController extends Controller
         $sponsor_id = $request->has('sponsor_id') ? $request->get('sponsor_id') : '';
         $creator_id = $request->has('creator_id') ? $request->get('creator_id') : '';
         $location_id = $request->has('location_id') ? $request->get('location_id') : '';
+        $topic = $request->has('topic') ? $request->get('topic') : '';
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars']);
         $videos = $videos->whereDate('release_date', '<=', Carbon::now()->toDateString());
@@ -52,6 +53,11 @@ class VideosController extends Controller
         if ($category != '') {
             $videos = $videos->whereHas('proposal.genre', function ($q) use ($category) {
                 $q->where('genre_name', '=', $category);
+            });
+        }
+        if ($topic != '') {
+            $videos = $videos->whereHas('proposal', function ($q) use ($topic) {
+                $q->where('topics', 'LIKE', '%' . $topic . '%');
             });
         }
         if ($rating != '') {
