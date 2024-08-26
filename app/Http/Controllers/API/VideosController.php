@@ -24,6 +24,7 @@ class VideosController extends Controller
         $sponsor_id = $request->has('sponsor_id') ? $request->get('sponsor_id') : '';
         $creator_id = $request->has('creator_id') ? $request->get('creator_id') : '';
         $location_id = $request->has('location_id') ? $request->get('location_id') : '';
+        $topic = $request->has('topic') ? $request->get('topic') : '';
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars']);
         $videos = $videos->whereDate('release_date', '<=', Carbon::now()->toDateString());
@@ -52,6 +53,11 @@ class VideosController extends Controller
         if ($category != '') {
             $videos = $videos->whereHas('proposal.genre', function ($q) use ($category) {
                 $q->where('genre_name', '=', $category);
+            });
+        }
+        if ($topic != '') {
+            $videos = $videos->whereHas('proposal', function ($q) use ($topic) {
+                $q->where('topics', 'LIKE', '%' . $topic . '%');
             });
         }
         if ($rating != '') {
@@ -94,7 +100,7 @@ class VideosController extends Controller
     {
         $videos = $this->videosFilter($request);
         $videos = $videos->orderBy('release_date', 'desc');
-        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 10;
 
         $videos = $videos->paginate($limit);
         return new VideosResource($videos);
@@ -116,7 +122,7 @@ class VideosController extends Controller
         //TODO: implement ordering by most views
         $videos = $videos->withAvg('stars', 'stars');
         $videos = $videos->orderBy('stars_avg_stars', 'desc');
-        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 10;
 
         $videos = $videos->paginate($limit);
         return new VideosResource($videos);
