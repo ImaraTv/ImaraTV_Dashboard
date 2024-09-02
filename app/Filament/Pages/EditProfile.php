@@ -246,11 +246,11 @@ class EditProfile extends Page implements HasForms
                                     ->columnSpan(3)
                                     ->label('Organization Website')->nullable(),
 //                            --
-                            TextInput::make('default_call_to_action')
+                            TextInput::make('default_cta_text')
                                     ->columnSpan(3)
-                                    ->label('Call to Action')->required(),
+                                    ->label('Call to Action Text')->required(),
 //                            --
-                            TextInput::make('default_call_to_action_link')
+                            TextInput::make('default_cta_link')
                                     ->url()
                                     ->suffixIcon('heroicon-m-globe-alt')
                                     ->columnSpan(3)
@@ -372,8 +372,8 @@ class EditProfile extends Page implements HasForms
                                 TextEntry::make('about_us')->columnSpan(2),
                                 TextEntry::make('organization_name')->columnSpan(2),
                                 TextEntry::make('organization_website')->columnSpan(2),
-                                TextEntry::make('defeault_call_to_action')->columnSpan(2),
-                                TextEntry::make('default_call_to_action_link')->columnSpan(2),
+                                TextEntry::make('default_cta_text')->columnSpan(2)->label('Call to Action Text'),
+                                TextEntry::make('default_cta_link')->columnSpan(2)->label('Call to Action Link'),
                                 TextEntry::make('topics_of_interest')->columnSpan(2),
                                 TextEntry::make('locations_of_interest')->columnSpan(2),
                                 TextEntry::make('contact_person_name')->columnSpan(2),
@@ -427,11 +427,11 @@ class EditProfile extends Page implements HasForms
                             ->columnSpan(2)
                             ->label('Organization Website')->nullable(),
 //                            --
-                    TextInput::make('default_call_to_action')
+                    TextInput::make('default_cta_text')
                             ->columnSpan(2)
-                            ->label('Default Call to Action')->required(),
+                            ->label('Call to Action Text')->required(),
 //                            --
-                    TextInput::make('default_call_to_action_link')
+                    TextInput::make('default_cta_link')
                             ->url()
                             ->suffixIcon('heroicon-m-globe-alt')
                             ->columnSpan(2)
