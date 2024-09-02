@@ -31,8 +31,8 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'topics' => collect(explode(',', $item->proposal?->topics)),
                 'description' => $item->synopsis,
                 'vimeo_link' => $item->proposal->vimeo_link,
-                'call_to_action_btn' => $item->call_to_action_text,
-                'call_to_action_link' => $item->call_to_action_link,
+                'call_to_action_btn' => $item->call_to_action_text ?? $item->sponsor?->default_cta_text,
+                'call_to_action_link' => $item->call_to_action_link ?? $item->sponsor?->default_cta_link,
                 'creator' => [
                     'id' => $item->creator?->id,
                     'name' => $item->creator?->name,
