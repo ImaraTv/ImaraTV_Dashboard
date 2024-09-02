@@ -13,11 +13,20 @@ use function request;
 class Register extends BaseRegister
 {
 
-//    protected static ?string $navigationIcon = 'heroicon-o-document-text';
-//
-//    protected static string $view = 'filament.pages.auth.register';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string $view = 'filament.pages.auth.register';
 
-
+    protected function getCachedSubNavigation(){}
+    protected function getSubNavigationPosition(){}
+    protected function getWidgetData() {}
+    protected function getHeader() {}
+    protected function getCachedHeaderActions() {}
+    protected function getActions() {}
+    protected function getActionsLayout(){}
+    protected function getBreadcrumbs(){}
+    protected function getVisibleHeaderWidgets() {}
+    protected function getVisibleFooterWidgets(){}
+    protected function getFooter(){}
     protected function getForms(): array
     {
         $validator = Validator::make(request()->all(), [

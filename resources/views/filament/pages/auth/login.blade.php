@@ -7,9 +7,8 @@
         </x-slot>
     @endif
 
-    
     <x-filament-panels::form wire:submit="authenticate">
-        <x-filament-socialite::buttons :showDivider="false" />
+        <x-filament-socialite::buttons :showDivider="true" />
         {{ $this->form }}
 
         <x-filament-panels::form.actions
@@ -18,5 +17,4 @@
         />
     </x-filament-panels::form>
 
-    
 </x-filament-panels::page.simple>
