@@ -63,11 +63,11 @@ class SponsorResource extends Resource
                                     ->columnSpan(3)
                                     ->label('Organization Website')->nullable(),
 //                            --
-                            TextInput::make('default_call_to_action')
+                            TextInput::make('default_cta_text')
                                     ->columnSpan(3)
-                                    ->label('Default Call to Action')->required(),
+                                    ->label('Default Call to Action Text')->required(),
                             //                            --
-                            TextInput::make('default_call_to_action_link')
+                            TextInput::make('default_cta_link')
                                     ->url()
                                     ->suffixIcon('heroicon-m-globe-alt')
                                     ->columnSpan(3)
