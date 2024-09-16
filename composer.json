@@ -20,6 +20,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.4",
         "maatwebsite/excel": "^3.1.57",
+        "mailchimp/marketing": "^3.0",
         "owenvoke/blade-fontawesome": "^2.6",
         "sendgrid/sendgrid": "^8.1",
         "symfony/http-client": "^6.3",
