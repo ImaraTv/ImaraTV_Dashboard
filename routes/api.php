@@ -46,6 +46,11 @@ Route::group(['middleware' => 'api'], function () {
     Route::get('/locations', [LocationsController::class, 'list']);
     Route::post('/contact', [SiteController::class, 'contact']);
 
+    Route::prefix('newsletter')->group(function () {
+        Route::post('/subscribe', [SiteController::class, 'newsletterSubscribe']);
+        Route::post('/unsubscribe', [SiteController::class, 'newsletterUnsubscribe']);
+    });
+
     Route::group(['middleware' => 'jwt.auth'], function () {
         Route::get('/profile', [AuthController::class, 'profile']);
         Route::post('change-password', [AuthController::class, 'changePassword']);
