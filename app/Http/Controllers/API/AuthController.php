@@ -138,6 +138,7 @@ class AuthController extends Controller
                     'name' => ['required', 'string', 'max:255'],
                     'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                     'password' => ['required', 'string', 'min:8', 'confirmed'],
+                    'url' => ['required', 'string']
         ]);
 
         if ($validator->fails()) {
@@ -304,6 +305,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
                     'name' => ['required', 'string', 'max:255'],
                     'email' => ['required', 'string', 'email', 'max:255'],
+                    'url' => ['required', 'string']
         ]);
 
         if ($validator->fails()) {
