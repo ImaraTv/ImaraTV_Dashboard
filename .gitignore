@@ -5,6 +5,10 @@
 /public/storage
 /storage/*.key
 /vendor
+/public/admin/css/filament
+/public/admin/js/filament
+/public/js/filament
+/public/vendor
 .env
 .env.backup
 .env.production

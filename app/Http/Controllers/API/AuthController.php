@@ -328,50 +328,5 @@ class AuthController extends Controller
         }
         return response()->json(['status' => 'error', 'message' => 'user details update failed'], 401);
     }
-
-    /**
-     * Handle Google login.
-     *
-     * @param  Request  $request
-     * @return JsonResponse
-     */
-    public function handleGoogleLogin(Request $request)
-    {
-        $token = $request->input('credential');
-
-        $client = new Google_Client(['client_id' => config('services.google.client_id')]);
-        $payload = $client->verifyIdToken($token);
-
-        if ($payload) {
-            $googleId = $payload['sub'];
-            $name = $payload['name'];
-            $email = $payload['email'];
-
-            // Check if the user already exists
-            $user = User::where('email', $email)->first();
-
-            if ($user) {
-                // Log the user in
-                Auth::login($user);
-            } else {
-                // Create a new user
-                $user = User::create([
-                    'name' => $name,
-                    'email' => $email,
-                    'password' => Hash::make(Str::random(16)), // Set a random password
-                ]);
-
-                // Assign role if necessary
-                $user->assignRole('user');
-
-                // Log the new user in
-                Auth::login($user);
-            }
-
-            return response()->json(['success' => true, 'redirect' => url('/dashboard')]);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Invalid Google token'], 401);
-        }
-    }
 }
 
