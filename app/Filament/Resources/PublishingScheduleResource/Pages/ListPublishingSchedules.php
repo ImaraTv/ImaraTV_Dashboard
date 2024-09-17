@@ -10,6 +10,8 @@ class ListPublishingSchedules extends ListRecords
 {
     protected static string $resource = PublishingScheduleResource::class;
 
+    protected static string $view = 'filament.pages.tables.publishing-schedules';
+
     protected function getHeaderActions(): array
     {
         return [

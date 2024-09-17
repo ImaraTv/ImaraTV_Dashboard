@@ -10,10 +10,9 @@ use App\{Filament\Pages\Auth\Login,
     Models\SocialiteUser,
     Models\User};
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use Blade;
 use DutchCodingCompany\FilamentSocialite\FilamentSocialitePlugin;
-use Filament\{
-    Enums\ThemeMode,
+use Filament\{Enums\ThemeMode,
+    Forms\Components\Component,
     Http\Middleware\Authenticate,
     Http\Middleware\DisableBladeIconComponents,
     Http\Middleware\DispatchServingFilamentEvent,
@@ -24,19 +23,17 @@ use Filament\{
     PanelProvider,
     Support\Colors\Color,
     View\PanelsRenderHook,
-    Widgets
-};
+    Widgets};
 use Filament\Support\Enums\MaxWidth;
-use Illuminate\{
-    Contracts\Auth\Authenticatable,
+use Illuminate\{Contracts\Auth\Authenticatable,
     Cookie\Middleware\AddQueuedCookiesToResponse,
     Cookie\Middleware\EncryptCookies,
     Foundation\Http\Middleware\VerifyCsrfToken,
     Routing\Middleware\SubstituteBindings,
     Session\Middleware\AuthenticateSession,
     Session\Middleware\StartSession,
-    View\Middleware\ShareErrorsFromSession
-};
+    Support\Facades\Blade,
+    View\Middleware\ShareErrorsFromSession};
 use Laravel\Socialite\Contracts\User as SocialiteUserContract;
 use function app_path;
 use function asset;

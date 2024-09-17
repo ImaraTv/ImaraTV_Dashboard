@@ -10,6 +10,8 @@ class ListCreators extends ListRecords
 {
     protected static string $resource = CreatorResource::class;
 
+    protected static string $view = 'filament.pages.tables.creators';
+
     protected function getHeaderActions(): array
     {
         return [
