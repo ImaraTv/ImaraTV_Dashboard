@@ -83,6 +83,7 @@ class UserResource extends Resource implements HasShieldPermissions
                                 Forms\Components\TextInput::make('email')
                                 ->label('Email Address')
                                 ->email()
+                                ->unique(column: 'email')
                                 ->required(),
                                 Forms\Components\TextInput::make('password')
                                 ->password()

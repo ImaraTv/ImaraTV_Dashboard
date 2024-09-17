@@ -13,7 +13,6 @@ use Illuminate\{
     Support\Facades\Validator,
 };
 use MailchimpMarketing\ApiClient;
-use NZTim\Mailchimp\Mailchimp;
 use function request;
 use function response;
 
