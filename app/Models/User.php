@@ -6,6 +6,7 @@ namespace App\Models;
 
 
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
+use Rappasoft\LaravelAuthenticationLog\Traits\AuthenticationLoggable;
 use Filament\{
     Models\Contracts\FilamentUser,
     Panel
@@ -30,7 +31,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         Notifiable,
         HasRoles,
         HasPanelShield,
-        InteractsWithMedia;
+        InteractsWithMedia, AuthenticationLoggable;
 
     /**
      * The attributes that are mass assignable.
