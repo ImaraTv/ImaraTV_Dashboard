@@ -10,6 +10,8 @@ class ListSponsors extends ListRecords
 {
     protected static string $resource = SponsorResource::class;
 
+    protected static string $view = 'filament.pages.tables.sponsors';
+
     protected function getHeaderActions(): array
     {
         return [

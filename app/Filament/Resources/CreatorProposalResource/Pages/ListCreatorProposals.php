@@ -10,6 +10,8 @@ class ListCreatorProposals extends ListRecords
 {
     protected static string $resource = CreatorProposalResource::class;
 
+    protected static string $view = 'filament.pages.tables.creator-proposals';
+
     protected function getHeaderActions(): array
     {
         return [
