@@ -11,15 +11,14 @@
 
 namespace App\Http\Controllers\API;
 
-use App\{
+use App\{Events\Login as LoginEvent,
     Http\Controllers\Controller,
     Http\Resources\UsersResources,
     Mail\UserRegistrationEmail,
     Mail\UserResetPasswordEmail,
     Models\PasswordResetToken,
     Models\RegisterToken,
-    Models\User
-};
+    Models\User};
 use Illuminate\{
     Http\JsonResponse,
     Http\Request,
@@ -31,7 +30,6 @@ use Illuminate\{
     Support\Facades\Validator,
     Support\Str
 };
-use Google_Client;
 use function auth;
 use function request;
 use function response;
@@ -76,10 +74,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'user is not verified', 'error' => 'Unverified'], 401);
         }
 
-
         if (!$token = auth('api')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        event(new LoginEvent($user));
 
         return $this->respondWithToken($token);
     }
@@ -91,7 +90,6 @@ class AuthController extends Controller
      */
     public function profile()
     {
-
         return new UsersResources([auth()->guard('api')->user()]);
     }
 
@@ -290,10 +288,8 @@ class AuthController extends Controller
         }
         $user = auth('api')->user();
         if ($user) {
-
             $user->password = Hash::make($request->password);
             if ($user->update()) {
-
                 return response()->json(['message' => 'password changed successfully'], 201);
             }
         }
@@ -315,7 +311,6 @@ class AuthController extends Controller
 
         if (trim($user->email) !== trim($request->email)) {
             // send verification email
-            // \\
             $user->email_verified_at = null;
             $this->sendRegisterEmail($request, $user);
         }
@@ -323,7 +318,6 @@ class AuthController extends Controller
         $user->email = $request->email;
 
         if ($user->update()) {
-
             return response()->json(['message' => 'user details updated successfully'], 201);
         }
         return response()->json(['status' => 'error', 'message' => 'user details update failed'], 401);

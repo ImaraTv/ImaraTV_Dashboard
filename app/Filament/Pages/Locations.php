@@ -94,7 +94,7 @@ class Locations extends Page implements HasTable
                                 BulkActionGroup::make([
                                     DeleteBulkAction::make(),
                                 ]),
-            ]);
+                            ]);
         }
     }
 }
