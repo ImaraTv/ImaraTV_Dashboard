@@ -18,9 +18,9 @@ class AuthLog extends Page implements HasTable
 {
     use InteractsWithTable, HasPageShield;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-m-user-group';
     protected static string $view = 'filament.pages.auth-log';
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Statistics';
 
     #[\Override]
     public static function canAccess(): bool

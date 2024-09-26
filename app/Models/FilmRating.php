@@ -15,4 +15,14 @@ class FilmRating extends Model
         SoftDeletes;
 
     protected $guarded = [];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function film()
+    {
+        return $this->belongsTo(PublishingSchedule::class, 'video_id', 'id');
+    }
 }
