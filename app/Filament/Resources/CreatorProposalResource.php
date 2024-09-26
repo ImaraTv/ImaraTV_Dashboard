@@ -479,8 +479,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                             ->relationship('sponsor', 'organization_name'),
                             SelectFilter::make('film_genre')
                             ->relationship('genre', 'genre_name')
-                            ->label('Genre')
-                            ,
+                            ->label('Genre'),
                             SelectFilter::make('status')
                             ->relationship('proposal_status', 'status'),
                             Filter::make('created_at')
