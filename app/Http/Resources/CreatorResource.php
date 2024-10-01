@@ -45,7 +45,7 @@ class CreatorResource extends ResourceCollection
 
             return
             [
-                'id' => $item->id,
+                'id' => $item->user_id,
                 'name' => $item->name,
                 'stage_name' => $item->stage_name,
                 'user_id' => $item->user_id,
