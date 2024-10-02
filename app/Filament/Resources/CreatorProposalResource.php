@@ -479,10 +479,13 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ])
                         ->filters([
                             SelectFilter::make('sponsored_by')
-                            ->searchable()
-                            ->preload()
-                            ->label('Sponsor')
-                            ->relationship('sponsor', 'organization_name'),
+                                ->visible(function () use ($admins_only) {
+                                    return $admins_only;
+                                })
+                                ->searchable()
+                                ->preload()
+                                ->label('Sponsor')
+                                ->relationship('sponsor', 'organization_name'),
                             SelectFilter::make('film_genre')
                             ->relationship('genre', 'genre_name')
                             ->label('Genre'),

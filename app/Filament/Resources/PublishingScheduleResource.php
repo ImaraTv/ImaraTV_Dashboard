@@ -70,7 +70,6 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
 
     public static function canCreate(): bool
     {
-
         return auth()->user()->can('create_publishing::schedule');
     }
 
@@ -256,6 +255,8 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
 
     public static function table(Table $table): Table
     {
+        $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
+
         $query = PublishingSchedule::with(['sponsor', 'creator', 'proposal']);
 
         if (auth()->user()->hasRole('creator')) {
@@ -291,6 +292,9 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
             })
             ->filters([
                 SelectFilter::make('sponsor_id')
+                    ->visible(function () use ($admins_only) {
+                        return $admins_only;
+                    })
                     ->searchable()
                     ->preload()
                     ->label('Sponsor')
@@ -316,7 +320,10 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 fn(Builder $query, $date): Builder => $query->whereDate('release_date', '<=', $date),
                         );
                     }),
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make()
+                    ->visible(function () use ($admins_only) {
+                        return $admins_only;
+                    }),
                     ], layout: FiltersLayout::AboveContent)->filtersFormColumns(4)
             ->actions(static::tableActions())
             ->bulkActions([

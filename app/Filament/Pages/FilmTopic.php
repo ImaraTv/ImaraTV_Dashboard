@@ -20,7 +20,6 @@ use Filament\{
 
 class FilmTopic extends Page implements HasTable
 {
-
     use InteractsWithTable,
         HasPageShield;
 
@@ -34,7 +33,7 @@ class FilmTopic extends Page implements HasTable
     #[\Override]
     public static function canAccess(): bool
     {
-        return boolval(auth()->user()->approved);
+        return boolval(auth()->user()->hasRole('admin|super_admin'));
     }
 
     protected function getHeaderActions(): array
