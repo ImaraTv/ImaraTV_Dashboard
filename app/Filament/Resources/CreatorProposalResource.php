@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\{
-    Exports\FilmProjectsExport,
+use App\{Exports\FilmProjectsExport,
     Filament\Resources\CreatorProposalResource\Pages,
     Models\CreatorProfile,
     Models\CreatorProposal,
@@ -12,8 +11,7 @@ use App\{
     Models\PotentialSponsor,
     Models\ProposalStatus,
     Models\SponsorProfile,
-    Models\User
-};
+    Models\User};
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{Forms\Components\Card,
     Forms\Components\DatePicker,
@@ -38,12 +36,8 @@ use Filament\{Forms\Components\Card,
     Tables\Filters\Filter,
     Tables\Filters\SelectFilter,
     Tables\Table};
-use Illuminate\Database\Eloquent\{
-    Builder,
-    Model
-};
+use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Support\Facades\File;
-use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use function auth;

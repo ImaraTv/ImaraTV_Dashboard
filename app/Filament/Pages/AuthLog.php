@@ -34,6 +34,7 @@ class AuthLog extends Page implements HasTable
         if ($can_view) {
             return $table
                 ->query(Log::query())
+                ->defaultSort('id', 'desc')
                 ->columns([
                     TextColumn::make('authenticatable.name')
                         ->name('authenticatable.name')
