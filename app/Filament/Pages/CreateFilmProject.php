@@ -67,7 +67,11 @@ class CreateFilmProject extends SimplePage
                 Wizard::make([
                     Wizard\Step::make('Film Details')
                         ->description('Tell us about your film')
-                        ->columns(4)
+                        ->columns([
+                            'sm' => 4,
+                            'xl' => 4,
+                            '2xl' => 4,
+                        ])
                         ->schema($this->filmDetailSchema())
                         ->afterValidation(function() {
                             //
@@ -137,11 +141,11 @@ class CreateFilmProject extends SimplePage
                 ->filled()
                 ->string()
                 ->maxLength(255)
-                ->label('Working Title')->columnSpan(2),
+                ->label('Working Title')->columnSpan(['sm' => 4, 'md' => 2, 'xl' => 2, 'default' => 4]),
             Select::make('topics')
                 //->multiple()
                 ->options(FilmTopic::all()->pluck('topic_name', 'id'))
-                ->label('Topics (Select All Related Topics)')->columnSpan(2)->nullable(),
+                ->label('Topics (Select All Related Topics)')->columnSpan(['sm' => 4, 'md' => 2, 'xl' => 2, 'default' => 4])->nullable(),
             Textarea::make('synopsis')
                 ->required()
                 ->string()
@@ -154,20 +158,20 @@ class CreateFilmProject extends SimplePage
                 ->minValue(1000)
                 ->numeric()
                 ->filled()
-                ->label('Film Budget (KES)')->columnSpan(2)->nullable(),
+                ->label('Film Budget (KES)')->columnSpan(['sm' => 4, 'md' => 2, 'xl' => 2, 'default' => 4])->nullable(),
             Select::make('film_genre')
                 ->label('Film Genre  (Leave blank if optional)')
-                ->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(2)->nullable(),
+                ->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(['sm' => 4, 'md' => 2, 'xl' => 2, 'default' => 4])->nullable(),
             TextInput::make('film_length')
                 ->required()
                 ->type('number')
                 ->numeric()
-                ->label('Film Length (Minutes)')->columnSpan(2)->nullable(),
+                ->label('Film Length (Minutes)')->columnSpan(['sm' => 4, 'md' => 2, 'xl' => 2, 'default' => 4])->nullable(),
             TextInput::make('production_time')
                 ->required()
                 ->type('number')
                 ->numeric()
-                ->label('Production Time (Days)')->columnSpan(2)->nullable(),
+                ->label('Production Time (Days)')->columnSpan(['sm' => 4, 'md' => 2, 'xl' => 2, 'default' => 4])->nullable(),
 
 
         ];
