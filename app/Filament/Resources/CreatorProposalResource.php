@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\{
-    Exports\FilmProjectsExport,
+use App\{Exports\FilmProjectsExport,
     Filament\Resources\CreatorProposalResource\Pages,
     Models\CreatorProfile,
     Models\CreatorProposal,
@@ -12,8 +11,7 @@ use App\{
     Models\PotentialSponsor,
     Models\ProposalStatus,
     Models\SponsorProfile,
-    Models\User
-};
+    Models\User};
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{Forms\Components\Card,
     Forms\Components\DatePicker,
@@ -38,12 +36,8 @@ use Filament\{Forms\Components\Card,
     Tables\Filters\Filter,
     Tables\Filters\SelectFilter,
     Tables\Table};
-use Illuminate\Database\Eloquent\{
-    Builder,
-    Model
-};
+use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Support\Facades\File;
-use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use function auth;
@@ -122,46 +116,58 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->disabled(!$can_create_proposal)
                         ->schema([
                             Card::make()->schema([
-                                TextInput::make('working_title')->label('Working Title')->columnSpan(4),
+                                TextInput::make('working_title')
+                                    ->required()
+                                    ->filled()
+                                    ->string()
+                                    ->maxLength(255)
+                                    ->label('Working Title')
+                                    ->columnSpan(4),
                                 TagsInput::make('topics')
-                                ->separator(',')
-                                ->suggestions(FilmTopic::all()->pluck('topic_name'))
-                                ->label('Topics (Select All Related Topics)')->columnSpan(4)->nullable(),
-                                Textarea::make('synopsis')->label('Synopsis')->columnSpanFull()->nullable(),
+                                    ->separator(',')
+                                    ->suggestions(FilmTopic::all()->pluck('topic_name'))
+                                    ->label('Topics (Select All Related Topics)')->columnSpan(4)->nullable(),
+                                Textarea::make('synopsis')
+                                    ->label('Synopsis')
+                                    ->columnSpanFull()
+                                    ->nullable(),
                                 TextInput::make('film_budget')
-                                ->type('number')
-                                ->numeric()
-                                ->label('Film Budget (KES)')
-                                ->columnSpan(4)->nullable(),
+                                    ->required()
+                                    ->type('number')
+                                    ->minValue(1000)
+                                    ->numeric()
+                                    ->filled()
+                                    ->label('Film Budget (KES)')
+                                    ->columnSpan(4)->nullable(),
                                 TextInput::make('film_length')
-                                ->type('number')
-                                ->numeric()
-                                ->label('Film Length (Minutes)')->columnSpan(4)->nullable(),
+                                    ->type('number')
+                                    ->numeric()
+                                    ->label('Film Length (Minutes)')->columnSpan(4)->nullable(),
                                 TextInput::make('production_time')
-                                ->type('number')
-                                ->numeric()
-                                ->label('Production Time (Days)')->columnSpan(4)->nullable(),
+                                    ->type('number')
+                                    ->numeric()
+                                    ->label('Production Time (Days)')->columnSpan(4)->nullable(),
                                 Select::make('film_genre')
-                                ->label('Film Genre  (Leave blank if optional)')
-                                ->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(4)->nullable(),
+                                    ->label('Film Genre  (Leave blank if optional)')
+                                    ->options(FilmGenre::all()->pluck('genre_name', 'id'))->columnSpan(4)->nullable(),
                                 Select::make('film_rating')
-                                ->columnSpan(4)
-                                ->label('Film Rating')
+                                    ->columnSpan(4)
+                                    ->label('Film Rating')
                                 ->options([
                                     'pre-teen' => 'Pre-Teens',
                                     'teen' => 'Teens',
                                     'adult' => 'Adults'
                                 ]),
                                 Select::make('film_type')
-                                ->live()
-                                ->label('Film Type (Free or Premium)')->options([
-                                    'free' => 'Free',
-                                    'premium' => 'Premium',
-                                ])->columnSpan(4)->nullable(),
+                                    ->live()
+                                    ->label('Film Type (Free or Premium)')->options([
+                                        'free' => 'Free',
+                                        'premium' => 'Premium',
+                                    ])->columnSpan(4)->nullable(),
                                 TextInput::make('premium_file_price')
-                                ->disabled(fn(Get $get) => $get('film_type') == 'free')
-                                ->label('Premium Film Price per view (KES)')
-                                ->type('number')->columnSpan(4)->nullable(),
+                                    ->disabled(fn(Get $get) => $get('film_type') == 'free')
+                                    ->label('Premium Film Price per view (KES)')
+                                    ->type('number')->columnSpan(4)->nullable(),
                                 SpatieMediaLibraryFileUpload::make('attachments')
                                 ->label('Script')
                                 ->maxSize(100000)
@@ -473,10 +479,13 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ])
                         ->filters([
                             SelectFilter::make('sponsored_by')
-                            ->searchable()
-                            ->preload()
-                            ->label('Sponsor')
-                            ->relationship('sponsor', 'organization_name'),
+                                ->visible(function () use ($admins_only) {
+                                    return $admins_only;
+                                })
+                                ->searchable()
+                                ->preload()
+                                ->label('Sponsor')
+                                ->relationship('sponsor', 'organization_name'),
                             SelectFilter::make('film_genre')
                             ->relationship('genre', 'genre_name')
                             ->label('Genre'),
