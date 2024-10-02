@@ -34,7 +34,7 @@ class VideosResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'call_to_action_btn' => $item->call_to_action_text ?? $item->sponsor?->default_cta_text,
                 'call_to_action_link' => $item->call_to_action_link ?? $item->sponsor?->default_cta_link,
                 'creator' => [
-                    'id' => $item->creator?->id,
+                    'id' => $item->creator?->user_id,
                     'name' => $item->creator?->name,
                     'stage_name' => $item->creator?->stage_name,
                     'about' => $item->creator?->description,
