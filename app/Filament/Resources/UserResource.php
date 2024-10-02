@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Carbon\Carbon;
 use App\{Exports\Users, Filament\Resources\UserResource\Pages, Mail\UserApprovalEmail, Models\User};
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\{
@@ -141,7 +142,13 @@ class UserResource extends Resource implements HasShieldPermissions
                                 ->label('Approve')
                                 ->afterStateUpdated(function (Model $record) {
                                     if ($record->approved) {
+                                        $record->approved_at = Carbon::now();
+                                        $record->save();
                                         Mail::to($record)->send(new UserApprovalEmail($record));
+                                    }
+                                    else {
+                                        $record->unapproved_at = Carbon::now();
+                                        $record->save();
                                     }
                                 }),
                         ])
