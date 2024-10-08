@@ -96,6 +96,14 @@ class VideosController extends Controller
         return new VideosResource($videos);
     }
 
+    public function getVideoBySlug(Request $request, $slug)
+    {
+        $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre']);
+        $videos = $videos->where('slug', $slug)->get();
+
+        return new VideosResource($videos);
+    }
+
     public function latest(Request $request)
     {
         $videos = $this->videosFilter($request);

@@ -37,6 +37,7 @@ Route::group(['middleware' => 'api'], function () {
     Route::get('/videos/recommended', [VideosController::class, 'recommended']);
     Route::get('/videos/trending', [VideosController::class, 'trending']);
     Route::get('/videos/{id}', [VideosController::class, 'video']);
+    Route::get('/videos/slug/{slug}', [VideosController::class, 'getVideoBySlug']);
     Route::get('/creators', [CreatorsController::class, 'creators']);
     Route::get('/creators/{id}', [CreatorsController::class, 'creator']);
     Route::get('/categories', [CategoriesController::class, 'categories']);
