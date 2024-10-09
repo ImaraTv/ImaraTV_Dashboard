@@ -30,6 +30,7 @@ use Filament\{Forms\Components\Card,
     Support\Enums\ActionSize,
     Tables,
     Tables\Actions\ActionGroup,
+    Tables\Columns\CheckboxColumn,
     Tables\Columns\TextColumn,
     Tables\Enums\FiltersLayout,
     Tables\Filters\Filter,
@@ -281,6 +282,26 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                 TextColumn::make('slug'),
                 TextColumn::make('updated_at')->date()->label('Last Updated'),
                 TextColumn::make('release_date')->sortable()->date(),
+                CheckboxColumn::make('is_featured')->sortable()
+                    ->label('Is Featured')
+                    ->beforeStateUpdated(function (Model $record) {
+                        
+                    })
+                    ->afterStateUpdated(function (Model $record) {
+                        $msg = '';
+                        if ($record->is_featured) {
+                            $msg = 'Video added to Featured Videos';
+                            $record->featured_at = Carbon::now();
+                            $record->save();
+                        }
+                        else {
+                            $msg = 'Video removed from Featured Videos';
+                            $record->featured_at = null;
+                            $record->save();
+                        }
+                        Notification::make()->title($msg)->success()->send();
+                    }),
+                TextColumn::make('featured_at')->sortable()->dateTime(),
                 TextColumn::make('film_type'),
                 TextColumn::make('sponsor.organization_name')->searchable(),
                 TextColumn::make('creator.name'),
@@ -304,8 +325,8 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                     ->label('Film Type'),
                 Filter::make('release_date')
                     ->form([
-                        DatePicker::make('release_from')->label('From'),
-                        DatePicker::make('release_until')->label('To'),
+                        DatePicker::make('release_from')->label('Release Date From'),
+                        DatePicker::make('release_until')->label('Release Date To'),
                     ])
                     ->columns(2)
                     ->columnSpan(2)
@@ -320,6 +341,9 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                 fn(Builder $query, $date): Builder => $query->whereDate('release_date', '<=', $date),
                         );
                     }),
+                Filter::make('is_featured')
+                    ->label('Featured')
+                    ->query(fn (Builder $query): Builder => $query->where('is_featured', true)),
                 Tables\Filters\TrashedFilter::make()
                     ->visible(function () use ($admins_only) {
                         return $admins_only;
