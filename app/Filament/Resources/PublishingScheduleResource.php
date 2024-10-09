@@ -285,7 +285,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                 CheckboxColumn::make('is_featured')->sortable()
                     ->label('Is Featured')
                     ->beforeStateUpdated(function (Model $record) {
-                        
+
                     })
                     ->afterStateUpdated(function (Model $record) {
                         $msg = '';

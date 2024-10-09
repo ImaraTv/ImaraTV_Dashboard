@@ -15,7 +15,7 @@ use Illuminate\{
 
 class VideosController extends Controller
 {
-    protected function videosFilter(Request $request): Builder
+    protected function videosFilter(Request $request, bool $show_upcoming = false): Builder
     {
         $search = $request->has('search') ? $request->get('search') : '';
         $filter = $request->has('filter') ? $request->get('filter') : '';
@@ -27,7 +27,12 @@ class VideosController extends Controller
         $topic = $request->has('topic') ? $request->get('topic') : '';
 
         $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre','stars']);
-        $videos = $videos->whereDate('release_date', '<=', Carbon::now()->toDateString());
+        if ($show_upcoming) {
+            $videos = $videos->whereDate('release_date', '>', Carbon::now()->toDateString());
+        } else {
+            $videos = $videos->whereDate('release_date', '<=', Carbon::now()->toDateString());
+        }
+
 
         // fetch videos where vimeo_link is not null
         $videos = $videos->whereHas('proposal', function ($q) {
@@ -149,6 +154,11 @@ class VideosController extends Controller
 
     public function upcoming(Request $request)
     {
+        $videos = $this->videosFilter($request, true);
+        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        $videos = $videos->orderBy('release_date', 'asc');
+        $videos = $videos->paginate($limit);
 
+        return new VideosResource($videos);
     }
 }
