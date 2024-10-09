@@ -135,4 +135,20 @@ class VideosController extends Controller
         $videos = $videos->paginate($limit);
         return new VideosResource($videos);
     }
+
+    public function featured(Request $request)
+    {
+        $videos = $this->videosFilter($request);
+        $videos = $videos->where('is_featured', 1);
+        $videos = $videos->orderBy('featured_at', 'desc');
+        $limit = $request->has('limit') ? $request->get('limit', 6) : 6;
+
+        $videos = $videos->paginate($limit);
+        return new VideosResource($videos);
+    }
+
+    public function upcoming(Request $request)
+    {
+
+    }
 }
