@@ -4,7 +4,7 @@
 
 We have received a request to reset the password for your account at Imara TV.
 
-To reset your password, please click on the following link: 
+To reset your password, please click on the following link:
 
 
 @isset($actionText)
@@ -23,10 +23,12 @@ If you did not request this change, please disregard this email.
 
 If you have any concerns or need further assistance, please don't hesitate to contact us at
 
-support@imaratelevision.com
+star@imara.tv
 
-Regards,<br>
-{{ config('app.name') }}
+Warm Regards,<br>
+Imara TV Team
+
+<a href="https://imara.tv">https://imara.tv</a>
 
 
 
