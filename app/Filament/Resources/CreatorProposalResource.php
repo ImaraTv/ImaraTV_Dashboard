@@ -392,16 +392,16 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         'sponsor_id' => auth()->id(),
                         'proposal_id' => $record->id
                     ];
-                    $saved = PotentialSponsor::updateOrCreate($data, $data);
+                    $saved = PotentialSponsor::saveEOI($data, $data);
 
                     if ($saved) {
                         Notification::make()
                             ->success()
-                            ->title('Updated');
+                            ->title('Your Expression of Interest has been submitted');
                     } else {
                         Notification::make()
                             ->warning()
-                            ->title('Failed to update');
+                            ->title('Failed to submit Expression of Interest');
                     }
                     return;
                 })

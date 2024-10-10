@@ -3,6 +3,8 @@ Dear {{$name}},
 
 The film {{$film_name}} has been scheduled for release on {{$release_date}} at Imara TV.
 
-Thanks,<br>
-{{ config('app.name') }}
+Warm Regards,<br>
+Imara TV Team
+
+<a href="https://imara.tv">https://imara.tv</a>
 </x-mail::message>
