@@ -10,3 +10,8 @@
 </a>
 </td>
 </tr>
+<tr>
+<td class="header header-brand">
+{{ config('app.name') }}
+</td>
+</tr>

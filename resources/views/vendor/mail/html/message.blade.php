@@ -2,7 +2,7 @@
 {{-- Header --}}
 <x-slot:header>
 <x-mail::header :url="config('app.url')">
-{{ config('app.name') }}
+<img src="https://studio.imara.tv/images/imara_tv_logo_r.png" class="logo" alt="{{ config('app.name') }} Logo">
 </x-mail::header>
 </x-slot:header>
 

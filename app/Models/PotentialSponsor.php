@@ -39,7 +39,7 @@ class PotentialSponsor extends Model
             $mailToAdmin = new SponsorExpressionOfInterestEmail($model->proposal, $model->sponsor, true);
 
             Mail::to([$model->sponsor->email])->send($mailToSponsor);
-            Mail::to(['support@imara.tv'])->send($mailToAdmin);
+            Mail::to([env('APP_CONTACT_EMAIL')])->send($mailToAdmin);
         }
 
         return $model;
