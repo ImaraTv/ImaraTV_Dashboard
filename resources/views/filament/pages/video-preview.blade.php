@@ -1,6 +1,7 @@
 
 <h3>Preview {{ $video['type'] }} for <b>{{ $video['title'] }}</b></h3>
 <div>
+    @php //dd($video); @endphp
     @if(!empty($video['vimeo_url']))
         @php
             $segments = explode('/', $video['vimeo_url']);

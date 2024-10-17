@@ -49,3 +49,8 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
     ->name('socialite.callback');
 
 Route::get('/create-film-project', \App\Filament\Pages\CreateFilmProject::class)->name('create-film-project');
+
+Route::get('/file-uploader', \App\Filament\Pages\FileUploader::class)->name('file-uploader');
+//Route::get('/file-uploader', [\App\Http\Controllers\UploadController::class, 'create'])->name('file-uploader');
+Route::post('/upload-file', [\App\Http\Controllers\UploadController::class, 'uploadFile'])->name('ajax-file-upload');
+Route::post('/save-file', [\App\Http\Controllers\UploadController::class, 'saveFile'])->name('save-uploaded-file');
