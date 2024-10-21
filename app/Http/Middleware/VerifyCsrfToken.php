@@ -13,5 +13,7 @@ class VerifyCsrfToken extends BaseVerifyCsrfToken
      */
     protected $except = [
         '/upload-file',
+        '/tus',
+        '/tus/*',
     ];
 }
