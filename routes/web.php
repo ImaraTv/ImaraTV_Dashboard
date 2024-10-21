@@ -54,3 +54,7 @@ Route::get('/file-uploader', \App\Filament\Pages\FileUploader::class)->name('fil
 //Route::get('/file-uploader', [\App\Http\Controllers\UploadController::class, 'create'])->name('file-uploader');
 Route::post('/upload-file', [\App\Http\Controllers\UploadController::class, 'uploadFile'])->name('ajax-file-upload');
 Route::post('/save-file', [\App\Http\Controllers\UploadController::class, 'saveFile'])->name('save-uploaded-file');
+
+Route::any('/tus/{any?}', function () {
+    return app('tus-server')->serve();
+})->where('any', '.*');
