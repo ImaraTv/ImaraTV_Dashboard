@@ -8,8 +8,10 @@ use App\Models\FilmGenre;
 use App\Models\FilmTopic;
 use App\Models\RegisterToken;
 use App\Models\User;
+use Filament\Events\Auth\Registered;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -51,6 +53,7 @@ class CreateFilmProject extends SimplePage
     public $role;
     public $name;
     public $email;
+    public $newsletter_consent;
     public $verify_code;
     // the created user instance
     public $user;
@@ -193,7 +196,12 @@ class CreateFilmProject extends SimplePage
                 ->email()
                 ->required()
                 ->maxLength(255)
-                ->unique($this->getUserModel())
+                ->unique($this->getUserModel()),
+            Checkbox::make('newsletter_consent')
+                ->label('I consent to receive Emails from Imara TV')
+                ->required()
+                ->hint('By signing up you agree to receive Emails and Newsletters from Imara TV')
+                ->accepted()
         ];
     }
     protected function verifyEmailSchema(): array {
@@ -226,6 +234,7 @@ class CreateFilmProject extends SimplePage
             'email' => $this->email,
             'password' => Hash::make($password),
             'role' => $this->role,
+            'newsletter_consent' => $this->newsletter_consent,
         ]);
 
         if ($user) {
@@ -267,6 +276,7 @@ class CreateFilmProject extends SimplePage
                 $token_check->verified_at = Carbon::now();
                 $user->email_verified_at = Carbon::now();
                 if ($token_check->update() && $user->update()) {
+                    event(new Registered($user));
                     return true;
                 }
                 else {

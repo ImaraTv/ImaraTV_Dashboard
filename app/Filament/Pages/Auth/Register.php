@@ -4,6 +4,7 @@ namespace App\Filament\Pages\Auth;
 
 use App\Filament\Forms\Components\GoogleRecaptcha;
 use Filament\{
+    Forms\Components\Checkbox,
     Forms\Components\Select,
     Pages\Auth\Register as BaseRegister
 };
@@ -50,10 +51,20 @@ class Register extends BaseRegister
                                     ->required()
                                     ->default($role)
                                     ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor']),
-                                GoogleRecaptcha::make('captcha')
+                                GoogleRecaptcha::make('captcha'),
+                                Checkbox::make('newsletter_consent')
+                                    ->label('')
+                                    ->required()
+                                    ->hint('By signing up you agree to receive Emails and Newsletters from Imara TV')
+                                    ->accepted()
                             ])
                             ->statePath('data'),
             ),
         ];
+    }
+
+    public function beforeRegister(): void
+    {
+
     }
 }

@@ -46,6 +46,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'approved',
         'google_id',
         'email_verified_at',
+        'newsletter_consent',
     ];
 
     /**
