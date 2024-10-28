@@ -3,10 +3,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\{
-    Http\Controllers\Controller,
-    Mail\ContactFormEmail
-};
+use App\{Http\Controllers\Controller, Mail\ContactFormEmail, Mail\NewsletterRegistrationEmail};
 use Illuminate\{
     Http\Request,
     Support\Facades\Mail,
@@ -72,6 +69,9 @@ class SiteController extends Controller
                 "status_if_new" => "subscribed",
             ]);
             if ($response->id) {
+                // send welcome email
+                $mail = new NewsletterRegistrationEmail($email);
+                Mail::to([$email])->send($mail);
                 $collection = collect($response);
                 return response()->json($collection->only(['id', 'email_address', 'unique_email_id', 'contact_id', 'status'])->all());
             }
