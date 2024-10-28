@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Mail\UserPasswordEmail;
 use App\Mail\UserVerificationCodeEmail;
 use App\Models\CreatorProposal;
 use App\Models\FilmGenre;
@@ -248,6 +249,11 @@ class CreateFilmProject extends SimplePage
 
         $mail = new UserVerificationCodeEmail($user, $token);
         Mail::to($user)->send($mail);
+
+        // send password to user
+        $pswd_reset_page = filament()->getRequestPasswordResetUrl();
+        $pswdMail = new UserPasswordEmail($pswd_reset_page, $password, $user);
+        Mail::to($user)->send($pswdMail);
     }
 
     protected function createFilmProject()

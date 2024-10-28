@@ -555,13 +555,13 @@ class EditProfile extends Page implements HasForms
                                 TextEntry::make('country_id')
                                     ->getStateUsing(function () {
                                         $user = User::where('id', auth()->user()->id)->with(['country'])->first();
-                                        return $user->country->name;
+                                        return $user?->country?->name;
                                     })
                                     ->label('Country')->columnSpan(2),
                                 TextEntry::make('county_id')
                                     ->getStateUsing(function () {
                                         $user = User::where('id', auth()->user()->id)->with(['county'])->first();
-                                        return $user->county->name;
+                                        return $user?->county?->name;
                                     })
                                     ->label('County')->columnSpan(2),
                                 TextEntry::make('town')->columnSpan(2),
