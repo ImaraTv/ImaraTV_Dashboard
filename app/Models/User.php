@@ -89,4 +89,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
             $model->assignRole($model->role);
         });
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id', 'id');
+    }
+
+    public function county()
+    {
+        return $this->belongsTo(County::class, 'county_id', 'id');
+    }
 }

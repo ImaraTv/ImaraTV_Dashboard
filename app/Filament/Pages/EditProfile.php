@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\{AdminProfile, CreatorProfile, FilmTopic, Location, SponsorProfile, User};
+use App\Models\{AdminProfile, Country, County, CreatorProfile, FilmTopic, Location, SponsorProfile, User};
 use Filament\{
     Forms\Components\Card,
     Forms\Components\DatePicker,
@@ -131,6 +131,7 @@ class EditProfile extends Page implements HasForms
                 $this->fdata = (new SponsorProfile())->toArray();
             }
 
+            $this->fdata = array_merge(collect(auth()->user())->only('email', 'name', 'country_id', 'county_id', 'town')->toArray(), $this->fdata);
 
             $this->form->fill(
                     $this->fdata
@@ -159,7 +160,7 @@ class EditProfile extends Page implements HasForms
             } else {
                 $this->fdata = (new CreatorProfile())->toArray();
             }
-            $this->fdata = array_merge(collect(auth()->user())->only('email', 'name')->toArray(), $this->fdata);
+            $this->fdata = array_merge(collect(auth()->user())->only('email', 'name', 'country_id', 'county_id', 'town')->toArray(), $this->fdata);
 
             $this->form->fill(
                     $this->fdata
@@ -185,7 +186,7 @@ class EditProfile extends Page implements HasForms
             } else {
                 $this->fdata = (new AdminProfile())->toArray();
             }
-            $this->fdata = array_merge(collect(auth()->user())->only('email', 'name')->toArray(), $this->fdata);
+            $this->fdata = array_merge(collect(auth()->user())->only('email', 'name', 'country_id', 'county_id', 'town')->toArray(), $this->fdata);
             $this->form->fill(
                     $this->fdata
             );
@@ -309,6 +310,16 @@ class EditProfile extends Page implements HasForms
                                     ->columnSpan(3),
                                     TextInput::make('mobile_phone')
                                     ->columnSpan(3),
+                                    Select::make('country_id')
+                                        ->label('Country')
+                                        ->options(Country::all()->pluck('name', 'id'))
+                                        ->columnSpan(1),
+                                    Select::make('county_id')
+                                        ->label('County')
+                                        ->options(County::all()->pluck('name', 'id'))
+                                        ->columnSpan(1),
+                                    TextInput::make('town')
+                                        ->columnSpan(1),
                                     Textarea::make('description')
                                     ->label('About Me')
                                     ->columnSpan(6),
@@ -485,7 +496,17 @@ class EditProfile extends Page implements HasForms
                     ->email()
                     ->columnSpan(2),
                     TextInput::make('mobile_phone')
-                    ->columnSpan(2),
+                        ->columnSpan(2),
+                    Select::make('country_id')
+                        ->label('Country')
+                        ->options(Country::all()->pluck('name', 'id'))
+                        ->columnSpan(2),
+                    Select::make('county_id')
+                        ->label('County')
+                        ->options(County::all()->pluck('name', 'id'))
+                        ->columnSpan(2),
+                    TextInput::make('town')
+                        ->columnSpan(2),
                     Textarea::make('description')
                     ->label('About Me')
                     ->columnSpan(4),
@@ -530,6 +551,20 @@ class EditProfile extends Page implements HasForms
                                 TextEntry::make('name')->columnSpan(2),
                                 TextEntry::make('email')->columnSpan(2),
                                 TextEntry::make('mobile_phone')->columnSpan(2),
+                                TextEntry::make('mobile_phone')->columnSpan(2),
+                                TextEntry::make('country_id')
+                                    ->getStateUsing(function () {
+                                        $user = User::where('id', auth()->user()->id)->with(['country'])->first();
+                                        return $user->country->name;
+                                    })
+                                    ->label('Country')->columnSpan(2),
+                                TextEntry::make('county_id')
+                                    ->getStateUsing(function () {
+                                        $user = User::where('id', auth()->user()->id)->with(['county'])->first();
+                                        return $user->county->name;
+                                    })
+                                    ->label('County')->columnSpan(2),
+                                TextEntry::make('town')->columnSpan(2),
                                 TextEntry::make('stage_name')->columnSpan(2),
                                 TextEntry::make('description')->columnSpan(4),
                                 TextEntry::make('skills_and_talents')->columnSpan(2),
@@ -689,8 +724,13 @@ class EditProfile extends Page implements HasForms
 
     protected function saveSponsorProfile($data): void
     {
-        $profile_data = collect($data)->except('logo')->toArray();
+        $current_user_id = auth()->user()->id;
+        $profile_data = collect($data)->except('logo', 'country_id', 'county_id', 'town')->toArray();
         $model = SponsorProfile::updateOrCreate(['user_id' => auth()->user()->id], $profile_data);
+
+        $user_data = collect($data)->only('country_id', 'county_id', 'town')->toArray();
+        User::where('id', $current_user_id)->update($user_data);
+
         if (!is_null($data['logo'])) {
             $picture_path = storage_path() . '/app/public/' . $data['logo'];
             if (file_exists($picture_path)) {
@@ -703,8 +743,13 @@ class EditProfile extends Page implements HasForms
 
     protected function saveCreatorProfile($data): void
     {
-        $profile_data = collect($data)->except('profile_picture', 'profile_banner')->toArray();
-        $model = creatorProfile::updateOrCreate(['user_id' => auth()->user()->id], $profile_data);
+        $current_user_id = auth()->user()->id;
+        $profile_data = collect($data)->except('profile_picture', 'profile_banner', 'country_id', 'county_id', 'town')->toArray();
+        $model = creatorProfile::updateOrCreate(['user_id' => $current_user_id], $profile_data);
+
+        $user_data = collect($data)->only('country_id', 'county_id', 'town')->toArray();
+        User::where('id', $current_user_id)->update($user_data);
+
         if (!is_null($data['profile_picture'])) {
             $picture_path = storage_path() . '/app/public/' . $data['profile_picture'];
             if (file_exists($picture_path)) {
