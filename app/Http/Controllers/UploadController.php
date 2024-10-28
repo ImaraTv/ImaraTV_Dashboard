@@ -9,24 +9,26 @@ use Monolog\Logger;
 
 class UploadController extends Controller
 {
-    public function create(Request $request)
+    public function create(Request $request, $proposal_id = null, $type = null)
     {
-        return view('uploader');
+        $creatorProposal = null;
+        if ($proposal_id) {
+            $creatorProposal = CreatorProposal::find($proposal_id);
+        }
+        return view('uploader')->with(compact('proposal_id', 'creatorProposal', 'type'));
     }
     public function saveFile(Request $request)
     {
         $form_fields = ['film_project', 'collection', 'path', 'url', 'size', 'name', 'type', 'file_ext'];
         $data = $request->only($form_fields);
         $creatorProposal = CreatorProposal::find($data['film_project']);
-        //dd($data, $creatorProposal);
         $media = $creatorProposal->addMedia($data['path'])->toMediaCollection($data['collection']);
-        //dd($media);
         if ($media) {
             $output = [
                 'success' => true,
                 'msg' => 'File successfully uploaded and attached to ' . $creatorProposal->working_title,
             ];
-            return redirect('file-uploader')->with('upload-success', $output['msg']);
+            return redirect()->back()->with('upload-success', $output['msg']);
         }
 
     }

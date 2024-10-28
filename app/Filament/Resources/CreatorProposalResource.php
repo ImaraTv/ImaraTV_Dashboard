@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\{Exports\FilmProjectsExport,
+    Filament\Pages\FileUploader,
     Filament\Resources\CreatorProposalResource\Pages,
     Models\CreatorProfile,
     Models\CreatorProposal,
@@ -25,6 +26,7 @@ use Filament\{Forms\Components\Card,
     Infolists\Components\Grid,
     Infolists\Components\RepeatableEntry,
     Infolists\Components\TextEntry,
+    Navigation\NavigationItem,
     Notifications\Notification,
     Resources\Resource,
     Support\Enums\ActionSize,
@@ -182,27 +184,28 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                                 ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
                                 ->columnSpan(4)->nullable(),
 //                                --
-                                SpatieMediaLibraryFileUpload::make('trailer_upload')
+                                SpatieMediaLibraryFileUpload::make('poster_upload')
+                                    ->label('Poster')
+                                    ->collection('posters')
+                                    ->acceptedFileTypes(['image/*'])
+                                    ->maxSize(100000)
+                                    ->columnSpan(4)->nullable(),
+//                                --
+                                /*SpatieMediaLibraryFileUpload::make('trailer_upload')
                                 ->label('Trailer')
                                 ->collection('trailers')
                                 ->acceptedFileTypes(['video/x-msvideo', 'video/mpeg', 'video/mp4'])
                                 ->maxSize(config('media-library.max_file_size'))
-                                ->columnSpan(4)->nullable(),
+                                ->columnSpan(4)->nullable(),*/
 //                                --
-                                SpatieMediaLibraryFileUpload::make('poster_upload')
-                                ->label('Poster')
-                                ->collection('posters')
-                                ->acceptedFileTypes(['image/*'])
-                                ->maxSize(100000)
-                                ->columnSpan(4)->nullable(),
-//                                --
-                                SpatieMediaLibraryFileUpload::make('hd_fil_upload')
+
+                                /*SpatieMediaLibraryFileUpload::make('hd_fil_upload')
                                 ->previewable(false)
                                 ->label('HD file upload')
                                 ->collection('videos')
                                 ->acceptedFileTypes(['video/x-msvideo', 'video/mpeg', 'video/mp4'])
                                 ->maxSize(config('media-library.max_file_size'))
-                                ->columnSpan(4)->nullable(),
+                                ->columnSpan(4)->nullable(),*/
 //                                --
                                 Select::make('sponsored_by')
                                 ->hidden(function ($record) {
@@ -412,6 +415,18 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             ActionGroup::make([
                 Tables\Actions\EditAction::make()
                     ->label('Update Project'),
+                Tables\Actions\Action::make('upload-hd-video')
+                    ->label('Upload HD Video')
+                    ->icon('heroicon-m-arrow-up-tray')
+                    ->url(function ($record) {
+                        return Pages\UploadCreatorProposalHDVideo::getUrl([$record]);
+                    }),
+                Tables\Actions\Action::make('upload-trailer-video')
+                    ->label('Upload Trailer')
+                    ->icon('heroicon-m-arrow-up-tray')
+                    ->url(function ($record) {
+                        return Pages\UploadCreatorProposalTrailer::getUrl([$record]);
+                    }),
                 Tables\Actions\ViewAction::make()
                     ->infolist([
                         Grid::make([
@@ -557,6 +572,24 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             'index' => Pages\ListCreatorProposals::route('/'),
             'create' => Pages\CreateCreatorProposal::route('/create'),
             'edit' => Pages\EditCreatorProposal::route('/{record}/edit'),
+            'manage-videos' => Pages\EditCreatorProposalVideos::route('/{record}/manage-videos'),
+            'upload-hd-video' => Pages\UploadCreatorProposalHDVideo::route('/{record}/upload-video'),
+            'upload-trailer' => Pages\UploadCreatorProposalTrailer::route('/{record}/upload-trailer'),
         ];
+    }
+
+    public static function getRecordSubNavigation(\Filament\Resources\Pages\Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\EditCreatorProposal::class,
+            //Pages\EditCreatorProposalVideos::class,
+            Pages\UploadCreatorProposalHDVideo::class,
+            Pages\UploadCreatorProposalTrailer::class,
+        ]);
+    }
+
+    public function getSubNavigationParameters(): array
+    {
+        return [];
     }
 }
