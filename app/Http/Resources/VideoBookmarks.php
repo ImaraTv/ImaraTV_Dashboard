@@ -11,7 +11,6 @@ use Illuminate\Http\{
 class VideoBookmarks extends ResourceCollection
 {
 
-    
     /**
      * Transform the resource into an array.
      *
@@ -27,8 +26,6 @@ class VideoBookmarks extends ResourceCollection
                 'videos' => (new \App\Http\Resources\VideosResource([$video]))
             ];
         });
-        return $collection
-                
-                ->toArray();
+        return $collection->toArray();
     }
 }

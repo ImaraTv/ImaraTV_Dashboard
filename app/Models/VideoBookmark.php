@@ -18,7 +18,7 @@ class VideoBookmark extends Model
     protected $guarded = [];
 
 
-    public function videos()
+    public function video()
     {
         return $this->belongsTo(PublishingSchedule::class, 'video_id');
     }
