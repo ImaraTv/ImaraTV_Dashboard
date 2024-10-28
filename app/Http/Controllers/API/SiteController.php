@@ -3,10 +3,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\{
-    Http\Controllers\Controller,
-    Mail\ContactFormEmail
-};
+use App\{Http\Controllers\Controller,
+    Mail\ContactFormEmail,
+    Mail\NewsletterRegistrationEmail,
+    Services\NewsletterService};
 use Illuminate\{
     Http\Request,
     Support\Facades\Mail,
@@ -55,22 +55,9 @@ class SiteController extends Controller
                 return response()->json(['error' => $validator->errors()], 422);
             }
             $email = $request->input('email');
-            $listId = env('MAILCHIMP_LIST_ID');
-            $apiKey = env('MAILCHIMP_API_KEY');
-            $apiKeyParts = explode('-', $apiKey);
-            $serverPrefix = array_pop($apiKeyParts);
-            $email_hash = md5($email);
 
-            $client = new ApiClient();
-            $client->setConfig([
-                'apiKey' => $apiKey,
-                'server' => $serverPrefix,
-            ]);
+            $response = NewsletterService::subscribe($email);
 
-            $response = $client->lists->setListMember($listId, $email_hash, [
-                "email_address" => $email,
-                "status_if_new" => "subscribed",
-            ]);
             if ($response->id) {
                 $collection = collect($response);
                 return response()->json($collection->only(['id', 'email_address', 'unique_email_id', 'contact_id', 'status'])->all());
@@ -95,23 +82,9 @@ class SiteController extends Controller
                 return response()->json(['error' => $validator->errors()], 422);
             }
             $email = $request->input('email');
-            $listId = env('MAILCHIMP_LIST_ID');
-            $apiKey = env('MAILCHIMP_API_KEY');
-            $apiKeyParts = explode('-', $apiKey);
-            $serverPrefix = array_pop($apiKeyParts);
-            $email_hash = md5($email);
 
-            $client = new ApiClient();
-            $client->setConfig([
-                'apiKey' => $apiKey,
-                'server' => $serverPrefix,
-            ]);
+            $response = NewsletterService::unsubscribe($email);
 
-            $response = $client->lists->setListMember($listId, $email_hash, [
-                "email_address" => $email,
-                "status_if_new" => "unsubscribed",
-                'status' => 'unsubscribed'
-            ]);
             if ($response->id) {
                 $collection = collect($response);
                 return response()->json($collection->only(['id', 'email_address', 'unique_email_id', 'contact_id', 'status'])->all());

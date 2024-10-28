@@ -68,14 +68,14 @@ class AuthController extends Controller
 
         $user = User::where(['email' => $request->email])->first();
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'User does not exist'], 401);
         }
         if (is_null($user->email_verified_at)) {
             return response()->json(['message' => 'user is not verified', 'error' => 'Unverified'], 401);
         }
 
         if (!$token = auth('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Email and Password do not match'], 401);
         }
 
         event(new LoginEvent($user));

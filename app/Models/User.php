@@ -46,6 +46,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'approved',
         'google_id',
         'email_verified_at',
+        'newsletter_consent',
     ];
 
     /**
@@ -87,5 +88,15 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         static::created(function ($model) {
             $model->assignRole($model->role);
         });
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id', 'id');
+    }
+
+    public function county()
+    {
+        return $this->belongsTo(County::class, 'county_id', 'id');
     }
 }

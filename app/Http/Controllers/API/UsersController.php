@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\{
-    Http\Controllers\Controller,
+use App\{Http\Controllers\Controller,
     Http\Resources\VideoBookmarks,
+    Http\Resources\VideosResource,
     Models\FilmRating,
     Models\PublishingSchedule,
-    Models\VideoBookmark
-};
+    Models\VideoBookmark};
 use Illuminate\{
     Http\Request,
     Support\Facades\Validator
@@ -62,10 +61,13 @@ class UsersController extends Controller
         return response()->json(['status' => 'error', 'message' => 'failed to update bookmark']);
     }
 
-    public function videoBookmarks(Request $request): VideoBookmarks
+    public function videoBookmarks(Request $request): VideosResource
     {
-        $videos = VideoBookmark::where(['user_id' => auth('api')->id()])->paginate(10);
-
-        return (new VideoBookmarks($videos));
+        $user = auth('api')->user();
+        $bookmarks = VideoBookmark::where(['user_id' => $user->id])->get()->pluck('video_id')->toArray();
+        $videos = PublishingSchedule::with(['proposal', 'creator', 'sponsor', 'proposal.genre'])
+            ->whereIn('id', $bookmarks);
+        $videos = $videos->paginate(20);
+        return new VideosResource($videos);
     }
 }
