@@ -411,15 +411,9 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                 ->button()
                 ->visible(fn() => $admins_and_sponsors),
             Action::make('potentialSponsors')
-                ->infolist([
-                    RepeatableEntry::make('potential_sponsors')
-                        ->schema([
-                            TextEntry::make('sponsor.organization_name')->label('Organization'),
-                            TextEntry::make('sponsor.contact_person_name')->label('Contact Person Name'),
-                            TextEntry::make('sponsor.contact_person_email')->label('Contact Person Email')
-                        ])
-                        ->grid(2)
-                ])
+                ->url(function ($record) {
+                    return Pages\ListCreatorProposalEOI::getUrl([$record]);
+                })
                 ->label('Potential Sponsors')
                 ->visible(fn() => $admins_only),
             Action::make('selectForFunding')

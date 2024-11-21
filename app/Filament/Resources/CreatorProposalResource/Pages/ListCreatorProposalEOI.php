@@ -58,6 +58,7 @@ class ListCreatorProposalEOI extends ListRecords
         $query->orderBy('id', 'desc');
         return $table
             ->query($query)
+            ->emptyStateHeading('No Potential Sponsors have Expressed Interest in this Film Project')
             ->columns([
                 TextColumn::make('film_project')
                     ->name('proposal.working_title')
