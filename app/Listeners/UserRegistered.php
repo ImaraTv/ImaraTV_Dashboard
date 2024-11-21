@@ -26,6 +26,7 @@ class UserRegistered
         if ($user->newsletter_consent) {
             NewsletterService::sendWelcomeEmail($user->email);
         }
+        //TODO: send email to admin when new sponsor or creator is registered
 
     }
 }

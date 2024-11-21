@@ -49,6 +49,7 @@ Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback']
     ->name('socialite.callback');
 
 Route::get('/create-film-project', \App\Filament\Pages\CreateFilmProject::class)->name('create-film-project');
+Route::get('/onboard-sponsor', \App\Filament\Pages\SponsorOnboarding::class)->name('onboard-sponsor');
 
 Route::get('/file-uploader', \App\Filament\Pages\FileUploader::class)->name('file-uploader');
 //Route::get('/file-uploader', [\App\Http\Controllers\UploadController::class, 'create'])->name('file-uploader');

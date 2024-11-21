@@ -24,6 +24,10 @@ class PotentialSponsor extends Model
     {
          return $this->belongsTo(User::class, 'sponsor_id', 'id');
     }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'creator_id', 'id');
+    }
 
     public function proposal()
     {
