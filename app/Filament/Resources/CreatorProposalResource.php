@@ -515,6 +515,15 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->label('Assign Sponsor')
                     ->icon('heroicon-o-user-plus'),
+                Action::make('publishFilm')
+                    ->url(function ($record) {
+                        return \App\Filament\Resources\PublishingScheduleResource\Pages\CreatePublishingSchedule::getUrl(['proposal_id' => $record]);
+                    })
+                    ->visible(function (CreatorProposal $record) use ($admins_only) {
+                        return $admins_only;
+                    })
+                    ->label('Publish Film')
+                    ->icon('heroicon-m-clock'),
                 Tables\Actions\ViewAction::make()
                     ->label('View Details')
                     ->infolist([
