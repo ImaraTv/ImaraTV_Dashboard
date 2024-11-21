@@ -21,6 +21,8 @@ class UploadVideoToVimeo implements ShouldQueue
         Queueable,
         SerializesModels;
 
+    public $timeout = 3600;
+
     const MEDIA_HD_VIDEO = 'videos';
     const MEDIA_TRAILER_VIDEO = 'trailers';
 
