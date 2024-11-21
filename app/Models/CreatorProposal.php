@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
+use App\Mail\ProposalAssignedEmail;
 use App\Mail\VimeoUploadComplete;
 use App\Mail\VimeoUploadFail;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
-use Illuminate\Database\Eloquent\{
-    Factories\HasFactory,
-    Model,
-    SoftDeletes
-};
+use Illuminate\Database\Eloquent\{Builder, Factories\HasFactory, Model, Relations\HasOneThrough, SoftDeletes};
 use Spatie\MediaLibrary\{
     HasMedia,
     InteractsWithMedia
@@ -45,6 +42,15 @@ class CreatorProposal extends Model implements HasMedia
     {
         return $this->belongsTo(SponsorProfile::class, 'sponsored_by', 'user_id');
     }
+    public function sponsorProfile()
+    {
+        return $this->belongsTo(SponsorProfile::class, 'sponsored_by', 'user_id');
+    }
+
+    public function sponsorUser()
+    {
+        return $this->belongsTo(User::class, 'sponsored_by', 'id');
+    }
 
     public function proposal_status()
     {
@@ -59,6 +65,24 @@ class CreatorProposal extends Model implements HasMedia
     public function assigned_creator()
     {
        return $this->belongsTo(CreatorProfile::class, 'creator_id', 'user_id');
+    }
+
+    public function creatorUser()
+    {
+        return $this->belongsTo(User::class, 'creator_id', 'id');
+    }
+
+    /**
+     * Scope a query to only include unpublished.
+     */
+    public function scopeUnpublished(Builder $query): void
+    {
+        $query->where('is_published', 0)->orWhereNull('is_published');
+    }
+
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('is_published', 1);
     }
 
     public static function getVimeoVideoDetails(string $url): array
@@ -108,5 +132,31 @@ class CreatorProposal extends Model implements HasMedia
         $model = CreatorProposal::where($proposal->id)->first();
         $mail = new VimeoUploadFail($model, $video_title, $failure_message);
         Mail::to(['support@imara.tv', env('APP_CONTACT_EMAIL')])->send($mail);
+    }
+
+    public function assignCreator(int $creator_id)
+    {
+        $this->creator_id = $creator_id;
+        $saved = $this->save();
+        if ($saved) {
+            $this->refresh();
+            // notify creator
+            $user = $this->creatorUser;
+            Mail::to($user)->send(new ProposalAssignedEmail($user, $this, 'Creator'));
+        }
+        return $saved;
+    }
+
+    public function assignSponsor(int $sponsored_by)
+    {
+        $this->sponsored_by = $sponsored_by;
+        $saved = $this->save();
+        if ($saved) {
+            $this->refresh();
+            // notify sponsor
+            $user = $this->sponsorUser;
+            Mail::to($user)->send(new ProposalAssignedEmail($user, $this, 'Sponsor'));
+        }
+        return $saved;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Listeners;
 
+use App\Models\User;
+use App\Services\AdminService;
 use Filament\Events\Auth\Registered;
 use App\Services\NewsletterService;
 
@@ -21,10 +23,15 @@ class UserRegistered
      */
     public function handle(Registered $event): void
     {
+        /* @var $user User */
         $user = $event->getUser();
 
         if ($user->newsletter_consent) {
             NewsletterService::sendWelcomeEmail($user->email);
+        }
+        //send email to admin when new sponsor or creator is registered
+        if ($user->hasRole(['creator', 'sponsor'])) {
+            AdminService::notifyAdminsofNewRegistration($user);
         }
 
     }

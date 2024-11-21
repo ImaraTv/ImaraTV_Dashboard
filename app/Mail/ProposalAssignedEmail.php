@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Filament\Resources\PublishingScheduleResource;
-use App\Models\PublishingSchedule;
+use App\Filament\Resources\CreatorProposalResource;
+use App\Models\CreatorProposal;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,14 +12,14 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class FilmScheduleCreatedEmail extends Mailable
+class ProposalAssignedEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user, public PublishingSchedule $film)
+    public function __construct(public User $user, public CreatorProposal $proposal, public string $role)
     {
         //
     }
@@ -30,7 +30,7 @@ class FilmScheduleCreatedEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Film Schedule Created at Imara TV',
+            subject: 'Film Project has been Assigned to You at Imara TV',
         );
     }
 
@@ -40,15 +40,14 @@ class FilmScheduleCreatedEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.film-schedule-created',
+            markdown: 'emails.proposal.assigned',
             with:
             [
                 'level' => 'success',
-                'user_type' => $this->user->role,
                 'name' => $this->user->name,
-                'film_name' => $this->film->film_title,
-                'release_date' => $this->film->release_date,
-                'link' => PublishingScheduleResource::getUrl()
+                'proposal_title' => $this->proposal->working_title,
+                'role' => $this->role,
+                'link' => CreatorProposalResource::getUrl(),
             ],
         );
     }

@@ -5,18 +5,18 @@ namespace App\Filament\Resources;
 use Carbon\Carbon;
 use App\{Exports\Users, Filament\Resources\UserResource\Pages, Mail\UserApprovalEmail, Models\User};
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
-use Filament\{
-    Forms,
+use Filament\{Forms,
     Forms\Components\DatePicker,
     Forms\Form,
+    Notifications\Notification,
     Resources\Pages\CreateRecord,
     Resources\Pages\Page,
     Resources\Resource,
     Tables,
+    Tables\Columns\CheckboxColumn,
     Tables\Enums\FiltersLayout,
     Tables\Filters\Filter,
-    Tables\Table
-};
+    Tables\Table};
 use Illuminate\{Database\Eloquent\Builder, Database\Eloquent\Model, Support\Facades\Hash, Support\Facades\Mail};
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
@@ -84,7 +84,7 @@ class UserResource extends Resource implements HasShieldPermissions
                                 Forms\Components\TextInput::make('email')
                                 ->label('Email Address')
                                 ->email()
-                                ->unique(column: 'email')
+                                ->unique(column: 'email', ignoreRecord: true)
                                 ->required(),
                                 Forms\Components\TextInput::make('password')
                                 ->password()
@@ -151,6 +151,19 @@ class UserResource extends Resource implements HasShieldPermissions
                                         $record->save();
                                     }
                                 }),
+                            CheckboxColumn::make('newsletter_consent')
+                                ->label('Newsletter Consent')
+                                ->disabled(function (Model $record) {
+                                    return true;
+                                }),
+                            Tables\Columns\ToggleColumn::make('receive_admin_emails')
+                                ->label('Receive Admin Emails')
+                                ->disabled(function (Model $record) {
+                                    if (!$record->hasRole(['admin', 'super_admin'])) {
+                                        return true;
+                                    }
+                                    return false;
+                                }),
                         ])
                         ->filters([
                             Tables\Filters\SelectFilter::make('role')
@@ -187,6 +200,7 @@ class UserResource extends Resource implements HasShieldPermissions
                         ->filtersFormColumns(3)
                         ->actions([
                             Tables\Actions\EditAction::make(),
+                            Tables\Actions\ViewAction::make(),
                         ])
                         ->bulkActions([
                             Tables\Actions\BulkActionGroup::make([
@@ -208,6 +222,7 @@ class UserResource extends Resource implements HasShieldPermissions
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\ViewUser::route('/{record}/view'),
         ];
     }
 

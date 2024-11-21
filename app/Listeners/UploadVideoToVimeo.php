@@ -2,11 +2,11 @@
 
 namespace App\Listeners;
 
+use Illuminate\Support\Facades\Log;
 use App\{
     Jobs\UploadVideoToVimeo as UploadVidJob,
     Models\CreatorProposal
 };
-use Log;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 use function dispatch;
 use function logger;

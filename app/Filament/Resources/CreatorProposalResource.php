@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\{Exports\FilmProjectsExport,
     Filament\Pages\FileUploader,
     Filament\Resources\CreatorProposalResource\Pages,
+    Jobs\UploadVideoToVimeo,
     Models\CreatorProfile,
     Models\CreatorProposal,
     Models\FilmGenre,
@@ -77,6 +78,18 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             'assign_sponsor',
             'assign_creator'
         ];
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        if (auth()->user()->hasRole('creator')) {
+            return 'Film Projects';
+        }
+        if (auth()->user()->hasRole('sponsor')) {
+            return 'Creator Proposals';
+        }
+
+        return 'Film Projects';
     }
 
     #[\Override]
@@ -295,9 +308,29 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         return false;
     }
 
+    public static function infolistSchema()
+    {
+        return [
+            TextEntry::make('working_title')->color('gray'),
+            TextEntry::make('topics')->label('Topics')->color('gray')->default('--'),
+            TextEntry::make('synopsis')->label('Synopsis')->color('gray')->columnSpanFull()->default('--'),
+            TextEntry::make('film_type')->label('Film Type')->color('gray')->default('--'),
+            TextEntry::make('film_rating')->label('Film Rating')->color('gray')->default('--'),
+            TextEntry::make('film_budget')->label('Film Budget (KES)')->color('gray')->default('--'),
+            TextEntry::make('film_length')->label('Film Length (Minutes)')->color('gray')->default('--'),
+            TextEntry::make('production_time')->label('Production Time (Days)')->color('gray')->default('--'),
+            TextEntry::make('user.name')->label('Created By')->color('gray')->default('--'),
+            TextEntry::make('sponsorUser.name')->label('Sponsor User')->color('gray')->default('--'),
+            TextEntry::make('sponsor.organization_name')->label('Sponsor Organization')->color('gray')->default('--'),
+            TextEntry::make('genre.genre_name')->label('Genre')->color('gray')->default('--'),
+            TextEntry::make('proposal_status.status')->label('Status')->color('gray')->default('--')
+        ];
+    }
+
     public static function tableActions()
     {
         $admins_only = auth()->user()->hasRole(['admin', 'super_admin']);
+        $admins_and_sponsors = auth()->user()->hasRole(['admin', 'super_admin', 'sponsor']);
 
         return [
             ActionGroup::make([
@@ -376,17 +409,11 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                 ->size(ActionSize::Small)
                 ->color('primary')
                 ->button()
-                ->visible(fn() => $admins_only),
+                ->visible(fn() => $admins_and_sponsors),
             Action::make('potentialSponsors')
-                ->infolist([
-                    RepeatableEntry::make('potential_sponsors')
-                        ->schema([
-                            TextEntry::make('sponsor.organization_name')->label('Organization'),
-                            TextEntry::make('sponsor.contact_person_name')->label('Contact Person Name'),
-                            TextEntry::make('sponsor.contact_person_email')->label('Contact Person Email')
-                        ])
-                        ->grid(2)
-                ])
+                ->url(function ($record) {
+                    return Pages\ListCreatorProposalEOI::getUrl([$record]);
+                })
                 ->label('Potential Sponsors')
                 ->visible(fn() => $admins_only),
             Action::make('selectForFunding')
@@ -420,41 +447,129 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     ->icon('heroicon-m-arrow-up-tray')
                     ->url(function ($record) {
                         return Pages\UploadCreatorProposalHDVideo::getUrl([$record]);
-                    }),
+                    })->visible(fn() => $admins_only),
                 Tables\Actions\Action::make('upload-trailer-video')
                     ->label('Upload Trailer')
                     ->icon('heroicon-m-arrow-up-tray')
                     ->url(function ($record) {
                         return Pages\UploadCreatorProposalTrailer::getUrl([$record]);
+                    })->visible(fn() => $admins_only),
+                Tables\Actions\Action::make('upload_hd_to_vimeo')
+                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
+                    ->requiresConfirmation(function (CreatorProposal $record) {
+                        return $record->vimeo_link != null;
+                    })
+                    ->icon('heroicon-m-cloud-arrow-up')
+                    ->label('Upload HD Video to Vimeo')
+                    ->modalHeading('Overwrite Video')
+                    ->modalDescription('This Film has a HD Video on vimeo. Do you want ot overwrite it?')
+                    ->action(function (CreatorProposal $record): void {
+                        UploadVideoToVimeo::dispatch($record, 'videos');
+
+                        Notification::make()
+                            ->title('upload has been queued')
+                            ->success()
+                            ->send();
                     }),
+                Tables\Actions\Action::make('upload_trailer_to_vimeo')
+                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
+                    ->requiresConfirmation(function (CreatorProposal $record) {
+                        $proposal = $record;
+                        /* @var $media Media */
+                        $media = $proposal->getMedia('trailers')->last();
+                        $vimeo_link = $media?->getCustomProperty('vimeo_link');
+                        return !empty($vimeo_link);
+                    })
+                    ->icon('heroicon-m-cloud-arrow-up')
+                    ->label('Upload Trailer to Vimeo')
+                    ->modalHeading('Overwrite Trailer')
+                    ->modalDescription('This Film has a trailer on vimeo. Do you want ot overwrite it?')
+                    ->action(function (CreatorProposal $record): void {
+                        UploadVideoToVimeo::dispatch($record, 'trailers');
+
+                        Notification::make()
+                            ->title('upload has been queued')
+                            ->success()
+                            ->send();
+                    }),
+                Action::make('assignCreator')
+                    ->fillForm(fn (CreatorProposal $record): array => [
+                        'creator_id' => $record->creator_id,
+                    ])
+                    ->form([
+                        Select::make('creator_id')
+                            ->label('Creator')
+                            ->options(CreatorProfile::all()->pluck('name', 'user_id'))
+                            ->required(),
+                    ])
+                    ->action(function (array $data, CreatorProposal $record) {
+                        $assigned = $record->assignCreator($data['creator_id']);
+
+                        if ($assigned) {
+                            Notification::make()
+                                ->success()
+                                ->title('Creator has been assigned to this Film Proposal');
+                        } else {
+                            Notification::make()
+                                ->warning()
+                                ->title('Failed to assign Creator');
+                        }
+                    })
+                    ->visible(function (CreatorProposal $record) use ($admins_only) {
+                        return $admins_only && $record->creator_id == null;
+                    })
+                    ->label('Assign Creator')
+                    ->icon('heroicon-m-user-plus'),
+                Action::make('assignSponsor')
+                    ->fillForm(fn (CreatorProposal $record): array => [
+                        'sponsored_by' => $record->sponsored_by,
+                    ])
+                    ->form([
+                        Select::make('sponsored_by')
+                            ->label('Sponsor')
+                            ->options(SponsorProfile::all()->pluck('organization_name', 'user_id'))
+                            ->required(),
+                    ])
+                    ->action(function (array $data, CreatorProposal $record) {
+                        $assigned = $record->assignSponsor($data['sponsored_by']);
+
+                        if ($assigned) {
+                            Notification::make()
+                                ->success()
+                                ->title('Sponsor has been assigned to this Film Proposal');
+                        } else {
+                            Notification::make()
+                                ->warning()
+                                ->title('Failed to assign Sponsor');
+                        }
+                    })
+                    ->visible(function (CreatorProposal $record) use ($admins_only) {
+                        return $admins_only && $record->sponsored_by == null;
+                    })
+                    ->label('Assign Sponsor')
+                    ->icon('heroicon-o-user-plus'),
+                Action::make('publishFilm')
+                    ->url(function ($record) {
+                        return \App\Filament\Resources\PublishingScheduleResource\Pages\CreatePublishingSchedule::getUrl(['proposal_id' => $record]);
+                    })
+                    ->visible(function (CreatorProposal $record) use ($admins_only) {
+                        return $admins_only && !$record->is_published;
+                    })
+                    ->label('Publish Film')
+                    ->icon('heroicon-m-clock'),
                 Tables\Actions\ViewAction::make()
+                    ->label('View Details')
                     ->infolist([
                         Grid::make([
                             'default' => 2
                         ])
-                            ->schema([
-                                TextEntry::make('working_title'),
-                                TextEntry::make('topics')
-                                    ->label('Topics'),
-                                TextEntry::make('synopsis')
-                                    ->columnSpanFull()
-                                    ->label('Synopsis'),
-                                TextEntry::make('film_budget')
-                                    ->label('Film Budget'),
-                                TextEntry::make('user.name')
-                                    ->label('Created By'),
-                                TextEntry::make('sponsor.organization_name')
-                                    ->label('Sponsor'),
-                                TextEntry::make('genre.genre_name')
-                                    ->label('Genre'),
-                                TextEntry::make('proposal_status.status')
-                                    ->label('Status')
-                            ])
+                        ->schema(static::infolistSchema())
                     ])
                     ->fillForm(function ($record) {
                         return collect($record)->toArray();
                     }),
                 Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation()
                     ->visible(auth()->user()->can('delete_creator::proposal'))
             ])
             ->label('Actions')
@@ -478,8 +593,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
         }
         if (auth()->user()->hasRole('sponsor')) {
             $query = $query->where(function ($q) {
-                $q->where('sponsored_by', auth()->id())
-                        ->orWhereNull('sponsored_by');
+                $q->whereNull('sponsored_by');
             });
         }
 
@@ -533,23 +647,27 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->query($query)
                         ->columns([
                             TextColumn::make('working_title')
-                            ->label('Working Title'),
+                                ->label('Working Title'),
                             TextColumn::make('user.name')
-                            ->label('Created By')
-                            ->name('user.name'),
-                            TextColumn::make('sponsor')
-                            ->name('sponsor.organization_name'),
+                                ->label('Created By')
+                                ->name('user.name'),
+                            TextColumn::make('sponsor_user')
+                                ->name('sponsorUser.name')
+                                ->label('Sponsor User Name'),
+                            TextColumn::make('sponsor_orgname')
+                                ->name('sponsor.organization_name')
+                                ->label('Sponsor Org Name'),
                             TextColumn::make('assigned_creator')
-                            ->label('Assigned Creator')
-                            ->name('assigned_creator.name'),
+                                ->label('Assigned Creator')
+                                ->name('assigned_creator.name'),
                             TextColumn::make('genre')
-                            ->name('genre.genre_name'),
+                                ->name('genre.genre_name'),
                             TextColumn::make('status')
-                            ->label('Proposal Status')
-                            ->name('proposal_status.status'),
+                                ->label('Proposal Status')
+                                ->name('proposal_status.status'),
                             TextColumn::make('created_at')
-                            ->label('Date Created')
-                            ->date()
+                                ->label('Date Created')
+                                ->date()
                         ])
                         ->actions(static::tableActions())
                         ->bulkActions([
@@ -575,6 +693,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             'manage-videos' => Pages\EditCreatorProposalVideos::route('/{record}/manage-videos'),
             'upload-hd-video' => Pages\UploadCreatorProposalHDVideo::route('/{record}/upload-video'),
             'upload-trailer' => Pages\UploadCreatorProposalTrailer::route('/{record}/upload-trailer'),
+            'list-eoi' => Pages\ListCreatorProposalEOI::route('/{record}/list-eoi'),
         ];
     }
 
@@ -585,6 +704,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
             //Pages\EditCreatorProposalVideos::class,
             Pages\UploadCreatorProposalHDVideo::class,
             Pages\UploadCreatorProposalTrailer::class,
+            Pages\ListCreatorProposalEOI::class,
         ]);
     }
 

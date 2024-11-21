@@ -11,12 +11,11 @@ use Filament\{
     Models\Contracts\FilamentUser,
     Panel
 };
-use Illuminate\{
-    Contracts\Auth\MustVerifyEmail,
+use Illuminate\{Contracts\Auth\MustVerifyEmail,
+    Database\Eloquent\Builder,
     Database\Eloquent\Factories\HasFactory,
     Foundation\Auth\User as Authenticatable,
-    Notifications\Notifiable
-};
+    Notifications\Notifiable};
 use Spatie\{
     MediaLibrary\HasMedia,
     MediaLibrary\InteractsWithMedia,
@@ -47,6 +46,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'google_id',
         'email_verified_at',
         'newsletter_consent',
+        'receive_admin_emails'
     ];
 
     /**
@@ -99,4 +99,20 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
     {
         return $this->belongsTo(County::class, 'county_id', 'id');
     }
+
+    public function scopeAdmins(Builder $query): void
+    {
+        $this->scopeRole($query, ['super_admin']);
+    }
+    public function scopeApproved(Builder $query): void
+    {
+        $query->where('approved', 1);
+    }
+
+    public function canReceiveAdminEmails(): bool
+    {
+        return $this->hasRole(['admin', 'super_admin']) && $this->receive_admin_emails;
+    }
+
+
 }
