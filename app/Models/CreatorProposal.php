@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Mail\ProposalAssignedEmail;
 use App\Mail\VimeoUploadComplete;
 use App\Mail\VimeoUploadFail;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
@@ -64,6 +65,11 @@ class CreatorProposal extends Model implements HasMedia
     public function assigned_creator()
     {
        return $this->belongsTo(CreatorProfile::class, 'creator_id', 'user_id');
+    }
+
+    public function creatorUser()
+    {
+        return $this->belongsTo(User::class, 'creator_id', 'id');
     }
 
     /**
@@ -133,7 +139,10 @@ class CreatorProposal extends Model implements HasMedia
         $this->creator_id = $creator_id;
         $saved = $this->save();
         if ($saved) {
+            $this->refresh();
             // notify creator
+            $user = $this->creatorUser;
+            Mail::to($user)->send(new ProposalAssignedEmail($user, $this, 'Creator'));
         }
         return $saved;
     }
@@ -143,7 +152,10 @@ class CreatorProposal extends Model implements HasMedia
         $this->sponsored_by = $sponsored_by;
         $saved = $this->save();
         if ($saved) {
+            $this->refresh();
             // notify sponsor
+            $user = $this->sponsorUser;
+            Mail::to($user)->send(new ProposalAssignedEmail($user, $this, 'Sponsor'));
         }
         return $saved;
     }
