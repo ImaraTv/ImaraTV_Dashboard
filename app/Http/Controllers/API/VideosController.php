@@ -20,6 +20,7 @@ class VideosController extends Controller
         $search = $request->has('search') ? $request->get('search') : '';
         $filter = $request->has('filter') ? $request->get('filter') : '';
         $category = $request->has('category') ? $request->get('category') : '';
+        $genre = $request->has('genre') ? $request->get('genre') : '';
         $rating = $request->has('rating') ? $request->get('rating') : '';
         $sponsor_id = $request->has('sponsor_id') ? $request->get('sponsor_id') : '';
         $creator_id = $request->has('creator_id') ? $request->get('creator_id') : '';
@@ -55,9 +56,15 @@ class VideosController extends Controller
             });
         }
 
+        // replaced category with genre
         if ($category != '') {
             $videos = $videos->whereHas('proposal.genre', function ($q) use ($category) {
                 $q->where('genre_name', '=', $category);
+            });
+        }
+        if ($genre != '') {
+            $videos = $videos->whereHas('proposal.genre', function ($q) use ($genre) {
+                $q->where('genre_name', '=', $genre);
             });
         }
         if ($topic != '') {
