@@ -29,9 +29,13 @@ class UserRegistered
         if ($user->newsletter_consent) {
             NewsletterService::sendWelcomeEmail($user->email);
         }
-        //send email to admin when new sponsor or creator is registered
+
         if ($user->hasRole(['creator', 'sponsor'])) {
+            // send email to admin when new sponsor or creator is registered
             AdminService::notifyAdminsofNewRegistration($user);
+
+            // create profile record
+            $user->createUserProfile();
         }
 
     }
