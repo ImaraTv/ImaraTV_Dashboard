@@ -114,5 +114,31 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         return $this->hasRole(['admin', 'super_admin']) && $this->receive_admin_emails;
     }
 
+    public function createUserProfile()
+    {
+        if ($this->hasRole(['creator'])) {
+            $profile_data = [
+                'name' => $this->name,
+                'email' => $this->email,
+            ];
+            $profile = CreatorProfile::where('user_id', $this->id)->first();
+            if (!$profile) {
+                $model = CreatorProfile::updateOrCreate(['user_id' => $this->id], $profile_data);
+            }
+        }
 
+        if ($this->hasRole(['sponsor'])) {
+            $profile_data = [
+                'organization_name' => $this->name,
+                'contact_person_name' => $this->name,
+                'contact_person_email' => $this->email,
+            ];
+            $profile = SponsorProfile::where('user_id', $this->id)->first();
+            if (!$profile) {
+                $model = SponsorProfile::updateOrCreate(['user_id' => $this->id], $profile_data);
+            }
+        }
+
+        return $this;
+    }
 }
