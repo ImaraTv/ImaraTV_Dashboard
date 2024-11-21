@@ -57,7 +57,7 @@ class SuperAdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $panel->sidebarWidth('20rem')
+        $panel->sidebarWidth('18rem')
             ->sidebarCollapsibleOnDesktop();
         $panel->maxContentWidth(MaxWidth::Full);
 

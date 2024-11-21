@@ -51,7 +51,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
 {
     use InteractsWithForms;
 
-    public array $data = [];
+    //public array $data = [];
 
     protected static ?string $model = PublishingSchedule::class;
 
@@ -122,7 +122,6 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
 
         return $form
                         ->disabled(!auth()->user()->can('update_publishing::schedule'))
-                        ->fill($film_project_data)
                         ->schema([
                             Card::make()->schema([
                                 Select::make('proposal_id')
@@ -143,7 +142,7 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                                         $set('premium_film_price', $film_project->premium_film_price);
                                     })
                                     ->label('Select Film')
-                                    ->options(CreatorProposal::all()->pluck('working_title', 'id'))
+                                    ->options(CreatorProposal::unpublished()->get()->pluck('working_title', 'id'))
                                     ->columnSpan(5)
                                     ->required(),
 //                            --
@@ -242,46 +241,6 @@ class PublishingScheduleResource extends Resource implements HasShieldPermission
                         $data = $schedule->toArray();
 
                         return $data;
-                    }),
-                Tables\Actions\Action::make('upload_hd_to_vimeo')
-                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
-                    ->requiresConfirmation(function (PublishingSchedule $schedule) {
-                        return $schedule->proposal->vimeo_link != null;
-                    })
-                    ->icon('heroicon-m-arrow-up-tray')
-                    ->label('Upload HD Video to Vimeo')
-                    ->modalHeading('Overwrite Video')
-                    ->modalDescription('This schedule has a HD Video on vimeo. Do you want ot overwrite it?')
-                    ->action(function (PublishingSchedule $schedule): void {
-                        //$job = (new UploadVideoToVimeo($schedule->proposal));
-                        //dispatch_sync($job);
-                        UploadVideoToVimeo::dispatch($schedule->proposal, 'videos');
-
-                        Notification::make()
-                            ->title('upload has been queued')
-                            ->success()
-                            ->send();
-                    }),
-                Tables\Actions\Action::make('upload_trailer_to_vimeo')
-                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
-                    ->requiresConfirmation(function (PublishingSchedule $schedule) {
-                        $proposal = $schedule->proposal;
-                        /* @var $media Media */
-                        $media = $proposal->getMedia('trailers')->last();
-                        $vimeo_link = $media?->getCustomProperty('vimeo_link');
-                        return !empty($vimeo_link);
-                    })
-                    ->icon('heroicon-m-arrow-up-tray')
-                    ->label('Upload Trailer to Vimeo')
-                    ->modalHeading('Overwrite Trailer')
-                    ->modalDescription('This schedule has a trailer on vimeo. Do you want ot overwrite it?')
-                    ->action(function (PublishingSchedule $schedule): void {
-                        UploadVideoToVimeo::dispatch($schedule->proposal, 'trailers');
-
-                        Notification::make()
-                            ->title('upload has been queued')
-                            ->success()
-                            ->send();
                     }),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),

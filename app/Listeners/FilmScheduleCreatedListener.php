@@ -22,7 +22,6 @@ class FilmScheduleCreatedListener
     public function handle(FilmScheduleCreatedEvent $event): void
     {
         $film_schedule = $event->getPublishingSchedule();
-        //TODO: send email to Sponsor and Creator
 
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Filament\Resources\PublishingScheduleResource;
 use App\Models\PublishingSchedule;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -47,6 +48,7 @@ class FilmScheduleCreatedEmail extends Mailable
                 'name' => $this->user->name,
                 'film_name' => $this->film->film_title,
                 'release_date' => $this->film->release_date,
+                'link' => PublishingScheduleResource::getUrl()
             ],
         );
     }

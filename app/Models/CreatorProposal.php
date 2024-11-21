@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Mail\VimeoUploadComplete;
 use App\Mail\VimeoUploadFail;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
-use Illuminate\Database\Eloquent\{Factories\HasFactory, Model, Relations\HasOneThrough, SoftDeletes};
+use Illuminate\Database\Eloquent\{Builder, Factories\HasFactory, Model, Relations\HasOneThrough, SoftDeletes};
 use Spatie\MediaLibrary\{
     HasMedia,
     InteractsWithMedia
@@ -64,6 +64,19 @@ class CreatorProposal extends Model implements HasMedia
     public function assigned_creator()
     {
        return $this->belongsTo(CreatorProfile::class, 'creator_id', 'user_id');
+    }
+
+    /**
+     * Scope a query to only include unpublished.
+     */
+    public function scopeUnpublished(Builder $query): void
+    {
+        $query->where('is_published', 0)->orWhereNull('is_published');
+    }
+
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('is_published', 1);
     }
 
     public static function getVimeoVideoDetails(string $url): array

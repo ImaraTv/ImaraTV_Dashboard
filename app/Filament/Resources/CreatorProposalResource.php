@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\{Exports\FilmProjectsExport,
     Filament\Pages\FileUploader,
     Filament\Resources\CreatorProposalResource\Pages,
+    Jobs\UploadVideoToVimeo,
     Models\CreatorProfile,
     Models\CreatorProposal,
     Models\FilmGenre,
@@ -459,6 +460,44 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     ->url(function ($record) {
                         return Pages\UploadCreatorProposalTrailer::getUrl([$record]);
                     })->visible(fn() => $admins_only),
+                Tables\Actions\Action::make('upload_hd_to_vimeo')
+                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
+                    ->requiresConfirmation(function (CreatorProposal $record) {
+                        return $record->vimeo_link != null;
+                    })
+                    ->icon('heroicon-m-cloud-arrow-up')
+                    ->label('Upload HD Video to Vimeo')
+                    ->modalHeading('Overwrite Video')
+                    ->modalDescription('This Film has a HD Video on vimeo. Do you want ot overwrite it?')
+                    ->action(function (CreatorProposal $record): void {
+                        UploadVideoToVimeo::dispatch($record, 'videos');
+
+                        Notification::make()
+                            ->title('upload has been queued')
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\Action::make('upload_trailer_to_vimeo')
+                    ->visible(auth()->user()->can('upload_to_vimeo_publishing::schedule'))
+                    ->requiresConfirmation(function (CreatorProposal $record) {
+                        $proposal = $record;
+                        /* @var $media Media */
+                        $media = $proposal->getMedia('trailers')->last();
+                        $vimeo_link = $media?->getCustomProperty('vimeo_link');
+                        return !empty($vimeo_link);
+                    })
+                    ->icon('heroicon-m-cloud-arrow-up')
+                    ->label('Upload Trailer to Vimeo')
+                    ->modalHeading('Overwrite Trailer')
+                    ->modalDescription('This Film has a trailer on vimeo. Do you want ot overwrite it?')
+                    ->action(function (CreatorProposal $record): void {
+                        UploadVideoToVimeo::dispatch($record, 'trailers');
+
+                        Notification::make()
+                            ->title('upload has been queued')
+                            ->success()
+                            ->send();
+                    }),
                 Action::make('assignCreator')
                     ->fillForm(fn (CreatorProposal $record): array => [
                         'creator_id' => $record->creator_id,
@@ -520,7 +559,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         return \App\Filament\Resources\PublishingScheduleResource\Pages\CreatePublishingSchedule::getUrl(['proposal_id' => $record]);
                     })
                     ->visible(function (CreatorProposal $record) use ($admins_only) {
-                        return $admins_only;
+                        return $admins_only && !$record->is_published;
                     })
                     ->label('Publish Film')
                     ->icon('heroicon-m-clock'),
