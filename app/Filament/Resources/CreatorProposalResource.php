@@ -41,6 +41,7 @@ use Filament\{Forms\Components\Card,
     Tables\Table};
 use Illuminate\Database\Eloquent\{Builder, Model};
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use function auth;
@@ -368,6 +369,30 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false),
+                Action::make('downloadHDVideo')
+                    ->label('Download HD Video')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->requiresConfirmation()
+                    ->action(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('videos')->last();
+                        return response()->download($item->getPath(), $item->file_name);
+                    })
+                    ->visible(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('videos')->last();
+                        return !is_null($item) && File::exists($item->getPath());
+                    }),
+                Action::make('downloadTrailer')
+                    ->label('Download Trailer')
+                    ->icon('heroicon-m-arrow-down-tray')
+                    ->requiresConfirmation()
+                    ->action(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('trailers')->last();
+                        return response()->download($item->getPath(), $item->file_name);
+                    })
+                    ->visible(function (CreatorProposal $proposal) {
+                        $item = $proposal->getMedia('trailers')->last();
+                        return !is_null($item) && File::exists($item->getPath());
+                    }),
                 Action::make('downloadScript')
                     ->label('Download Script')
                     ->icon('heroicon-m-arrow-down-tray')
