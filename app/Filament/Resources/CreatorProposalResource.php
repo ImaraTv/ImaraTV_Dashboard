@@ -374,24 +374,44 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     ->icon('heroicon-m-arrow-down-tray')
                     ->requiresConfirmation()
                     ->action(function (CreatorProposal $proposal) {
-                        $item = $proposal->getMedia('videos')->last();
-                        return response()->download($item->getPath(), $item->file_name);
+                        $media = $proposal->getMedia('videos')->last();
+                        $vimeo_link = $media?->getCustomProperty('vimeo_link');
+                        $video_details = CreatorProposal::getVimeoVideoDetails($vimeo_link);
+                        $download_links = $video_details['original_data']['download'];
+                        $sizes = [];
+                        foreach ($download_links as $k => $link) {
+                            $sizes[$k] = $link['size'];
+                        }
+                        arsort($sizes);
+                        $largest = array_key_first($sizes);
+                        $to_download = $download_links[$largest];
+                        return response()->redirectTo($to_download['link']);
                     })
                     ->visible(function (CreatorProposal $proposal) {
-                        $item = $proposal->getMedia('videos')->last();
-                        return !is_null($item) && File::exists($item->getPath());
+                        $media = $proposal->getMedia('videos')->last();
+                        return !is_null($media) && !empty($media->getCustomProperty('vimeo_link'));
                     }),
                 Action::make('downloadTrailer')
                     ->label('Download Trailer')
                     ->icon('heroicon-m-arrow-down-tray')
                     ->requiresConfirmation()
                     ->action(function (CreatorProposal $proposal) {
-                        $item = $proposal->getMedia('trailers')->last();
-                        return response()->download($item->getPath(), $item->file_name);
+                        $media = $proposal->getMedia('trailers')->last();
+                        $vimeo_link = $media?->getCustomProperty('vimeo_link');
+                        $video_details = CreatorProposal::getVimeoVideoDetails($vimeo_link);
+                        $download_links = $video_details['original_data']['download'];
+                        $sizes = [];
+                        foreach ($download_links as $k => $link) {
+                            $sizes[$k] = $link['size'];
+                        }
+                        arsort($sizes);
+                        $largest = array_key_first($sizes);
+                        $to_download = $download_links[$largest];
+                        return response()->redirectTo($to_download['link']);
                     })
                     ->visible(function (CreatorProposal $proposal) {
-                        $item = $proposal->getMedia('trailers')->last();
-                        return !is_null($item) && File::exists($item->getPath());
+                        $media = $proposal->getMedia('trailers')->last();
+                        return !is_null($media) && !empty($media->getCustomProperty('vimeo_link'));
                     }),
                 Action::make('downloadScript')
                     ->label('Download Script')

@@ -104,8 +104,8 @@ class CreatorProposal extends Model implements HasMedia
         ));
         $context = stream_context_create($options);
 
-        $hash = json_decode(file_get_contents("https://api.vimeo.com/videos/{$video_id}", false, $context));
-
+        $video = file_get_contents("https://api.vimeo.com/videos/{$video_id}", false, $context);
+        $hash = json_decode($video);
         return array(
             'provider' => 'Vimeo',
             'video_id' => $video_id,
@@ -116,7 +116,8 @@ class CreatorProposal extends Model implements HasMedia
             'video' => $hash->link,
             //'embed_video' => "https://player.vimeo.com/video/" . $video_id,
             'embed_video' => empty($video_h) ? "https://player.vimeo.com/video/" . $video_id : "https://player.vimeo.com/video/" . $video_id . '?h=' . $video_h,
-            'duration' => gmdate("H:i:s", $hash->duration)
+            'duration' => gmdate("H:i:s", $hash->duration),
+            'original_data' => json_decode($video, true),
         );
 
     }
