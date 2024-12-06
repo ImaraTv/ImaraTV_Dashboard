@@ -20,6 +20,19 @@ class Event extends Model implements HasMedia
 
     protected $guarded = [];
 
+    public function sponsor()
+    {
+        return $this->belongsTo(SponsorProfile::class, 'sponsored_by', 'user_id');
+    }
+    public function sponsorProfile()
+    {
+        return $this->belongsTo(SponsorProfile::class, 'sponsored_by', 'user_id');
+    }
+    public function sponsorUser()
+    {
+        return $this->belongsTo(User::class, 'sponsored_by', 'id');
+    }
+
     public static function statusOptions(): array
     {
         return [

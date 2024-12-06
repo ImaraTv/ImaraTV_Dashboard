@@ -3,11 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EventResource\Pages;
+use App\Models\CreatorProposal;
 use App\Models\Event;
+use App\Models\SponsorProfile;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\ActionSize;
@@ -40,6 +44,7 @@ class EventResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(3)
             ->schema([
                 Forms\Components\TextInput::make('title')
                     ->required()
@@ -49,16 +54,38 @@ class EventResource extends Resource
                     ->required()
                     ->columnSpan(1)
                     ->options(Event::statusOptions()),
+                Forms\Components\TextInput::make('link')
+                    ->maxLength(255)->hint('Link to Twitter, Facebook, Zoom, Google Meet etc'),
                 Forms\Components\Textarea::make('description')
                     ->columnSpanFull(),
+                Select::make('sponsored_by')
+                    ->label('Sponsored By')
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, ?int $state) {
+                        $profile = SponsorProfile::where('user_id', $state)->first();
+                        if (!$profile) {
+                            return null;
+                        }
+
+                        $set('cta_text', $profile->default_cta_text);
+                        $set('cta_link', $profile->default_cta_link);
+                    })
+                    ->options(
+                        SponsorProfile::all()->pluck('organization_name', 'user_id')
+                    )->columnSpan(1)->nullable(),
+                Forms\Components\TextInput::make('cta_text')
+                    ->label('Call to Action Text')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('cta_link')
+                    ->label('Call to Action Link')
+                    ->maxLength(255),
                 SpatieMediaLibraryFileUpload::make('poster')
                     ->label('Event Poster')
                     ->collection('event_posters')
                     ->acceptedFileTypes(['image/*'])
                     ->maxSize(100000)
                     ->columnSpan(1)->nullable(),
-                Forms\Components\TextInput::make('link')
-                    ->maxLength(255)->hint('Link to Twitter, Facebook, Zoom, Google Meet etc'),
+
                 Forms\Components\DateTimePicker::make('start_date')
                     ->label('Start Date and Time')
                     ->required(),

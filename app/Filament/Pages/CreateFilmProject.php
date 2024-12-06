@@ -258,6 +258,14 @@ class CreateFilmProject extends SimplePage
 
     protected function createFilmProject()
     {
+        $creator_id = null;
+        $sponsored_by = null;
+        if ($this->role == 'creator') {
+            $creator_id = $this->user->id;
+        }
+        if ($this->role == 'sponsor') {
+            $sponsored_by = $this->user->id;
+        }
         return CreatorProposal::create([
             'working_title' => $this->working_title,
             'synopsis' => $this->synopsis,
@@ -267,6 +275,8 @@ class CreateFilmProject extends SimplePage
             'film_genre' => $this->film_genre,
             'topics' => collect($this->topics)->implode(','),
             'user_id' => $this->user->id,
+            'creator_id' => $creator_id,
+            'sponsored_by' => $sponsored_by,
         ]);
     }
 
