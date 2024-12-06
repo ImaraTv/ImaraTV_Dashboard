@@ -25,6 +25,14 @@ class EventsResource extends \Illuminate\Http\Resources\Json\ResourceCollection
                 'start_date' => $item->start_date,
                 'end_date' => $item->end_date,
                 'poster' => $item->getMedia('event_posters')->last()?->getFullUrl(),
+                'cta_text' => $item->cta_text ?? $item->sponsor?->default_cta_text,
+                'cta_link' => $item->cta_link ?? $item->sponsor?->default_cta_link,
+                'sponsor' => [
+                    'name' => $item->sponsor?->organization_name,
+                    'about' => $item->sponsor?->about_us,
+                    'website' => $item->sponsor?->organization_website,
+                    'logo' => $item->sponsor?->getMedia('logo')->first()?->getFullUrl(),
+                ],
             ];
         });
         return [
