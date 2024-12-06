@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('events', function (Blueprint $table) {
             $table->integer('sponsored_by')->after('status')->nullable();
-            $table->string('cta_text', 255)->after('sponsor_id')->nullable();
+            $table->string('cta_text', 255)->after('sponsored_by')->nullable();
             $table->string('cta_link', 255)->after('cta_text')->nullable();
         });
     }
