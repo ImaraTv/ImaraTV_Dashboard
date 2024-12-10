@@ -15,7 +15,6 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -114,7 +113,7 @@ class CreateFilmProject extends SimplePage
                                 ]),
                         ]) ->afterValidation(function() {
                         }),
-                ])
+                ])->skippable()
                     //->persistStepInQueryString()
                     ->nextAction(function (Action $action) {
                     })
@@ -183,6 +182,22 @@ class CreateFilmProject extends SimplePage
 
     protected function userInfoSchema(): array {
         return [
+            TextInput::make('email')
+                ->label(__('filament-panels::pages/auth/register.form.email.label'))
+                ->email()
+                ->required()
+                ->live()
+                ->maxLength(255)
+                ->afterStateUpdated(function (?string $state) {
+                    $user = $this->checkUserEmail();
+                    if ($user) {
+                        $this->user = $user;
+                        $this->role = $user->role;
+                        $this->name = $user->name;
+                    }
+                })
+                //->unique($this->getUserModel())
+            ,
             Select::make('role')
                 ->label('I am a')
                 ->required()
@@ -192,12 +207,6 @@ class CreateFilmProject extends SimplePage
                 ->required()
                 ->maxLength(255)
                 ->autofocus(),
-            TextInput::make('email')
-                ->label(__('filament-panels::pages/auth/register.form.email.label'))
-                ->email()
-                ->required()
-                ->maxLength(255)
-                ->unique($this->getUserModel()),
             Checkbox::make('newsletter_consent')
                 ->label('I consent to receive Emails from Imara TV')
                 ->required()
@@ -225,6 +234,13 @@ class CreateFilmProject extends SimplePage
         $provider = $authGuard->getProvider();
 
         return $provider->getModel();
+    }
+
+    protected function checkUserEmail()
+    {
+        $user = User::where(['email' => $this->email])->first();
+        $this->user = $user;
+        return $user;
     }
 
     protected function createUser()
