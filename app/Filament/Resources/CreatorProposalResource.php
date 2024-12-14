@@ -375,7 +375,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     ->requiresConfirmation()
                     ->action(function (CreatorProposal $proposal) {
                         $media = $proposal->getMedia('videos')->last();
-                        $vimeo_link = $media?->getCustomProperty('vimeo_link');
+                        $vimeo_link = $media?->getCustomProperty('vimeo_link') ?? $proposal->vimeo_link;
                         $video_details = CreatorProposal::getVimeoVideoDetails($vimeo_link);
                         $download_links = $video_details['original_data']['download'];
                         $sizes = [];
@@ -389,7 +389,8 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->visible(function (CreatorProposal $proposal) {
                         $media = $proposal->getMedia('videos')->last();
-                        return !is_null($media) && !empty($media->getCustomProperty('vimeo_link'));
+                        $has_video = !empty($proposal->vimeo_link) || !empty($media->getCustomProperty('vimeo_link'));
+                        return $has_video;
                     }),
                 Action::make('downloadTrailer')
                     ->label('Download Trailer')
