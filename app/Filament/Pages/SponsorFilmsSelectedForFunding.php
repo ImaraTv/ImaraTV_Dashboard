@@ -45,7 +45,8 @@ class SponsorFilmsSelectedForFunding extends Page implements HasTable
             ->get()->pluck('proposal_id')->toArray();
 
         $query = CreatorProposal::query()->with(['sponsor', 'sponsorUser', 'genre', 'creator', 'assigned_creator']);
-        $query = $query->whereIn('id', $proposal_ids);
+        $query = $query->whereIn('id', $proposal_ids)
+                ->whereNull('sponsored_by');
 
         $query->orderBy('id', 'desc');
 

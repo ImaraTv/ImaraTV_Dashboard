@@ -692,7 +692,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                         ->query($query)
                         ->columns([
                             TextColumn::make('working_title')
-                                ->label('Working Title'),
+                                ->label('Working Title')->searchable(),
                             TextColumn::make('user.name')
                                 ->label('Created By')
                                 ->name('user.name'),
