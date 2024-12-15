@@ -9,16 +9,22 @@ use App\Models\FilmGenre;
 use App\Models\FilmTopic;
 use App\Models\RegisterToken;
 use App\Models\User;
+use Closure;
 use Filament\Events\Auth\Registered;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\CanUseDatabaseTransactions;
 use Filament\Pages\Concerns\InteractsWithFormActions;
@@ -54,6 +60,9 @@ class CreateFilmProject extends SimplePage
     public $role;
     public $name;
     public $email;
+    public $is_new_email = 0;
+    public $password;
+    public $show_password = false;
     public $newsletter_consent;
     public $verify_code;
     // the created user instance
@@ -81,17 +90,36 @@ class CreateFilmProject extends SimplePage
                             //
                         }),
                     Wizard\Step::make('My Information')
-                        ->description('Enter your details')
+                        ->description('Enter your email')
                         ->schema($this->userInfoSchema())
+                        ->beforeValidation(function(Component $component) use ($form) {
+                            //
+                        })
                         ->afterValidation(function() {
-                            // save user details and send email
-                            $this->createUser();
+                            //
+                        }),
+                    Wizard\Step::make('Login/Signup')
+                        ->description('Enter your details')
+                        ->schema($this->signupSchema())
+                        ->beforeValidation(function(Component $component) use ($form) {
+                            //
+                        })
+                        ->afterValidation(function() {
+                            if ($this->is_new_email) {
+                                $this->createUser();
+                            }
+                            else {
+                                $this->loginUser();
+                                $this->createFilmProject();
+                            }
                         }),
                     Wizard\Step::make('Verify Email')
+                        ->visible(function() {
+                            return $this->is_new_email;
+                        })
                         ->schema($this->verifyEmailSchema())
                         ->afterValidation(function() {
                             if(!$this->doVerifyCode()) {
-                                // TODO: show validation message
                                 Notification::make()
                                     ->title('Verification Code is incorrect')
                                     ->body('The code you have entered is either wrong or has been used already. Try to resend the code.')
@@ -183,26 +211,86 @@ class CreateFilmProject extends SimplePage
 
     protected function userInfoSchema(): array {
         return [
-            Select::make('role')
-                ->label('I am a')
-                ->required()
-                ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor']),
-            TextInput::make('name')
-                ->label(__('filament-panels::pages/auth/register.form.name.label'))
-                ->required()
-                ->maxLength(255)
-                ->autofocus(),
             TextInput::make('email')
                 ->label(__('filament-panels::pages/auth/register.form.email.label'))
                 ->email()
                 ->required()
+                ->live()
                 ->maxLength(255)
-                ->unique($this->getUserModel()),
+                ->afterStateUpdated(function (Set $set, ?string $state) {
+                    $user = $this->checkUserEmail();
+                    if ($user) {
+                        $this->is_new_email = 0;
+                        $this->show_password = true;
+                        $this->user = $user;
+                        $this->role = $user->role;
+                        $this->name = $user->name;
+                    }
+                    else {
+                        $this->is_new_email = 1;
+                    }
+                })
+                //->unique($this->getUserModel())
+            ,
+        ];
+    }
+
+    protected function signupSchema(): array {
+        return [
+            Hidden::make('is_new_email')->default($this->is_new_email)->live(),
+            Placeholder::make('login')
+                ->content('Enter your password to login to your account')
+                ->visible(function (Get $get) {
+                    return !$get('is_new_email') && $this->show_password;
+                }),
+            TextInput::make('password')
+                ->label(__('filament-panels::pages/auth/login.form.password.label'))
+                ->hint(filament()->hasPasswordReset() ? new HtmlString(Blade::render('<x-filament::link :href="filament()->getRequestPasswordResetUrl()" tabindex="3"> {{ __(\'filament-panels::pages/auth/login.actions.request_password_reset.label\') }}</x-filament::link>')) : null)
+                ->password()
+                ->revealable(filament()->arePasswordsRevealable())
+                ->autocomplete('current-password')
+                ->required()
+                ->extraInputAttributes(['tabindex' => 2])
+                ->hidden(function (Get $get) {
+                    return $get('is_new_email') && !$this->show_password;
+                })
+                ->visible(function (Get $get) {
+                    return !$get('is_new_email') && $this->show_password;
+                })
+                ->rules([
+                    fn (): Closure => function (string $attribute, $value, Closure $fail) {
+                        if (!$this->checkEmailAndPassword($this->email, $value)) {
+                            $fail('Email and password does not match. Try again');
+                        }
+                    },
+                ])
+                ->afterStateUpdated(function (HasForms $livewire, TextInput $component) {
+                    $livewire->validateOnly($component->getStatePath());
+                })
+            ,
+            Select::make('role')
+                ->label('I am a')
+                ->required()
+                ->options(['creator' => 'Creator', 'sponsor' => 'Sponsor'])
+                ->hidden(function (Get $get) {
+                    return !$get('is_new_email');
+                }),
+            TextInput::make('name')
+                ->label(__('filament-panels::pages/auth/register.form.name.label'))
+                ->required()
+                ->maxLength(255)
+                ->autofocus()
+                ->hidden(function (Get $get) {
+                    return !$get('is_new_email');
+                }),
             Checkbox::make('newsletter_consent')
                 ->label('I consent to receive Emails from Imara TV')
                 ->required()
                 ->hint('By signing up you agree to receive Emails and Newsletters from Imara TV')
                 ->accepted()
+                ->hidden(function (Get $get) {
+                    return !$get('is_new_email');
+                }),
         ];
     }
     protected function verifyEmailSchema(): array {
@@ -225,6 +313,27 @@ class CreateFilmProject extends SimplePage
         $provider = $authGuard->getProvider();
 
         return $provider->getModel();
+    }
+
+    protected function checkUserEmail()
+    {
+        $user = User::where(['email' => $this->email])->first();
+        $this->user = $user;
+        return $user;
+    }
+
+    protected function checkEmailAndPassword($email, $password)
+    {
+        return auth('web')->attempt(['email' => $email, 'password' => $password]);
+    }
+
+    protected function loginUser()
+    {
+        if ($this->checkEmailAndPassword($this->email, $this->password)) {
+            Filament::auth()->login($this->user, true);
+            return true;
+        }
+        return false;
     }
 
     protected function createUser()
