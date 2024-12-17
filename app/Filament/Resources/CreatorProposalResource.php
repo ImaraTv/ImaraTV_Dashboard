@@ -389,7 +389,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->visible(function (CreatorProposal $proposal) {
                         $media = $proposal->getMedia('videos')->last();
-                        return !is_null($media) && !empty($media->getCustomProperty('vimeo_link'));
+                        return !is_null($media) && !empty($media?->getCustomProperty('vimeo_link'));
                     }),
                 Action::make('downloadTrailer')
                     ->label('Download Trailer')
@@ -411,7 +411,7 @@ class CreatorProposalResource extends Resource implements HasShieldPermissions
                     })
                     ->visible(function (CreatorProposal $proposal) {
                         $media = $proposal->getMedia('trailers')->last();
-                        return !is_null($media) && !empty($media->getCustomProperty('vimeo_link'));
+                        return !is_null($media) && !empty($media?->getCustomProperty('vimeo_link'));
                     }),
                 Action::make('downloadScript')
                     ->label('Download Script')
