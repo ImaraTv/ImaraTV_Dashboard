@@ -33,6 +33,7 @@ use Filament\Forms\Components\Wizard;
 use Filament\Support\Enums\IconSize;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
@@ -67,6 +68,15 @@ class CreateFilmProject extends SimplePage
     public $verify_code;
     // the created user instance
     public $user;
+
+    public function getHeading(): string | Htmlable
+    {
+        $register_url = filament()->getRegistrationUrl();
+        $html = '<h1 class="fi-simple-header-heading text-center text-2xl font-bold tracking-tight text-gray-950 dark:text-white"><span>Create Film Project</a> </span></h1>';
+        $html .= '<p class="fi-simple-header-subheading mt-2 text-center text-sm text-gray-500 dark:text-gray-400">or</p>';
+        $html .= '<h1 class="text-center text-2xl font-bold"><a class="font-medium text-blue-600 dark:text-blue-600 hover:underline" href="'. $register_url .'"><span>Proceed to Signup</span> </a> </h1>';
+        return new HtmlString($html);
+    }
 
     protected function getFormActions(): array
     {
