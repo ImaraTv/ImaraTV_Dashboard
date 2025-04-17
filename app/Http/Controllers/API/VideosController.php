@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\{
-    Http\Controllers\Controller,
+use App\{Http\Controllers\Controller,
+    Http\Resources\UpcomingVideosResource,
     Http\Resources\VideosResource,
-    Models\PublishingSchedule
-};
+    Models\PublishingSchedule};
 use Illuminate\{
     Database\Eloquent\Builder,
     Http\Request,
@@ -161,11 +160,16 @@ class VideosController extends Controller
 
     public function upcoming(Request $request)
     {
-        $videos = $this->videosFilter($request, true);
-        $limit = $request->has('limit') ? $request->get('limit', 20) : 20;
-        $videos = $videos->orderBy('release_date', 'asc');
-        $videos = $videos->paginate($limit);
+        //$videos = $this->videosFilter($request, true);
+        //$limit = $request->has('limit') ? $request->get('limit', 20) : 20;
+        //$videos = $videos->orderBy('release_date', 'asc');
+        //$videos = $videos->paginate($limit);
 
-        return new VideosResource($videos);
+        ## spread films on the current month calendar
+        $videos = $this->videosFilter($request, false);
+        $videos = $videos->orderBy('release_date', 'asc');
+        $videos = $videos->paginate(1000);
+
+        return new UpcomingVideosResource($videos);
     }
 }
